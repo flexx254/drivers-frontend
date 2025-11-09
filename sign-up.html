@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>D4D — Driver Signup</title>
+  <style>
+    /* Black & white clean theme */
+    :root{
+      --bg:#0b0b0b;
+      --card:#ffffff;
+      --text:#111;
+      --muted:#666;
+      --accent:#000;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    .wrap{max-width:820px;margin:40px auto;padding:28px;background:var(--card);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+    h1{margin:0 0 8px;font-size:22px;color:var(--text)}
+    p.lead{margin:0 0 18px;color:var(--muted)}
+    label{display:block;margin-top:12px;font-weight:600;color:var(--text)}
+    input[type="text"], input[type="password"], input[type="date"], select {width:100%;padding:10px;margin-top:6px;border:1px solid #ddd;border-radius:6px;font-size:15px}
+    input[type="file"]{margin-top:8px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .note{font-size:13px;color:var(--muted);margin-top:8px}
+    .checklist{margin-top:10px;padding:0;list-style:none;display:grid;gap:6px}
+    .checklist li{padding:8px;border-radius:6px;background:#f3f3f3;color:#222}
+    .valid{background:#e6ffe6}
+    .invalid{background:#fff6f6}
+    .actions{display:flex;gap:12px;align-items:center;margin-top:14px}
+    button{background:var(--accent);color:var(--card);padding:12px 16px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
+    button[disabled]{opacity:.45;cursor:not-allowed}
+    .preview{display:flex;gap:10px;margin-top:10px;align-items:center}
+    .preview img{height:80px;width:120px;object-fit:cover;border-radius:6px;border:1px solid #ddd}
+    .flash{margin-top:12px;padding:10px;border-radius:6px}
+    .flash.success{background:#e6ffed;color:#064e2f}
+    .flash.error{background:#ffecec;color:#6a0000}
+    @media (max-width:700px){ .row{grid-template-columns:1fr} .preview img{height:60px;width:100px} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>D4D — Driver Registration</h1>
+    <p class="lead">Register to get verified. Only non-sensitive info is shown publicly.</p>
+
+    <div id="response"></div>
+
+    <form id="signupForm" enctype="multipart/form-data" novalidate>
+      <label>Full name
+        <input id="full_name" name="full_name" required placeholder="John Mwangi" />
+      </label>
+
+      <div class="row">
+        <label>Phone
+          <input id="phone" name="phone" required placeholder="+2547XXXXXXXX" />
+        </label>
+
+        <label>Sacco
+          <select id="sacco" name="sacco" required>
+            <option value="">-- choose --</option>
+            <option value="OOD">OOD</option>
+            <option value="UOD">UOD</option>
+            <option value="NONE">None (Independent)</option>
+          </select>
+        </label>
+      </div>
+
+      <label>Vehicle type
+        <select id="vehicle_type" name="vehicle_type">
+          <option value="">Select</option>
+          <option value="taxi">Taxi</option>
+          <option value="matatu">Matatu</option>
+          <option value="boda">Boda</option>
+          <option value="delivery">Delivery</option>
+          <option value="tuktuk">TukTuk</option>
+        </select>
+      </label>
+
+      <div class="row">
+        <label>Car plate (any format) 
+          <input id="car_plate" name="car_plate" required placeholder="k c b 123 t" />
+        </label>
+
+        <label>PSV expiry
+          <input id="psv_expiry" name="psv_expiry" type="date" required />
+        </label>
+      </div>
+
+      <label>Profile photo (jpg/png)
+        <input id="profile_photo" name="profile_photo" type="file" accept="image/*" required />
+      </label>
+
+      <div class="preview" id="profilePreview" aria-hidden="true"></div>
+
+      <label>PSV badge (jpg/png)
+        <input id="psv_badge" name="psv_badge" type="file" accept="image/*" required />
+      </label>
+
+      <div class="preview" id="badgePreview" aria-hidden="true"></div>
+
+      <label>Password
+        <input id="password" name="password" type="password" required placeholder="Create a strong password" />
+      </label>
+
+      <ul class="checklist" id="pwdChecklist" aria-live="polite">
+        <li id="len" class="invalid">Minimum <strong>8 characters</strong></li>
+        <li id="lower" class="invalid">Contains a <strong>lowercase</strong> letter</li>
+        <li id="upper" class="invalid">Contains an <strong>uppercase</strong> letter</li>
+        <li id="digit" class="invalid">Contains a <strong>digit</strong></li>
+        <li id="special" class="invalid">Contains a <strong>special</strong> character (e.g. !@#$%)</li>
+      </ul>
+
+      <label style="margin-top:12px">
+        <input id="consent" type="checkbox" name="consent" required /> I consent to D4D collecting my information for driver verification.
+      </label>
+
+      <div class="actions">
+        <button id="submitBtn" type="submit" disabled>Register</button>
+        <div class="note">Phone must be <strong>+2547XXXXXXXX</strong>. Plate will be normalized to uppercase without spaces.</div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // ---------- helpers ----------
+    const phoneInput = document.getElementById('phone');
+    const pwd = document.getElementById('password');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('signupForm');
+    const profilePhoto = document.getElementById('profile_photo');
+    const psvBadge = document.getElementById('psv_badge');
+    const profilePreview = document.getElementById('profilePreview');
+    const badgePreview = document.getElementById('badgePreview');
+    const responseDiv = document.getElementById('response');
+
+    const checks = {
+      len: v => v.length >= 8,
+      lower: v => /[a-z]/.test(v),
+      upper: v => /[A-Z]/.test(v),
+      digit: v => /[0-9]/.test(v),
+      special: v => /[!@#$%^&*(),.?":{}|<>]/.test(v)
+    };
+
+    function updateChecklist(v){
+      let ok = true;
+      Object.keys(checks).forEach(id => {
+        const el = document.getElementById(id);
+        if (checks[id](v)) { el.classList.remove('invalid'); el.classList.add('valid'); }
+        else { el.classList.remove('valid'); el.classList.add('invalid'); ok = false; }
+      });
+      submitBtn.disabled = !ok;
+    }
+
+    pwd.addEventListener('input', e => updateChecklist(e.target.value));
+    window.addEventListener('load', () => updateChecklist(pwd.value || ''));
+
+    // Phone format hint enforcement (not strict, final check on server)
+    phoneInput.addEventListener('blur', () => {
+      const v = phoneInput.value.trim();
+      if (v && !/^\+2547\d{8}$/.test(v)) {
+        phoneInput.setCustomValidity('Phone must be +2547XXXXXXXX');
+      } else phoneInput.setCustomValidity('');
+    });
+
+    // Image previews
+    function previewImage(fileInput, container){
+      container.innerHTML = '';
+      const f = fileInput.files && fileInput.files[0];
+      if (!f) return;
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      container.appendChild(img);
+    }
+    profilePhoto.addEventListener('change', () => previewImage(profilePhoto, profilePreview));
+    psvBadge.addEventListener('change', () => previewImage(psvBadge, badgePreview));
+
+    // Normalize plate (remove spaces + uppercase)
+    function normalizePlate(s){ return s.replace(/\s+/g,'').toUpperCase(); }
+
+    // Submit handler - uses fetch with FormData (multipart)
+    form.addEventListener('submit', async (evt) => {
+      evt.preventDefault();
+      responseDiv.innerHTML = '';
+
+      // ensure password meets client rules
+      const pw = pwd.value;
+      const allPass = Object.keys(checks).every(k => checks[k](pw));
+      if (!allPass){ responseDiv.innerHTML = `<div class="flash error">Password does not meet requirements.</div>`; return; }
+
+      // normalize plate value
+      const plateInput = document.getElementById('car_plate');
+      plateInput.value = normalizePlate(plateInput.value || '');
+
+      // simple local PSV date check (future)
+      const psvDate = document.getElementById('psv_expiry').value;
+      if (!psvDate) { responseDiv.innerHTML = `<div class="flash error">PSV expiry is required.</div>`; return; }
+      const psvDt = new Date(psvDate);
+      const today = new Date(); today.setHours(0,0,0,0);
+      if (psvDt <= today){ responseDiv.innerHTML = `<div class="flash error">PSV expiry must be a future date.</div>`; return; }
+
+      // construct FormData
+      const fd = new FormData(form);
+
+      // endpoint - change if your deployment uses different path/domain
+      const endpoint = "/signup";
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Registering...';
+
+      try {
+        const res = await fetch(endpoint, { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok){
+          responseDiv.innerHTML = `<div class="flash error">${data.error || JSON.stringify(data)}</div>`;
+        } else {
+          responseDiv.innerHTML = `<div class="flash success">Registered! Driver ID: <strong>${data.driver_id || ''}</strong></div>`;
+          form.reset();
+          profilePreview.innerHTML = '';
+          badgePreview.innerHTML = '';
+          updateChecklist('');
+        }
+      } catch (err){
+        responseDiv.innerHTML = `<div class="flash error">Network error: ${err.message}</div>`;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Register';
+      }
+    });
+  </script>
+</body>
+</html>
