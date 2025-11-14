@@ -1,39 +1,66 @@
-const hamburger = document.getElementById('hamburger');
-const navMenu = document.getElementById('nav-menu');
+// Your backend URL on Render
+const API_BASE = "https://drivers-backend-4spp.onrender.com";
 
-hamburger.addEventListener('click', () => {
-  if (navMenu.style.display === 'flex') {
-    navMenu.style.display = 'none';
-  } else {
-    navMenu.style.display = 'flex';
-  }
-});
+// Toggle mobile menu
+document.getElementById("hamburger").onclick = () => {
+  document.getElementById("mobileMenu").classList.toggle("hidden");
+};
 
-const signupForm = document.getElementById('signupForm');
-const responseDiv = document.getElementById('response');
+// Toggle password visibility
+function togglePassword(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
 
-// Replace this with your Render backend URL
-const BACKEND_URL = 'https://drivers-backend-4spp.onrender.com';
+  icon.onclick = () => {
+    input.type = input.type === "password" ? "text" : "password";
+  };
+}
 
-signupForm.addEventListener('submit', async (e) => {
+togglePassword("password", "togglePass");
+togglePassword("confirmPassword", "toggleConfirm");
+
+// Form submission
+document.getElementById("signupForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const formData = new FormData(signupForm);
 
+  const fullname = document.getElementById("fullname").value;
+  const email = document.getElementById("email").value;
+  const phone = document.getElementById("phone").value;
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
+  const errorBox = document.getElementById("passwordError");
+  const result = document.getElementById("result");
+
+  errorBox.textContent = "";
+  result.textContent = "";
+
+  // Password match check
+  if (password !== confirmPassword) {
+    errorBox.textContent = "Passwords do not match!";
+    return;
+  }
+
+  // Send signup request
   try {
-    const res = await fetch(`${BACKEND_URL}/signup`, {
-      method: 'POST',
-      body: formData
+    const response = await fetch(`${API_BASE}/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fullname, email, phone, password })
     });
-    const data = await res.json();
-    responseDiv.textContent = data.message || JSON.stringify(data);
-    if (!res.ok) {
-      responseDiv.style.color = 'red';
-    } else {
-      responseDiv.style.color = 'green';
-      signupForm.reset();
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      result.style.color = "red";
+      result.textContent = data.error || "Signup failed.";
+      return;
     }
+
+    result.style.color = "green";
+    result.textContent = "Signup successful!";
+
   } catch (err) {
-    responseDiv.textContent = 'Network error';
-    responseDiv.style.color = 'red';
+    result.style.color = "red";
+    result.textContent = "Network error. Could not reach backend.";
   }
 });
