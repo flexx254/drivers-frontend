@@ -1,127 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>D4D Driver Signup</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frontend Debug</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #e8f5e9;
-      padding: 20px;
-      color: #003300;
-    }
-
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #aaa;
-    }
-
-    h2 {
-      text-align: center;
-      color: #0a5c0a;
-    }
-
-    label {
-      font-weight: bold;
-      margin-top: 10px;
-      display: block;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #0a5c0a;
-      border-radius: 5px;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #0a5c0a;
-      border: none;
-      color: white;
-      font-size: 18px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-
-    button:hover {
-      background: #0c7c0c;
-    }
-
-    .message {
-      margin-top: 15px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    #otp-section {
-      display: none;
-    }
+    body { font-family: sans-serif; padding: 20px; }
+    input, button { display: block; margin: 10px 0; }
+    #log { background: #eee; padding: 10px; white-space: pre-wrap; max-height: 300px; overflow-y: scroll; }
+    .error { color: red; }
   </style>
 </head>
-
 <body>
+  <h1>Frontend Debug</h1>
 
-<div class="container">
-  <h2>D4D Driver Signup</h2>
-
+  <h2>Signup Form</h2>
   <form id="signupForm">
-    <label>Full Name</label>
-    <input type="text" name="full_name" required>
-
-    <label>Email</label>
-    <input type="email" name="email" required>
-
-    <label>Password</label>
-    <input type="password" name="password" required>
-
-    <label>PSV Expiry</label>
-    <input type="date" name="psv_expiry" required>
-
-    <label>Car Plate</label>
-    <input type="text" name="car_plate" placeholder="KDA123A" required>
-
-    <label>Sacco</label>
-    <select name="sacco" required>
-      <option value="">Select Sacco</option>
-      <option value="OOD">OOD</option>
-      <option value="UOD">UOD</option>
-      <option value="NONE">NONE</option>
-    </select>
-
-    <label>Profile Photo</label>
-    <input type="file" name="profile_photo" accept="image/*" required>
-
-    <label>PSV Badge</label>
-    <input type="file" name="psv_badge" accept="image/*" required>
-
+    <input type="text" name="full_name" placeholder="Full Name" required />
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <input type="text" name="car_plate" placeholder="Car Plate" required />
+    <input type="text" name="sacco" placeholder="Sacco (OOD/UOD/NONE)" required />
+    <input type="date" name="psv_expiry" required />
+    <input type="file" name="profile_photo" required />
+    <input type="file" name="psv_badge" required />
     <button type="submit">Sign Up</button>
-
-    <div class="message" id="signupMsg"></div>
   </form>
 
-  <!-- OTP SECTION -->
-  <div id="otp-section">
-    <h3>Email Verification</h3>
+  <h2>Send OTP</h2>
+  <input type="email" id="otpEmail" placeholder="Email for OTP" />
+  <button id="sendOtpBtn">Send OTP</button>
 
-    <label>Enter OTP</label>
-    <input type="text" id="otpInput" placeholder="6-digit code">
+  <h2>Verify OTP</h2>
+  <input type="email" id="verifyEmail" placeholder="Email" />
+  <input type="text" id="verifyCode" placeholder="OTP Code" />
+  <button id="verifyOtpBtn">Verify OTP</button>
 
-    <button id="verifyBtn">Verify OTP</button>
+  <h2>Debug Log</h2>
+  <div id="log"></div>
 
-    <div class="message" id="otpMsg"></div>
-  </div>
+  <script>
+    const log = (msg, error=false) => {
+      const div = document.getElementById('log');
+      div.innerText += (error ? "[ERROR] " : "[INFO] ") + msg + "\n";
+      console.log(msg);
+    };
 
-</div>
+    const BASE_URL = "https://drivers-backend-4spp.onrender.com";
 
-<script src="app.js"></script>
+    // -------------------- Signup --------------------
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      log("Submitting signup form...");
+
+      try {
+        const res = await fetch(`${BASE_URL}/signup`, { method: "POST", body: formData });
+        log(`Status: ${res.status}`);
+        const data = await res.json();
+        log(`Response: ${JSON.stringify(data)}`);
+        if (!res.ok) log("Signup failed", true);
+      } catch (err) {
+        log(`Network error: ${err}`, true);
+      }
+    });
+
+    // -------------------- Send OTP --------------------
+    document.getElementById("sendOtpBtn").addEventListener("click", async () => {
+      const email = document.getElementById("otpEmail").value;
+      if (!email) { log("Email required", true); return; }
+
+      log("Sending OTP...");
+      try {
+        const res = await fetch(`${BASE_URL}/send_otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+        log(`Status: ${res.status}`);
+        const data = await res.json();
+        log(`Response: ${JSON.stringify(data)}`);
+        if (!res.ok) log("OTP sending failed", true);
+      } catch (err) {
+        log(`Network error: ${err}`, true);
+      }
+    });
+
+    // -------------------- Verify OTP --------------------
+    document.getElementById("verifyOtpBtn").addEventListener("click", async () => {
+      const email = document.getElementById("verifyEmail").value;
+      const code = document.getElementById("verifyCode").value;
+      if (!email || !code) { log("Email & OTP required", true); return; }
+
+      log("Verifying OTP...");
+      try {
+        const res = await fetch(`${BASE_URL}/verify_otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, code })
+        });
+        log(`Status: ${res.status}`);
+        const data = await res.json();
+        log(`Response: ${JSON.stringify(data)}`);
+        if (!res.ok) log("OTP verification failed", true);
+      } catch (err) {
+        log(`Network error: ${err}`, true);
+      }
+    });
+  </script>
 </body>
-</html>
+</html> 
