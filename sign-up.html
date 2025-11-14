@@ -4,58 +4,124 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>D4D Driver Signup</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e8f5e9;
+      padding: 20px;
+      color: #003300;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #aaa;
+    }
+
+    h2 {
+      text-align: center;
+      color: #0a5c0a;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #0a5c0a;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #0a5c0a;
+      border: none;
+      color: white;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background: #0c7c0c;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    #otp-section {
+      display: none;
+    }
+  </style>
 </head>
+
 <body>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="logo">D4D</div>
-    <button id="hamburger" class="hamburger">☰</button>
-  </header>
+<div class="container">
+  <h2>D4D Driver Signup</h2>
 
-  <!-- MOBILE MENU -->
-  <nav id="mobileMenu" class="mobile-menu hidden">
-    <a href="#">Home</a>
-    <a href="#">Login</a>
-    <a href="#">Support</a>
-  </nav>
+  <form id="signupForm">
+    <label>Full Name</label>
+    <input type="text" name="full_name" required>
 
-  <!-- SIGNUP FORM -->
-  <section class="container">
-    <h2>Create Driver Account</h2>
+    <label>Email</label>
+    <input type="email" name="email" required>
 
-    <form id="signupForm">
+    <label>Password</label>
+    <input type="password" name="password" required>
 
-      <label>Full Name</label>
-      <input type="text" id="fullname" required>
+    <label>PSV Expiry</label>
+    <input type="date" name="psv_expiry" required>
 
-      <label>Email</label>
-      <input type="email" id="email" required>
+    <label>Car Plate</label>
+    <input type="text" name="car_plate" placeholder="KDA123A" required>
 
-      <label>Phone (+254xxxxxxxxx)</label>
-      <input type="text" id="phone" pattern="^\+254\d{9}$" required>
+    <label>Sacco</label>
+    <select name="sacco" required>
+      <option value="">Select Sacco</option>
+      <option value="OOD">OOD</option>
+      <option value="UOD">UOD</option>
+      <option value="NONE">NONE</option>
+    </select>
 
-      <label>Password</label>
-      <div class="password-wrap">
-        <input type="password" id="password" required>
-        <span class="toggle" id="togglePass">👁</span>
-      </div>
+    <label>Profile Photo</label>
+    <input type="file" name="profile_photo" accept="image/*" required>
 
-      <label>Confirm Password</label>
-      <div class="password-wrap">
-        <input type="password" id="confirmPassword" required>
-        <span class="toggle" id="toggleConfirm">👁</span>
-      </div>
+    <label>PSV Badge</label>
+    <input type="file" name="psv_badge" accept="image/*" required>
 
-      <p id="passwordError" class="error"></p>
+    <button type="submit">Sign Up</button>
 
-      <button type="submit" class="btn">Sign Up</button>
-    </form>
+    <div class="message" id="signupMsg"></div>
+  </form>
 
-    <p id="result" class="result"></p>
-  </section>
+  <!-- OTP SECTION -->
+  <div id="otp-section">
+    <h3>Email Verification</h3>
 
-  <script src="script.js"></script>
+    <label>Enter OTP</label>
+    <input type="text" id="otpInput" placeholder="6-digit code">
+
+    <button id="verifyBtn">Verify OTP</button>
+
+    <div class="message" id="otpMsg"></div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
