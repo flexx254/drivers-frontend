@@ -1,114 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Frontend Debug</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; }
-    input, button { display: block; margin: 10px 0; }
-    #log { background: #eee; padding: 10px; white-space: pre-wrap; max-height: 300px; overflow-y: scroll; }
-    .error { color: red; }
-  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D4D Backend Tester</title>
+
+<style>
+  body { font-family: Arial; padding: 10px; background:#f4f4f4; }
+  .box { background:white; padding:15px; border-radius:10px; margin-bottom:15px; }
+  input, select { width:100%; padding:10px; margin-top:5px; margin-bottom:10px; }
+  button { width:100%; padding:12px; background:green; color:white; border:none; font-size:16px; }
+  #output { white-space:pre-wrap; background:black; color:#0f0; padding:10px; border-radius:10px; margin-top:10px; }
+  .loading { color:blue; font-weight:bold; }
+</style>
+
 </head>
 <body>
-  <h1>Frontend Debug</h1>
 
-  <h2>Signup Form</h2>
-  <form id="signupForm">
-    <input type="text" name="full_name" placeholder="Full Name" required />
-    <input type="email" name="email" placeholder="Email" required />
-    <input type="password" name="password" placeholder="Password" required />
-    <input type="text" name="car_plate" placeholder="Car Plate" required />
-    <input type="text" name="sacco" placeholder="Sacco (OOD/UOD/NONE)" required />
-    <input type="date" name="psv_expiry" required />
-    <input type="file" name="profile_photo" required />
-    <input type="file" name="psv_badge" required />
-    <button type="submit">Sign Up</button>
-  </form>
+<h2>D4D BACKEND TESTER</h2>
 
-  <h2>Send OTP</h2>
-  <input type="email" id="otpEmail" placeholder="Email for OTP" />
-  <button id="sendOtpBtn">Send OTP</button>
+<div class="box">
+  <h3>Signup Test</h3>
 
-  <h2>Verify OTP</h2>
-  <input type="email" id="verifyEmail" placeholder="Email" />
-  <input type="text" id="verifyCode" placeholder="OTP Code" />
-  <button id="verifyOtpBtn">Verify OTP</button>
+  <label>Full Name</label>
+  <input id="full_name">
 
-  <h2>Debug Log</h2>
-  <div id="log"></div>
+  <label>Email</label>
+  <input id="email" type="email">
 
-  <script>
-    const log = (msg, error=false) => {
-      const div = document.getElementById('log');
-      div.innerText += (error ? "[ERROR] " : "[INFO] ") + msg + "\n";
-      console.log(msg);
-    };
+  <label>Password</label>
+  <input id="password" type="password">
 
-    const BASE_URL = "https://drivers-backend-4spp.onrender.com";
+  <label>PSV Expiry (YYYY-MM-DD)</label>
+  <input id="psv_expiry" type="date">
 
-    // -------------------- Signup --------------------
-    document.getElementById("signupForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
+  <label>Car Plate</label>
+  <input id="car_plate">
 
-      log("Submitting signup form...");
+  <label>Sacco</label>
+  <select id="sacco">
+    <option value="">Select</option>
+    <option value="OOD">OOD</option>
+    <option value="UOD">UOD</option>
+    <option value="NONE">NONE</option>
+  </select>
 
-      try {
-        const res = await fetch(`${BASE_URL}/signup`, { method: "POST", body: formData });
-        log(`Status: ${res.status}`);
-        const data = await res.json();
-        log(`Response: ${JSON.stringify(data)}`);
-        if (!res.ok) log("Signup failed", true);
-      } catch (err) {
-        log(`Network error: ${err}`, true);
-      }
+  <label>Profile Photo</label>
+  <input id="profile_photo" type="file" accept="image/*">
+
+  <label>PSV Badge</label>
+  <input id="psv_badge" type="file" accept="image/*">
+
+  <button onclick="submitSignup()">Submit Signup</button>
+</div>
+
+<div id="output">Waiting...</div>
+
+<script>
+const BASE = "https://drivers-backend-4spp.onrender.com";
+
+function log(msg, color="lime") {
+  const box = document.getElementById("output");
+  box.style.color = color;
+  box.textContent = msg;
+}
+
+async function submitSignup() {
+  log("Sending request...\nPlease wait...", "yellow");
+
+  try {
+    // FRONTEND VALIDATION
+    const full_name = document.getElementById("full_name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const psv_expiry = document.getElementById("psv_expiry").value.trim();
+    const car_plate = document.getElementById("car_plate").value.trim();
+    const sacco = document.getElementById("sacco").value.trim();
+    const profile = document.getElementById("profile_photo").files[0];
+    const badge = document.getElementById("psv_badge").files[0];
+
+    if (!full_name || !email || !password || !psv_expiry || !car_plate || !sacco || !profile || !badge) {
+      return log("FRONTEND ERROR:\nOne or more fields are empty", "red");
+    }
+
+    const fd = new FormData();
+    fd.append("full_name", full_name);
+    fd.append("email", email);
+    fd.append("password", password);
+    fd.append("psv_expiry", psv_expiry);
+    fd.append("car_plate", car_plate);
+    fd.append("sacco", sacco);
+    fd.append("profile_photo", profile);
+    fd.append("psv_badge", badge);
+
+    const res = await fetch(BASE + "/signup", {
+      method: "POST",
+      body: fd
     });
 
-    // -------------------- Send OTP --------------------
-    document.getElementById("sendOtpBtn").addEventListener("click", async () => {
-      const email = document.getElementById("otpEmail").value;
-      if (!email) { log("Email required", true); return; }
+    const data = await res.json();
 
-      log("Sending OTP...");
-      try {
-        const res = await fetch(`${BASE_URL}/send_otp`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
-        });
-        log(`Status: ${res.status}`);
-        const data = await res.json();
-        log(`Response: ${JSON.stringify(data)}`);
-        if (!res.ok) log("OTP sending failed", true);
-      } catch (err) {
-        log(`Network error: ${err}`, true);
-      }
-    });
+    if (!res.ok) {
+      let errorText = "BACKEND ERROR:\n";
+      errorText += JSON.stringify(data, null, 2);
+      return log(errorText, "red");
+    }
 
-    // -------------------- Verify OTP --------------------
-    document.getElementById("verifyOtpBtn").addEventListener("click", async () => {
-      const email = document.getElementById("verifyEmail").value;
-      const code = document.getElementById("verifyCode").value;
-      if (!email || !code) { log("Email & OTP required", true); return; }
+    log("SUCCESS:\n" + JSON.stringify(data, null, 2), "lime");
 
-      log("Verifying OTP...");
-      try {
-        const res = await fetch(`${BASE_URL}/verify_otp`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, code })
-        });
-        log(`Status: ${res.status}`);
-        const data = await res.json();
-        log(`Response: ${JSON.stringify(data)}`);
-        if (!res.ok) log("OTP verification failed", true);
-      } catch (err) {
-        log(`Network error: ${err}`, true);
-      }
-    });
-  </script>
+  } catch (err) {
+    log("FRONTEND EXCEPTION:\n" + err.message, "red");
+  }
+}
+</script>
+
 </body>
-</html> 
+</html>
