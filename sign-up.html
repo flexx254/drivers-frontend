@@ -1,117 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>D4D Backend Tester</title>
-
-<style>
-  body { font-family: Arial; padding: 10px; background:#f4f4f4; }
-  .box { background:white; padding:15px; border-radius:10px; margin-bottom:15px; }
-  input, select { width:100%; padding:10px; margin-top:5px; margin-bottom:10px; }
-  button { width:100%; padding:12px; background:green; color:white; border:none; font-size:16px; }
-  #output { white-space:pre-wrap; background:black; color:#0f0; padding:10px; border-radius:10px; margin-top:10px; }
-  .loading { color:blue; font-weight:bold; }
-</style>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register Name</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    #response {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 15px;
+      display: none;
+    }
+    .error { background: #ffdddd; color: red; }
+    .success { background: #ddffdd; color: green; }
+  </style>
 </head>
 <body>
 
-<h2>D4D BACKEND TESTER</h2>
+  <h2>Register Full Name</h2>
 
-<div class="box">
-  <h3>Signup Test</h3>
+  <input id="fullName" type="text" placeholder="Enter full name (3 names)" />
 
-  <label>Full Name</label>
-  <input id="full_name">
+  <button onclick="registerName()">Submit</button>
 
-  <label>Email</label>
-  <input id="email" type="email">
+  <div id="response"></div>
 
-  <label>Password</label>
-  <input id="password" type="password">
+  <script>
+    async function registerName() {
+      const name = document.getElementById("fullName").value.trim();
+      const resBox = document.getElementById("response");
 
-  <label>PSV Expiry (YYYY-MM-DD)</label>
-  <input id="psv_expiry" type="date">
+      // Reset response box
+      resBox.style.display = "none";
 
-  <label>Car Plate</label>
-  <input id="car_plate">
+      // Local validation
+      const nameParts = name.split(" ");
+      if (nameParts.length !== 3) {
+        resBox.className = "error";
+        resBox.innerText = "Full name must contain exactly 3 names.";
+        resBox.style.display = "block";
+        return;
+      }
 
-  <label>Sacco</label>
-  <select id="sacco">
-    <option value="">Select</option>
-    <option value="OOD">OOD</option>
-    <option value="UOD">UOD</option>
-    <option value="NONE">NONE</option>
-  </select>
+      try {
+        const response = await fetch("https://drivers-backend-4spp.onrender.com/register-name", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ name })
+        });
 
-  <label>Profile Photo</label>
-  <input id="profile_photo" type="file" accept="image/*">
+        const data = await response.json();
 
-  <label>PSV Badge</label>
-  <input id="psv_badge" type="file" accept="image/*">
+        if (!response.ok) {
+          resBox.className = "error";
+          resBox.innerText = data.error || "An error occurred.";
+          resBox.style.display = "block";
+        } else {
+          resBox.className = "success";
+          resBox.innerText = data.message || "Name registered successfully.";
+          resBox.style.display = "block";
+        }
 
-  <button onclick="submitSignup()">Submit Signup</button>
-</div>
-
-<div id="output">Waiting...</div>
-
-<script>
-const BASE = "https://drivers-backend-4spp.onrender.com";
-
-function log(msg, color="lime") {
-  const box = document.getElementById("output");
-  box.style.color = color;
-  box.textContent = msg;
-}
-
-async function submitSignup() {
-  log("Sending request...\nPlease wait...", "yellow");
-
-  try {
-    // FRONTEND VALIDATION
-    const full_name = document.getElementById("full_name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const psv_expiry = document.getElementById("psv_expiry").value.trim();
-    const car_plate = document.getElementById("car_plate").value.trim();
-    const sacco = document.getElementById("sacco").value.trim();
-    const profile = document.getElementById("profile_photo").files[0];
-    const badge = document.getElementById("psv_badge").files[0];
-
-    if (!full_name || !email || !password || !psv_expiry || !car_plate || !sacco || !profile || !badge) {
-      return log("FRONTEND ERROR:\nOne or more fields are empty", "red");
+      } catch (err) {
+        resBox.className = "error";
+        resBox.innerText = "Network error. Check your backend.";
+        resBox.style.display = "block";
+      }
     }
-
-    const fd = new FormData();
-    fd.append("full_name", full_name);
-    fd.append("email", email);
-    fd.append("password", password);
-    fd.append("psv_expiry", psv_expiry);
-    fd.append("car_plate", car_plate);
-    fd.append("sacco", sacco);
-    fd.append("profile_photo", profile);
-    fd.append("psv_badge", badge);
-
-    const res = await fetch(BASE + "/signup", {
-      method: "POST",
-      body: fd
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      let errorText = "BACKEND ERROR:\n";
-      errorText += JSON.stringify(data, null, 2);
-      return log(errorText, "red");
-    }
-
-    log("SUCCESS:\n" + JSON.stringify(data, null, 2), "lime");
-
-  } catch (err) {
-    log("FRONTEND EXCEPTION:\n" + err.message, "red");
-  }
-}
-</script>
+  </script>
 
 </body>
 </html>
