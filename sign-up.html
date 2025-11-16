@@ -59,7 +59,7 @@
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ name })
+          body: JSON.stringify({ full_name: name })
         });
 
         const data = await response.json();
