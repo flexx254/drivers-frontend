@@ -5,8 +5,8 @@
   <style>
     body { font-family: sans-serif; padding: 20px; }
     input { display:block; width:100%; padding:10px; margin:10px 0; }
-    button { padding:10px 20px; }
-    #errorBox { color:red; margin-top:10px; }
+    button { padding:10px 20px; width:100%; }
+    #errorBox { color:red; margin-top:10px; white-space:pre-line; }
     #successBox { color:green; margin-top:10px; }
     #nextStep { display:none; margin-top:20px; }
   </style>
@@ -29,6 +29,22 @@
   <button id="nextStep">Next Step</button>
 
 <script>
+function validateFrontend(name, password, confirm) {
+  let errors = [];
+
+  if (!name) errors.push("Name is required.");
+
+  // Strong password rules
+  if (password.length < 8) errors.push("Password must be at least 8 characters.");
+  if (!/[A-Z]/.test(password)) errors.push("At least one capital letter required.");
+  if (!/[0-9]/.test(password)) errors.push("At least one number required.");
+  if (!/[!@#$%^&*]/.test(password)) errors.push("At least one special character required.");
+
+  if (password !== confirm) errors.push("Passwords do not match.");
+
+  return errors;
+}
+
 async function registerUser() {
   document.getElementById("errorBox").textContent = "";
   document.getElementById("successBox").textContent = "";
@@ -37,6 +53,14 @@ async function registerUser() {
   const password = document.getElementById("password").value;
   const confirm = document.getElementById("confirm").value;
 
+  // FRONTEND VALIDATION ------------------------------
+  const errors = validateFrontend(name, password, confirm);
+
+  if (errors.length > 0) {
+    document.getElementById("errorBox").textContent = errors.join("\n");
+    return;
+  }
+
   try {
     const res = await fetch("https://drivers-backend-4spp.onrender.com/register", {
       method: "POST",
@@ -44,14 +68,23 @@ async function registerUser() {
       body: JSON.stringify({ name, password, confirm })
     });
 
-    const data = await res.json();
+    // FIX FOR "Unexpected token <"
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      document.getElementById("errorBox").textContent =
+        "Server did not return JSON. Backend route may be wrong.\n\nRaw response:\n" +
+        (await res.text());
+      return;
+    }
 
     if (!data.success) {
       document.getElementById("errorBox").textContent = data.error;
       return;
     }
 
-    // Success
+    // SUCCESS -----------------------------------------
     document.getElementById("successBox").textContent =
       "You have partly registered successfully ✔";
 
