@@ -1,86 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Register Name</title>
+  <title>Register</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 16px;
-    }
-    #response {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 15px;
-      display: none;
-    }
-    .error { background: #ffdddd; color: red; }
-    .success { background: #ddffdd; color: green; }
+    body { font-family: sans-serif; padding: 20px; }
+    input { display:block; width:100%; padding:10px; margin:10px 0; }
+    button { padding:10px 20px; }
+    #errorBox { color:red; margin-top:10px; }
+    #successBox { color:green; margin-top:10px; }
+    #nextStep { display:none; margin-top:20px; }
   </style>
 </head>
 <body>
 
-  <h2>Register Full Name</h2>
+  <h2>Create Account</h2>
 
-  <input id="fullName" type="text" placeholder="Enter full name (3 names)" />
+  <input id="name" placeholder="Enter name" />
 
-  <button onclick="registerName()">Submit</button>
+  <input id="password" type="password" placeholder="Enter password" />
 
-  <div id="response"></div>
+  <input id="confirm" type="password" placeholder="Confirm password" />
 
-  <script>
-    async function registerName() {
-      const name = document.getElementById("fullName").value.trim();
-      const resBox = document.getElementById("response");
+  <button onclick="registerUser()">Submit</button>
 
-      // Reset response box
-      resBox.style.display = "none";
+  <div id="errorBox"></div>
+  <div id="successBox"></div>
 
-      // Local validation
-      const nameParts = name.split(" ");
-      if (nameParts.length !== 3) {
-        resBox.className = "error";
-        resBox.innerText = "Full name must contain exactly 3 names.";
-        resBox.style.display = "block";
-        return;
-      }
+  <button id="nextStep">Next Step</button>
 
-      try {
-        const response = await fetch("https://drivers-backend-4spp.onrender.com/register-name", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ full_name: name })
-        });
+<script>
+async function registerUser() {
+  document.getElementById("errorBox").textContent = "";
+  document.getElementById("successBox").textContent = "";
 
-        const data = await response.json();
+  const name = document.getElementById("name").value.trim();
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm").value;
 
-        if (!response.ok) {
-          resBox.className = "error";
-          resBox.innerText = data.error || "An error occurred.";
-          resBox.style.display = "block";
-        } else {
-          resBox.className = "success";
-          resBox.innerText = data.message || "Name registered successfully.";
-          resBox.style.display = "block";
-        }
+  try {
+    const res = await fetch("https://drivers-backend-4spp.onrender.com/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, password, confirm })
+    });
 
-      } catch (err) {
-        resBox.className = "error";
-        resBox.innerText = "Network error. Check your backend.";
-        resBox.style.display = "block";
-      }
+    const data = await res.json();
+
+    if (!data.success) {
+      document.getElementById("errorBox").textContent = data.error;
+      return;
     }
-  </script>
+
+    // Success
+    document.getElementById("successBox").textContent =
+      "You have partly registered successfully ✔";
+
+    document.getElementById("nextStep").style.display = "block";
+
+  } catch(err) {
+    document.getElementById("errorBox").textContent = "Network error: " + err;
+  }
+}
+</script>
 
 </body>
 </html>
