@@ -15,7 +15,7 @@
 
   <h2>Create Account</h2>
 
-  <input id="name" placeholder="Enter name" />
+  <input id="name" placeholder="Enter full name" />
 
   <input id="password" type="password" placeholder="Enter password" />
 
@@ -37,8 +37,9 @@ function validateFrontend(name, password, confirm) {
   // Strong password rules
   if (password.length < 8) errors.push("Password must be at least 8 characters.");
   if (!/[A-Z]/.test(password)) errors.push("At least one capital letter required.");
+  if (!/[a-z]/.test(password)) errors.push("At least one lowercase letter required."); // ADDED
   if (!/[0-9]/.test(password)) errors.push("At least one number required.");
-  if (!/[!@#$%^&*]/.test(password)) errors.push("At least one special character required.");
+  if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) errors.push("At least one special character required.");
 
   if (password !== confirm) errors.push("Passwords do not match.");
 
@@ -68,14 +69,14 @@ async function registerUser() {
       body: JSON.stringify({ name, password, confirm })
     });
 
-    // FIX FOR "Unexpected token <"
+    // Prevent "Unexpected token <"
     let data;
     try {
       data = await res.json();
     } catch (e) {
+      const raw = await res.text();
       document.getElementById("errorBox").textContent =
-        "Server did not return JSON. Backend route may be wrong.\n\nRaw response:\n" +
-        (await res.text());
+        "Server did not return JSON.\n\nRaw response:\n" + raw;
       return;
     }
 
