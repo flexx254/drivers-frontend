@@ -8,7 +8,6 @@
     button { padding:10px 20px; width:100%; }
     #errorBox { color:red; margin-top:10px; white-space:pre-line; }
     #successBox { color:green; margin-top:10px; }
-    #nextStep { display:none; margin-top:20px; }
   </style>
 </head>
 <body>
@@ -16,6 +15,8 @@
   <h2>Create Account</h2>
 
   <input id="name" placeholder="Enter full name" />
+
+  <input id="email" placeholder="Enter email" />
 
   <input id="password" type="password" placeholder="Enter password" />
 
@@ -26,18 +27,26 @@
   <div id="errorBox"></div>
   <div id="successBox"></div>
 
-  <button id="nextStep">Next Step</button>
-
 <script>
-function validateFrontend(name, password, confirm) {
+function validateFrontend(name, email, password, confirm) {
   let errors = [];
 
   if (!name) errors.push("Name is required.");
 
-  // Strong password rules
+  // EMAIL CHECK
+  if (!email) {
+    errors.push("Email is required.");
+  } else {
+    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    if (!emailRegex.test(email)) {
+      errors.push("Enter a valid email address.");
+    }
+  }
+
+  // STRONG PASSWORD RULES
   if (password.length < 8) errors.push("Password must be at least 8 characters.");
   if (!/[A-Z]/.test(password)) errors.push("At least one capital letter required.");
-  if (!/[a-z]/.test(password)) errors.push("At least one lowercase letter required."); // ADDED
+  if (!/[a-z]/.test(password)) errors.push("At least one lowercase letter required.");
   if (!/[0-9]/.test(password)) errors.push("At least one number required.");
   if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) errors.push("At least one special character required.");
 
@@ -51,11 +60,12 @@ async function registerUser() {
   document.getElementById("successBox").textContent = "";
 
   const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const confirm = document.getElementById("confirm").value;
 
-  // FRONTEND VALIDATION ------------------------------
-  const errors = validateFrontend(name, password, confirm);
+  // FRONTEND VALIDATION
+  const errors = validateFrontend(name, email, password, confirm);
 
   if (errors.length > 0) {
     document.getElementById("errorBox").textContent = errors.join("\n");
@@ -66,10 +76,9 @@ async function registerUser() {
     const res = await fetch("https://drivers-backend-4spp.onrender.com/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, password, confirm })
+      body: JSON.stringify({ name, email, password, confirm })
     });
 
-    // Prevent "Unexpected token <"
     let data;
     try {
       data = await res.json();
@@ -85,11 +94,8 @@ async function registerUser() {
       return;
     }
 
-    // SUCCESS -----------------------------------------
     document.getElementById("successBox").textContent =
-      "You have partly registered successfully ✔";
-
-    document.getElementById("nextStep").style.display = "block";
+      "Registration successful. Check your email to continue ✔";
 
   } catch(err) {
     document.getElementById("errorBox").textContent = "Network error: " + err;
