@@ -15,11 +15,8 @@
   <h2>Create Account</h2>
 
   <input id="name" placeholder="Enter full name" />
-
   <input id="email" placeholder="Enter email" />
-
   <input id="password" type="password" placeholder="Enter password" />
-
   <input id="confirm" type="password" placeholder="Confirm password" />
 
   <button onclick="registerUser()">Submit</button>
@@ -33,7 +30,7 @@ function validateFrontend(name, email, password, confirm) {
 
   if (!name) errors.push("Name is required.");
 
-  // EMAIL CHECK
+  // EMAIL
   if (!email) {
     errors.push("Email is required.");
   } else {
@@ -43,7 +40,7 @@ function validateFrontend(name, email, password, confirm) {
     }
   }
 
-  // STRONG PASSWORD RULES
+  // PASSWORD RULES
   if (password.length < 8) errors.push("Password must be at least 8 characters.");
   if (!/[A-Z]/.test(password)) errors.push("At least one capital letter required.");
   if (!/[a-z]/.test(password)) errors.push("At least one lowercase letter required.");
@@ -60,18 +57,19 @@ async function registerUser() {
   document.getElementById("successBox").textContent = "";
 
   const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
+  const email = document.getElementById("email").value.trim().toLowerCase();
   const password = document.getElementById("password").value;
   const confirm = document.getElementById("confirm").value;
 
   // FRONTEND VALIDATION
   const errors = validateFrontend(name, email, password, confirm);
-
   if (errors.length > 0) {
     document.getElementById("errorBox").textContent = errors.join("\n");
     return;
   }
 
+  // STEP 1 — REGISTER
+  let regData;
   try {
     const res = await fetch("https://drivers-backend-4spp.onrender.com/register", {
       method: "POST",
@@ -79,27 +77,40 @@ async function registerUser() {
       body: JSON.stringify({ name, email, password, confirm })
     });
 
-    let data;
-    try {
-      data = await res.json();
-    } catch (e) {
-      const raw = await res.text();
-      document.getElementById("errorBox").textContent =
-        "Server did not return JSON.\n\nRaw response:\n" + raw;
-      return;
-    }
-
-    if (!data.success) {
-      document.getElementById("errorBox").textContent = data.error;
-      return;
-    }
-
-    document.getElementById("successBox").textContent =
-      "Registration successful. Check your email to continue ✔";
-
-  } catch(err) {
-    document.getElementById("errorBox").textContent = "Network error: " + err;
+    regData = await res.json();
+  } catch (err) {
+    document.getElementById("errorBox").textContent = "Network error during registration: " + err;
+    return;
   }
+
+  if (!regData.success) {
+    document.getElementById("errorBox").textContent = regData.error;
+    return;
+  }
+
+  // STEP 2 — SEND CONTINUE REGISTRATION EMAIL
+  let contData;
+  try {
+    const res2 = await fetch("https://drivers-backend-4spp.onrender.com/continue-reg", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+
+    contData = await res2.json();
+  } catch (err) {
+    document.getElementById("errorBox").textContent = "Network error sending email: " + err;
+    return;
+  }
+
+  if (!contData.success) {
+    document.getElementById("errorBox").textContent = contData.error;
+    return;
+  }
+
+  // ALL GOOD
+  document.getElementById("successBox").textContent =
+    "Registration complete! Check your email to continue ✔";
 }
 </script>
 
