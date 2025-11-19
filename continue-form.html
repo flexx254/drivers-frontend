@@ -82,7 +82,6 @@ async function submitDocuments() {
     return;
   }
 
-  // FORM DATA
   const form = new FormData();
   form.append("token", token);
   form.append("id_number", id_number);
@@ -92,13 +91,13 @@ async function submitDocuments() {
   if (license_expiry) form.append("license_expiry", license_expiry);
 
   if (psv_badge) form.append("psv_badge", psv_badge);
-  if (psv_expiry) form.append("psv_expiry", psv_expiry);
+  if (psv_expiry) form.append("psv_badge_expiry", psv_expiry);
 
   if (good_conduct) form.append("good_conduct", good_conduct);
-  if (good_expiry) form.append("good_expiry", good_expiry);
+  if (good_expiry) form.append("good_conduct_expiry", good_expiry);
 
   try {
-    const res = await fetch("https://drivers-backend-4spp.onrender.com/continue-form-submit", {
+    const res = await fetch("https://drivers-backend-4spp.onrender.com/upload-documents", {
       method: "POST",
       body: form
     });
@@ -110,7 +109,6 @@ async function submitDocuments() {
       return;
     }
 
-    // SUCCESS
     document.getElementById("successBox").textContent =
       "You have registered successfully ✔\nYour documents were uploaded.";
 
