@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Continue Registration</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    h2 { color:#1b8f2a; }
+    input, button {
+      display:block;
+      width:100%;
+      margin:12px 0;
+      padding:10px;
+    }
+    button {
+      background:#1b8f2a;
+      color:white;
+      border:none;
+      font-size:16px;
+    }
+    #errorBox { color:red; white-space:pre-line; margin-top:10px; }
+    #successBox { color:green; white-space:pre-line; margin-top:10px; }
+  </style>
+</head>
+<body>
+
+<h2>Continue Registration</h2>
+
+<p>Please upload the required documents to complete registration.</p>
+
+<div id="errorBox"></div>
+<div id="successBox"></div>
+
+<!-- ID NUMBER -->
+<input id="id_number" placeholder="Enter National ID Number" />
+
+<!-- FILE UPLOADS -->
+<label>Profile Picture</label>
+<input type="file" id="profile_pic" accept="image/*" />
+
+<label>Driving License</label>
+<input type="file" id="license" accept="image/*" />
+<input type="date" id="license_expiry" />
+
+<label>PSV Badge</label>
+<input type="file" id="psv_badge" accept="image/*" />
+<input type="date" id="psv_expiry" />
+
+<label>Good Conduct Certificate</label>
+<input type="file" id="good_conduct" accept="image/*" />
+<input type="date" id="good_expiry" />
+
+<button onclick="submitDocuments()">Submit Documents</button>
+
+<script>
+function getToken() {
+  const url = new URL(window.location.href);
+  return url.searchParams.get("token");
+}
+
+async function submitDocuments() {
+  document.getElementById("errorBox").textContent = "";
+  document.getElementById("successBox").textContent = "";
+
+  const token = getToken();
+  if (!token) {
+    document.getElementById("errorBox").textContent =
+      "Token missing. Open this page from your email link.";
+    return;
+  }
+
+  const id_number = document.getElementById("id_number").value.trim();
+  const profile_pic = document.getElementById("profile_pic").files[0];
+  const license = document.getElementById("license").files[0];
+  const license_expiry = document.getElementById("license_expiry").value;
+  const psv_badge = document.getElementById("psv_badge").files[0];
+  const psv_expiry = document.getElementById("psv_expiry").value;
+  const good_conduct = document.getElementById("good_conduct").files[0];
+  const good_expiry = document.getElementById("good_expiry").value;
+
+  if (!id_number) {
+    document.getElementById("errorBox").textContent = "Enter ID number.";
+    return;
+  }
+
+  // FORM DATA
+  const form = new FormData();
+  form.append("token", token);
+  form.append("id_number", id_number);
+
+  if (profile_pic) form.append("profile_pic", profile_pic);
+  if (license) form.append("license", license);
+  if (license_expiry) form.append("license_expiry", license_expiry);
+
+  if (psv_badge) form.append("psv_badge", psv_badge);
+  if (psv_expiry) form.append("psv_expiry", psv_expiry);
+
+  if (good_conduct) form.append("good_conduct", good_conduct);
+  if (good_expiry) form.append("good_expiry", good_expiry);
+
+  try {
+    const res = await fetch("https://drivers-backend-4spp.onrender.com/continue-form-submit", {
+      method: "POST",
+      body: form
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      document.getElementById("errorBox").textContent = data.error;
+      return;
+    }
+
+    // SUCCESS
+    document.getElementById("successBox").textContent =
+      "You have registered successfully ✔\nYour documents were uploaded.";
+
+  } catch (err) {
+    document.getElementById("errorBox").textContent = "Network error: " + err;
+  }
+}
+</script>
+
+</body>
+</html>
