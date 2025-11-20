@@ -134,7 +134,10 @@ function showMessage(msg, isError=false) {
     const div = document.getElementById("message");
     div.style.display = "block";
     div.textContent = msg;
-    div.className = isError ? "error" : "success";
+
+    // FIXED (DO NOT BREAK ANYTHING)
+    div.classList.remove("error", "success");
+    div.classList.add(isError ? "error" : "success");
 }
 
 /* Submit Form */
