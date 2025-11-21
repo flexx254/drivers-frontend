@@ -103,23 +103,38 @@
     <button type="submit">Upload Documents</button>
 </form>
 
-
 <script>
-/* Extract token from URL */
+/* --- Extract token from URL --- */
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get("token");
+const submitBtn = document.querySelector("button[type='submit']");
 
 if (!token) {
     showMessage("Missing token in URL", true);
+    submitBtn.disabled = true;
 }
 
-/* Preview function */
+/* --- Show messages --- */
+function showMessage(msg, isError=false) {
+    const div = document.getElementById("message");
+    div.style.display = "block";
+    div.textContent = msg;
+    div.classList.remove("error", "success");
+    div.classList.add(isError ? "error" : "success");
+}
+
+/* --- Image preview with URL cleanup --- */
 function previewFile(input, previewImg) {
+    let currentURL;
     input.addEventListener("change", () => {
+        if (currentURL) URL.revokeObjectURL(currentURL);
         const file = input.files[0];
         if (file) {
-            previewImg.src = URL.createObjectURL(file);
+            currentURL = URL.createObjectURL(file);
+            previewImg.src = currentURL;
             previewImg.style.display = "block";
+        } else {
+            previewImg.style.display = "none";
         }
     });
 }
@@ -129,33 +144,32 @@ previewFile(document.getElementById("license"), document.getElementById("prev_li
 previewFile(document.getElementById("psv_badge"), document.getElementById("prev_psv"));
 previewFile(document.getElementById("good_conduct"), document.getElementById("prev_gc"));
 
-/* Show messages */
-function showMessage(msg, isError=false) {
-    const div = document.getElementById("message");
-    div.style.display = "block";
-    div.textContent = msg;
-
-    // FIXED (DO NOT BREAK ANYTHING)
-    div.classList.remove("error", "success");
-    div.classList.add(isError ? "error" : "success");
-}
-
-/* Submit Form */
+/* --- Form submission --- */
 document.getElementById("uploadForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    let formData = new FormData();
+    // Required file validation
+    const requiredFiles = ["profile_pic", "license", "psv_badge", "good_conduct"];
+    for (let id of requiredFiles) {
+        if (!document.getElementById(id).files[0]) {
+            showMessage(`Please upload ${id.replace("_", " ")}`, true);
+            return;
+        }
+    }
 
+    const formData = new FormData();
     formData.append("token", token);
     formData.append("id_number", document.getElementById("id_number").value);
     formData.append("license_expiry", document.getElementById("license_expiry").value);
     formData.append("psv_badge_expiry", document.getElementById("psv_badge_expiry").value);
     formData.append("good_conduct_expiry", document.getElementById("good_conduct_expiry").value);
 
-    formData.append("profile_pic", document.getElementById("profile_pic").files[0]);
-    formData.append("license", document.getElementById("license").files[0]);
-    formData.append("psv_badge", document.getElementById("psv_badge").files[0]);
-    formData.append("good_conduct", document.getElementById("good_conduct").files[0]);
+    requiredFiles.forEach(id => {
+        formData.append(id, document.getElementById(id).files[0]);
+    });
+
+    submitBtn.disabled = true;
+    showMessage("Uploading documents...", false);
 
     try {
         const res = await fetch("https://drivers-backend-4spp.onrender.com/upload-documents", {
@@ -163,20 +177,25 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
             body: formData
         });
 
-        const data = await res.json();
+        let data;
+        try { data = await res.json(); } catch { data = {}; }
 
         if (!res.ok) {
             showMessage(data.error || "Upload failed", true);
-            return;
+        } else {
+            showMessage("Documents uploaded successfully!", false);
+            // Optionally, clear the form here
+            // document.getElementById("uploadForm").reset();
         }
-
-        showMessage("Documents uploaded successfully!", false);
 
     } catch (err) {
         showMessage("Network error. Try again.", true);
+    } finally {
+        submitBtn.disabled = false;
     }
 });
-</script>
+    </script>
+            
 
 </body>
 </html>
