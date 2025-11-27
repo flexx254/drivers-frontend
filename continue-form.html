@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update ID Number</title>
+    <title>Update Details</title>
 
     <style>
         body {
@@ -82,24 +82,28 @@
 
 <div class="container">
 
-    <h2>Update ID Number</h2>
+    <h2>Update Your Details</h2>
 
     <input type="hidden" id="token">
 
+    <!-- ID Number -->
     <label for="id_number">Enter Your ID Number</label>
     <input type="text" id="id_number" placeholder="e.g. 12345678">
 
-    <button onclick="saveID()">Save ID Number</button>
+    <!-- Number Plate -->
+    <label for="number_plate">Enter Your Number Plate</label>
+    <input type="text" id="number_plate" placeholder="e.g. KDK 123A">
+
+    <button onclick="saveDetails()">Save Details</button>
 
     <div id="msgBox" class="msg"></div>
 
 </div>
 
 <script>
-    // Read token from ?token=XYZ in the email link
+    // Read token from URL
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
-
     document.getElementById("token").value = token || "";
 
     function showMessage(text, type) {
@@ -109,9 +113,10 @@
         msg.style.display = "block";
     }
 
-    async function saveID() {
-        const id = document.getElementById("id_number").value.trim();
+    async function saveDetails() {
         const tokenVal = document.getElementById("token").value.trim();
+        const id = document.getElementById("id_number").value.trim();
+        const plate = document.getElementById("number_plate").value.trim();
 
         if (!tokenVal) {
             showMessage("Token missing. Open the link from your email.", "error");
@@ -123,26 +128,61 @@
             return;
         }
 
-        const formData = new FormData();
-        formData.append("token", tokenVal);
-        formData.append("id_number", id);
+        if (!plate) {
+            showMessage("Number plate is required.", "error");
+            return;
+        }
+
+        // First: update ID number
+        const formID = new FormData();
+        formID.append("token", tokenVal);
+        formID.append("id_number", id);
+
+        let updatePlateAllowed = false;
 
         try {
-            const res = await fetch("https://drivers-backend-4spp.onrender.com/update-id", {
+            const resID = await fetch("https://drivers-backend-4spp.onrender.com/update-id", {
                 method: "POST",
-                body: formData
+                body: formID
             });
 
-            const data = await res.json();
+            const dataID = await resID.json();
 
-            if (data.success) {
-                showMessage("ID number saved successfully!", "success");
-            } else {
-                showMessage(data.error || "Error saving ID number", "error");
+            if (!dataID.success) {
+                showMessage(dataID.error || "Error saving ID number", "error");
+                return;
             }
 
+            updatePlateAllowed = true;
+
         } catch (e) {
-            showMessage("Network error. Try again.", "error");
+            showMessage("Network error updating ID number.", "error");
+            return;
+        }
+
+        // Then: update number plate
+        if (updatePlateAllowed) {
+            const formPlate = new FormData();
+            formPlate.append("token", tokenVal);
+            formPlate.append("number_plate", plate);
+
+            try {
+                const resPlate = await fetch("https://drivers-backend-4spp.onrender.com/update-number-plate", {
+                    method: "POST",
+                    body: formPlate
+                });
+
+                const dataPlate = await resPlate.json();
+
+                if (dataPlate.success) {
+                    showMessage("All details saved successfully!", "success");
+                } else {
+                    showMessage(dataPlate.error || "Error saving number plate", "error");
+                }
+
+            } catch (e) {
+                showMessage("Network error updating number plate.", "error");
+            }
         }
     }
 </script>
