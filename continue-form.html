@@ -76,6 +76,17 @@
             background: #ffd6d6;
             color: #a30000;
         }
+
+        /* PROFILE PIC PREVIEW */
+        #preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            object-fit: cover;
+            display: block;
+            margin-bottom: 15px;
+            border: 2px solid #1b8f2a;
+        }
     </style>
 </head>
 <body>
@@ -94,6 +105,11 @@
     <label for="number_plate">Enter Your Number Plate</label>
     <input type="text" id="number_plate" placeholder="e.g. KDK 123A">
 
+    <!-- PROFILE PICTURE -->
+    <label>Upload Profile Picture</label>
+    <img id="preview" src="" style="display:none;">
+    <input type="file" id="profile_pic" accept="image/*">
+
     <button onclick="saveDetails()">Save Details</button>
 
     <div id="msgBox" class="msg"></div>
@@ -111,6 +127,37 @@
         msg.textContent = text;
         msg.className = `msg ${type}`;
         msg.style.display = "block";
+    }
+
+    // PROFILE PICTURE PREVIEW
+    document.getElementById("profile_pic").addEventListener("change", function() {
+        if (this.files && this.files[0]) {
+            const preview = document.getElementById("preview");
+            preview.src = URL.createObjectURL(this.files[0]);
+            preview.style.display = "block";
+        }
+    });
+
+    async function uploadProfilePicture(tokenVal) {
+        const fileInput = document.getElementById("profile_pic");
+        if (!fileInput.files.length) {
+            return { success: true }; // No picture uploaded → skip but not fail
+        }
+
+        const formPic = new FormData();
+        formPic.append("token", tokenVal);
+        formPic.append("profile_picture", fileInput.files[0]);
+
+        try {
+            const resPic = await fetch("https://drivers-backend-4spp.onrender.com/update-profile-picture", {
+                method: "POST",
+                body: formPic
+            });
+
+            return await resPic.json();
+        } catch (e) {
+            return { success: false, error: "Network error uploading profile picture." };
+        }
     }
 
     async function saveDetails() {
@@ -174,16 +221,26 @@
 
                 const dataPlate = await resPlate.json();
 
-                if (dataPlate.success) {
-                    showMessage("All details saved successfully!", "success");
-                } else {
+                if (!dataPlate.success) {
                     showMessage(dataPlate.error || "Error saving number plate", "error");
+                    return;
                 }
 
             } catch (e) {
                 showMessage("Network error updating number plate.", "error");
+                return;
             }
         }
+
+        // Finally: upload profile picture
+        const picResult = await uploadProfilePicture(tokenVal);
+
+        if (!picResult.success) {
+            showMessage(picResult.error || "Error uploading profile picture.", "error");
+            return;
+        }
+
+        showMessage("All details saved successfully!", "success");
     }
 </script>
 
