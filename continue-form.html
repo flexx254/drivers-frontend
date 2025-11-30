@@ -94,18 +94,22 @@ setupPreview("good_conduct","gc_preview");
 async function uploadFile(tokenVal, fileInputId, expiryId, route){
     const fileInput=document.getElementById(fileInputId);
     if(!fileInput.files.length) return {success:true};
+
     const form=new FormData();
     form.append("token", tokenVal);
-    form.append("file", fileInput.files[0]);
-    if(expiryId) form.append(expiryId, document.getElementById(expiryId).value || "");
-    try{
-        const res=await fetch(`https://drivers-backend-4spp.onrender.com/${route}`, {method:"POST", body:form});
-        return await res.json();
-    }catch(e){ return {success:false,error:`Network error uploading ${fileInputId}`}; }
-}
+    form.append(fileInputId, fileInput.files[0]);  // ✔ FIXED HERE
 
-async function uploadProfilePicture(tokenVal){
-    return uploadFile(tokenVal,"profile_pic",null,"update-profile-picture");
+    if(expiryId) form.append(expiryId, document.getElementById(expiryId).value || "");
+
+    try{
+        const res=await fetch(`https://drivers-backend-4spp.onrender.com/${route}`, {
+            method:"POST",
+            body:form
+        });
+        return await res.json();
+    }catch(e){
+        return {success:false,error:`Network error uploading ${fileInputId}`};
+    }
 }
 
 // SAVE DETAILS
