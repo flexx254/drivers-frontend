@@ -63,97 +63,107 @@ img.preview { width:120px; height:120px; object-fit:cover; display:block; margin
 </div>
 
 <script>
+// Get token from URL
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token");
 document.getElementById("token").value = token || "";
 
-function showMessage(text,type){
-    const msg=document.getElementById("msgBox");
-    msg.textContent=text;
-    msg.className=`msg ${type}`;
-    msg.style.display="block";
+// Show messages
+function showMessage(text, type){
+    const msg = document.getElementById("msgBox");
+    msg.textContent = text;
+    msg.className = `msg ${type}`;
+    msg.style.display = "block";
 }
 
-// PREVIEWS
+// Image previews
 function setupPreview(inputId, previewId){
     document.getElementById(inputId).addEventListener("change", function(){
         if(this.files && this.files[0]){
-            const preview=document.getElementById(previewId);
-            preview.src=URL.createObjectURL(this.files[0]);
-            preview.style.display="block";
+            const preview = document.getElementById(previewId);
+            preview.src = URL.createObjectURL(this.files[0]);
+            preview.style.display = "block";
         }
     });
 }
 
+// Setup previews for all images
 setupPreview("profile_pic","preview");
 setupPreview("driving_license","license_preview");
 setupPreview("psv_badge","psv_preview");
 setupPreview("good_conduct","gc_preview");
 
-// UPLOAD FUNCTIONS
+// Generic file upload
 async function uploadFile(tokenVal, fileInputId, expiryId, route){
-    const fileInput=document.getElementById(fileInputId);
-    if(!fileInput.files.length) return {success:true};
+    const fileInput = document.getElementById(fileInputId);
+    if(!fileInput.files.length) return {success:true}; // no file selected
 
-    const form=new FormData();
+    const form = new FormData();
     form.append("token", tokenVal);
-    form.append(fileInputId, fileInput.files[0]);  // ✔ FIXED HERE
+    form.append(fileInputId, fileInput.files[0]);  // key must match backend input id
 
     if(expiryId) form.append(expiryId, document.getElementById(expiryId).value || "");
 
     try{
-        const res=await fetch(`https://drivers-backend-4spp.onrender.com/${route}`, {
-            method:"POST",
-            body:form
+        const res = await fetch(`https://drivers-backend-4spp.onrender.com/${route}`, {
+            method: "POST",
+            body: form
         });
         return await res.json();
     }catch(e){
-        return {success:false,error:`Network error uploading ${fileInputId}`};
+        return {success:false, error:`Network error uploading ${fileInputId}`};
     }
 }
 
-// SAVE DETAILS
+// Profile picture upload
+async function uploadProfilePicture(tokenVal){
+    return uploadFile(tokenVal, "profile_pic", null, "update-profile-picture");
+}
+
+// Save all details
 async function saveDetails(){
-    const tokenVal=document.getElementById("token").value.trim();
-    const id=document.getElementById("id_number").value.trim();
-    const plate=document.getElementById("number_plate").value.trim();
-    if(!tokenVal){ showMessage("Token missing. Open the link from your email.","error"); return;}
-    if(!id){ showMessage("ID number is required.","error"); return;}
-    if(!plate){ showMessage("Number plate is required.","error"); return;}
+    const tokenVal = document.getElementById("token").value.trim();
+    const id = document.getElementById("id_number").value.trim();
+    const plate = document.getElementById("number_plate").value.trim();
 
-    // Update ID
-    const formID=new FormData();
-    formID.append("token",tokenVal);
-    formID.append("id_number",id);
+    if(!tokenVal){ showMessage("Token missing. Open the link from your email.","error"); return; }
+    if(!id){ showMessage("ID number is required.","error"); return; }
+    if(!plate){ showMessage("Number plate is required.","error"); return; }
+
+    // --- Update ID ---
+    const formID = new FormData();
+    formID.append("token", tokenVal);
+    formID.append("id_number", id);
     try{
-        const res=await fetch("https://drivers-backend-4spp.onrender.com/update-id",{method:"POST",body:formID});
-        const data=await res.json();
-        if(!data.success){ showMessage(data.error||"Error saving ID number","error"); return;}
-    }catch(e){ showMessage("Network error updating ID number.","error"); return;}
+        const res = await fetch("https://drivers-backend-4spp.onrender.com/update-id", {method:"POST", body:formID});
+        const data = await res.json();
+        if(!data.success){ showMessage(data.error || "Error saving ID number","error"); return; }
+    }catch(e){ showMessage("Network error updating ID number.","error"); return; }
 
-    // Update number plate
-    const formPlate=new FormData();
-    formPlate.append("token",tokenVal);
-    formPlate.append("number_plate",plate);
+    // --- Update number plate ---
+    const formPlate = new FormData();
+    formPlate.append("token", tokenVal);
+    formPlate.append("number_plate", plate);
     try{
-        const res=await fetch("https://drivers-backend-4spp.onrender.com/update-number-plate",{method:"POST",body:formPlate});
-        const data=await res.json();
-        if(!data.success){ showMessage(data.error||"Error saving number plate","error"); return;}
-    }catch(e){ showMessage("Network error updating number plate.","error"); return;}
+        const res = await fetch("https://drivers-backend-4spp.onrender.com/update-number-plate", {method:"POST", body:formPlate});
+        const data = await res.json();
+        if(!data.success){ showMessage(data.error || "Error saving number plate","error"); return; }
+    }catch(e){ showMessage("Network error updating number plate.","error"); return; }
 
-    // Upload profile picture
-    let result=await uploadProfilePicture(tokenVal);
-    if(!result.success){ showMessage(result.error,"error"); return;}
+    // --- Upload profile picture ---
+    let result = await uploadProfilePicture(tokenVal);
+    if(!result.success){ showMessage(result.error,"error"); return; }
 
-    // Upload documents
-    const docs=[
-        {id:"driving_license", expiry:"license_expiry", route:"upload-driving-license"},
-        {id:"psv_badge", expiry:"psv_badge_expiry", route:"upload-psv-badge"},
-        {id:"good_conduct", expiry:"good_conduct_expiry", route:"upload-good-conduct"}
+    // --- Upload documents ---
+    const docs = [
+        {id:"driving_license", expiry:"license_expiry", route:"update-driving-license"},
+        {id:"psv_badge", expiry:"psv_badge_expiry", route:"update-psv-badge"},
+        {id:"good_conduct", expiry:"good_conduct_expiry", route:"update-good-conduct"}
     ];
+
     for(const doc of docs){
-        result=await uploadFile(tokenVal, doc.id, doc.expiry, doc.route);
-        if(!result.success){ showMessage(result.error,"error"); return;}
+        result = await uploadFile(tokenVal, doc.id, doc.expiry, doc.route);
+        if(!result.success){ showMessage(result.error,"error"); return; }
     }
 
     showMessage("All details saved successfully!","success");
