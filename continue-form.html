@@ -100,7 +100,7 @@ async function uploadFile(tokenVal, fileInputId, expiryId, route){
 
     const form = new FormData();
     form.append("token", tokenVal);
-    form.append("file", fileInput.files[0]);  // <-- Use "file" key
+    form.append("profile_picture", fileInput.files[0]);  // <-- Use "file" key
 
     if(expiryId) form.append(expiryId, document.getElementById(expiryId).value || "");
 
