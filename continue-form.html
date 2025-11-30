@@ -87,20 +87,20 @@ function setupPreview(inputId, previewId){
     });
 }
 
-// Setup previews for all images
+// Setup previews
 setupPreview("profile_pic","preview");
 setupPreview("driving_license","license_preview");
 setupPreview("psv_badge","psv_preview");
 setupPreview("good_conduct","gc_preview");
 
-// Generic file upload
+// Generic file upload with correct key
 async function uploadFile(tokenVal, fileInputId, expiryId, route){
     const fileInput = document.getElementById(fileInputId);
-    if(!fileInput.files.length) return {success:true}; // no file selected
+    if(!fileInput.files.length) return {success:true}; // no file
 
     const form = new FormData();
     form.append("token", tokenVal);
-    form.append(fileInputId, fileInput.files[0]);  // key must match backend input id
+    form.append("file", fileInput.files[0]);  // <-- Use "file" key
 
     if(expiryId) form.append(expiryId, document.getElementById(expiryId).value || "");
 
