@@ -61,7 +61,6 @@ img.preview { width:120px; height:120px; object-fit:cover; display:block; margin
 <div id="msgBox" class="msg"></div>
 
 </div>
-
 <script>
 // Get token from URL
 const params = new URLSearchParams(window.location.search);
@@ -93,16 +92,34 @@ setupPreview("driving_license","license_preview");
 setupPreview("psv_badge","psv_preview");
 setupPreview("good_conduct","gc_preview");
 
-// Generic file upload with correct key
+// ---------------------
+// FIXED FILE UPLOAD
+// ---------------------
 async function uploadFile(tokenVal, fileInputId, expiryId, route){
     const fileInput = document.getElementById(fileInputId);
-    if(!fileInput.files.length) return {success:true}; // no file
+    if(!fileInput.files.length) return {success:true}; // no file selected
 
     const form = new FormData();
     form.append("token", tokenVal);
-    form.append("profile_picture", fileInput.files[0]);  // <-- Use "file" key
 
-    if(expiryId) form.append(expiryId, document.getElementById(expiryId).value || "");
+    // Correct keys for the backend
+    if(fileInputId === "profile_pic"){
+        form.append("profile_picture", fileInput.files[0]);
+    }
+    if(fileInputId === "driving_license"){
+        form.append("license", fileInput.files[0]);
+    }
+    if(fileInputId === "psv_badge"){
+        form.append("psv_badge", fileInput.files[0]);
+    }
+    if(fileInputId === "good_conduct"){
+        form.append("good_conduct", fileInput.files[0]);
+    }
+
+    if(expiryId){
+        const expiryValue = document.getElementById(expiryId).value || "";
+        form.append(expiryId, expiryValue);
+    }
 
     try{
         const res = await fetch(`https://drivers-backend-4spp.onrender.com/${route}`, {
@@ -115,12 +132,14 @@ async function uploadFile(tokenVal, fileInputId, expiryId, route){
     }
 }
 
-// Profile picture upload
+// Upload profile picture separately
 async function uploadProfilePicture(tokenVal){
     return uploadFile(tokenVal, "profile_pic", null, "update-profile-picture");
 }
 
-// Save all details
+// ---------------------
+// SAVE DETAILS
+// ---------------------
 async function saveDetails(){
     const tokenVal = document.getElementById("token").value.trim();
     const id = document.getElementById("id_number").value.trim();
@@ -134,25 +153,48 @@ async function saveDetails(){
     const formID = new FormData();
     formID.append("token", tokenVal);
     formID.append("id_number", id);
+
     try{
-        const res = await fetch("https://drivers-backend-4spp.onrender.com/update-id", {method:"POST", body:formID});
+        const res = await fetch("https://drivers-backend-4spp.onrender.com/update-id", {
+            method:"POST",
+            body:formID
+        });
         const data = await res.json();
-        if(!data.success){ showMessage(data.error || "Error saving ID number","error"); return; }
-    }catch(e){ showMessage("Network error updating ID number.","error"); return; }
+        if(!data.success){
+            showMessage(data.error || "Error saving ID number","error");
+            return;
+        }
+    }catch(e){
+        showMessage("Network error updating ID number.","error");
+        return;
+    }
 
     // --- Update number plate ---
     const formPlate = new FormData();
     formPlate.append("token", tokenVal);
     formPlate.append("number_plate", plate);
+
     try{
-        const res = await fetch("https://drivers-backend-4spp.onrender.com/update-number-plate", {method:"POST", body:formPlate});
+        const res = await fetch("https://drivers-backend-4spp.onrender.com/update-number-plate", {
+            method:"POST",
+            body:formPlate
+        });
         const data = await res.json();
-        if(!data.success){ showMessage(data.error || "Error saving number plate","error"); return; }
-    }catch(e){ showMessage("Network error updating number plate.","error"); return; }
+        if(!data.success){
+            showMessage(data.error || "Error saving number plate","error");
+            return;
+        }
+    }catch(e){
+        showMessage("Network error updating number plate.","error");
+        return;
+    }
 
     // --- Upload profile picture ---
     let result = await uploadProfilePicture(tokenVal);
-    if(!result.success){ showMessage(result.error,"error"); return; }
+    if(!result.success){
+        showMessage(result.error,"error");
+        return;
+    }
 
     // --- Upload documents ---
     const docs = [
@@ -163,12 +205,15 @@ async function saveDetails(){
 
     for(const doc of docs){
         result = await uploadFile(tokenVal, doc.id, doc.expiry, doc.route);
-        if(!result.success){ showMessage(result.error,"error"); return; }
+        if(!result.success){
+            showMessage(result.error,"error");
+            return;
+        }
     }
 
     showMessage("All details saved successfully!","success");
 }
-</script>
+    </script>
 
 </body>
 </html>
