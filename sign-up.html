@@ -1,41 +1,192 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Register</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; }
-    input, select { display:block; width:100%; padding:10px; margin:10px 0; }
-    button { padding:10px 20px; width:100%; }
-    #errorBox { color:red; margin-top:10px; white-space:pre-line; }
-    #successBox { color:green; margin-top:10px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Register</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    .password-wrapper {
-      position: relative;
-      width: 100%;
-    }
+<style>
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
 
-    .toggle-eye {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      user-select: none;
-      font-size: 18px;
-    }
-  </style>
+/* THEME COLORS */
+:root {
+  --main-green: #006400;
+  --light-green: #228B22;
+  --white: #ffffff;
+}
+
+/* BODY */
+body {
+  background-color: #f5f5f5;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+header {
+  background-color: var(--main-green);
+  color: var(--white);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+header .logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+header .menu-icon {
+  font-size: 24px;
+  cursor: pointer;
+  display: none;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+nav.active {
+  display: block;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: var(--main-green);
+  padding: 15px;
+  border-radius: 5px;
+  width: 150px;
+}
+
+nav.active a {
+  display: block;
+  margin: 10px 0;
+}
+
+/* FORM STYLING */
+.container {
+  flex: 1;
+  max-width: 400px;
+  margin: 40px auto;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+  text-align: center;
+  color: var(--main-green);
+  margin-bottom: 20px;
+}
+
+input, select, button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+button {
+  background-color: var(--main-green);
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: var(--light-green);
+}
+
+#successBox {
+  color: green;
+  margin-top: 10px;
+  text-align: center;
+}
+
+#errorBox {
+  color: red;
+  margin-top: 10px;
+  white-space: pre-line;
+  text-align: center;
+}
+
+/* PASSWORD TOGGLE */
+.password-wrapper {
+  position: relative;
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  user-select: none;
+  font-size: 18px;
+}
+
+/* FOOTER */
+footer {
+  background-color: var(--main-green);
+  color: var(--white);
+  text-align: center;
+  padding: 15px;
+  margin-top: auto;
+}
+
+/* RESPONSIVE */
+@media screen and (max-width: 768px) {
+  nav {
+    display: none;
+    flex-direction: column;
+  }
+  header .menu-icon {
+    display: block;
+  }
+}
+</style>
 </head>
 <body>
 
+<header>
+  <div class="logo">Driver App</div>
+  <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
+  <nav id="navMenu">
+    <a href="#">Home</a>
+    <a href="#">Login</a>
+    <a href="#">About</a>
+  </nav>
+</header>
+
+<div class="container">
   <h2>Create Account</h2>
 
   <input id="name" placeholder="Enter full name" />
   <input id="email" placeholder="Enter email" />
-
-  <!-- PHONE NUMBER -->
   <input id="phone_number" placeholder="Enter phone number (+2547...)" />
 
-  <!-- SACCO -->
   <select id="sacco">
     <option value="">Select Sacco</option>
     <option value="OOD">OOD</option>
@@ -43,24 +194,27 @@
     <option value="NONE">NONE</option>
   </select>
 
-  <!-- PASSWORD WITH EYE -->
   <div class="password-wrapper">
     <input id="password" type="password" placeholder="Enter password" />
     <span class="toggle-eye" onclick="togglePassword('password', this)">👁️</span>
   </div>
 
-  <!-- CONFIRM PASSWORD WITH EYE -->
   <div class="password-wrapper">
     <input id="confirm" type="password" placeholder="Confirm password" />
     <span class="toggle-eye" onclick="togglePassword('confirm', this)">👁️</span>
   </div>
 
   <button onclick="registerUser()">Submit</button>
-
   <div id="errorBox"></div>
   <div id="successBox"></div>
+</div>
+
+<footer>
+  &copy; 2025 Driver App. All rights reserved.
+</footer>
 
 <script>
+/* PASSWORD TOGGLE */
 function togglePassword(id, el) {
   const input = document.getElementById(id);
   if (input.type === "password") {
@@ -72,12 +226,25 @@ function togglePassword(id, el) {
   }
 }
 
+/* RESPONSIVE MENU */
+const menuToggle = document.getElementById('menuToggle');
+const navMenu = document.getElementById('navMenu');
+
+menuToggle.addEventListener('click', () => {
+  navMenu.classList.toggle('active');
+  if (navMenu.classList.contains('active')) {
+    menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+  } else {
+    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+  }
+});
+
+/* FRONTEND VALIDATION & REGISTER */
 function validateFrontend(name, email, phone, sacco, password, confirm) {
   let errors = [];
 
   if (!name) errors.push("Name is required.");
 
-  // EMAIL
   if (!email) {
     errors.push("Email is required.");
   } else {
@@ -87,24 +254,18 @@ function validateFrontend(name, email, phone, sacco, password, confirm) {
     }
   }
 
-  // PHONE NUMBER (+254XXXXXXXXX)
   const phoneRegex = /^\+254\d{9}$/;
   if (!phoneRegex.test(phone)) {
     errors.push("Phone must be in +254XXXXXXXXX format.");
   }
 
-  // SACCO
-  if (!sacco) {
-    errors.push("Please select a sacco.");
-  }
+  if (!sacco) errors.push("Please select a sacco.");
 
-  // PASSWORD RULES
   if (password.length < 8) errors.push("Password must be at least 8 characters.");
   if (!/[A-Z]/.test(password)) errors.push("At least one capital letter required.");
   if (!/[a-z]/.test(password)) errors.push("At least one lowercase letter required.");
   if (!/[0-9]/.test(password)) errors.push("At least one number required.");
   if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) errors.push("At least one special character required.");
-
   if (password !== confirm) errors.push("Passwords do not match.");
 
   return errors;
@@ -121,15 +282,13 @@ async function registerUser() {
   const password = document.getElementById("password").value;
   const confirm = document.getElementById("confirm").value;
 
-  // FRONTEND VALIDATION
   const errors = validateFrontend(name, email, phone_number, sacco, password, confirm);
   if (errors.length > 0) {
     document.getElementById("errorBox").textContent = errors.join("\n");
     return;
   }
 
-  // STEP 1 — REGISTER
-  let regData;
+  // REGISTER
   try {
     const res = await fetch("https://drivers-backend-4spp.onrender.com/register", {
       method: "POST",
@@ -137,39 +296,29 @@ async function registerUser() {
       body: JSON.stringify({ name, email, phone_number, sacco, password, confirm })
     });
 
-    regData = await res.json();
-  } catch (err) {
-    document.getElementById("errorBox").textContent = "Network error during registration: " + err;
-    return;
-  }
+    const regData = await res.json();
+    if (!regData.success) {
+      document.getElementById("errorBox").textContent = regData.error;
+      return;
+    }
 
-  if (!regData.success) {
-    document.getElementById("errorBox").textContent = regData.error;
-    return;
-  }
-
-  // STEP 2 — SEND CONTINUE REG EMAIL
-  let contData;
-  try {
     const res2 = await fetch("https://drivers-backend-4spp.onrender.com/continue-reg", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
     });
 
-    contData = await res2.json();
+    const contData = await res2.json();
+    if (!contData.success) {
+      document.getElementById("errorBox").textContent = contData.error;
+      return;
+    }
+
+    document.getElementById("successBox").textContent = "Registration complete! Check your email to continue ✔";
+
   } catch (err) {
-    document.getElementById("errorBox").textContent = "Network error sending email: " + err;
-    return;
+    document.getElementById("errorBox").textContent = "Network error: " + err;
   }
-
-  if (!contData.success) {
-    document.getElementById("errorBox").textContent = contData.error;
-    return;
-  }
-
-  document.getElementById("successBox").textContent =
-    "Registration complete! Check your email to continue ✔";
 }
 </script>
 
