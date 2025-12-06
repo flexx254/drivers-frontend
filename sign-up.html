@@ -7,7 +7,22 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    body { font-family: sans-serif; padding: 20px; }
+    body {
+  font-family: sans-serif;
+  padding: 100px 20px 120px 20px; /* top padding for header, bottom for footer */
+}
+
+@media screen and (max-width: 768px) {
+  nav { display: none; }
+  .menu-icon { display: flex; }
+}
+
+
+  form, h2 {
+  max-width: 500px;
+  margin: 0 auto;
+}  
+    
     input, select { display:block; width:100%; padding:10px; margin:10px 0; }
     button { padding:10px 20px; width:100%; }
     #errorBox { color:red; margin-top:10px; white-space:pre-line; }
