@@ -2,21 +2,51 @@
 <html>
 <head>
   <title>Register</title>
+
   <style>
+    /* FORM CONTAINER */
+    .container {
+      max-width: 500px;     /* Limits width on large screens */
+      margin: 0 auto;       /* Centers the form */
+      padding: 20px;
+      box-sizing: border-box;
+    }
 
-    /* Add this inside <style> */
-.container {
-  max-width: 500px; /* limits width on large screens */
-  margin: 0 auto;   /* center horizontally */
-  padding: 20px;
-  box-sizing: border-box;
-}
-    body { font-family: sans-serif; padding: 20px; }
-    input, select { display:block; width:100%; padding:10px; margin:10px 0; }
-    button { padding:10px 20px; width:100%; }
-    #errorBox { color:red; margin-top:10px; white-space:pre-line; }
-    #successBox { color:green; margin-top:10px; }
+    /* GENERAL STYLES */
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      font-size: 16px;
+    }
 
+    input, select {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #errorBox {
+      color: red;
+      margin-top: 10px;
+      white-space: pre-line;
+    }
+
+    #successBox {
+      color: green;
+      margin-top: 10px;
+    }
+
+    /* PASSWORD EYE */
     .password-wrapper {
       position: relative;
       width: 100%;
@@ -31,43 +61,75 @@
       user-select: none;
       font-size: 18px;
     }
+
+    /* SMALL SCREENS */
+    @media (max-width: 400px) {
+      body {
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      input, select, button {
+        padding: 8px;
+        font-size: 14px;
+      }
+
+      .toggle-eye {
+        font-size: 16px;
+      }
+    }
+
+    /* LARGE SCREENS */
+    @media (min-width: 800px) {
+      button {
+        width: auto;
+        min-width: 200px;
+      }
+    }
   </style>
 </head>
+
 <body>
+
   <div class="container">
-  <h2>Create Account</h2>
 
-  <input id="name" placeholder="Enter full name" />
-  <input id="email" placeholder="Enter email" />
+    <h2>Create Account</h2>
 
-  <!-- PHONE NUMBER -->
-  <input id="phone_number" placeholder="Enter phone number (+2547...)" />
+    <input id="name" placeholder="Enter full name" />
+    <input id="email" placeholder="Enter email" />
 
-  <!-- SACCO -->
-  <select id="sacco">
-    <option value="">Select Sacco</option>
-    <option value="OOD">OOD</option>
-    <option value="DOD">DOD</option>
-    <option value="NONE">NONE</option>
-  </select>
+    <!-- PHONE NUMBER -->
+    <input id="phone_number" placeholder="Enter phone number (+2547...)" />
 
-  <!-- PASSWORD WITH EYE -->
-  <div class="password-wrapper">
-    <input id="password" type="password" placeholder="Enter password" />
-    <span class="toggle-eye" onclick="togglePassword('password', this)">👁️</span>
+    <!-- SACCO -->
+    <select id="sacco">
+      <option value="">Select Sacco</option>
+      <option value="OOD">OOD</option>
+      <option value="DOD">DOD</option>
+      <option value="NONE">NONE</option>
+    </select>
+
+    <!-- PASSWORD WITH EYE -->
+    <div class="password-wrapper">
+      <input id="password" type="password" placeholder="Enter password" />
+      <span class="toggle-eye">👁️</span>
+    </div>
+
+    <!-- CONFIRM PASSWORD -->
+    <div class="password-wrapper">
+      <input id="confirm" type="password" placeholder="Confirm password" />
+      <span class="toggle-eye">👁️</span>
+    </div>
+
+    <button>Submit</button>
+
+    <div id="errorBox"></div>
+    <div id="successBox"></div>
+
   </div>
 
-  <!-- CONFIRM PASSWORD WITH EYE -->
-  <div class="password-wrapper">
-    <input id="confirm" type="password" placeholder="Confirm password" />
-    <span class="toggle-eye" onclick="togglePassword('confirm', this)">👁️</span>
-  </div>
-
-  <button onclick="registerUser()">Submit</button>
-
-  <div id="errorBox"></div>
-  <div id="successBox"></div>
-  </div>
+</body>
+</html>
 <script>
 function togglePassword(id, el) {
   const input = document.getElementById(id);
