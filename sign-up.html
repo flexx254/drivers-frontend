@@ -8,12 +8,7 @@
 
 <style>
 /* RESET */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: sans-serif;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
 
 /* THEME COLORS */
 :root {
@@ -42,27 +37,13 @@ header {
   position: relative;
 }
 
-header .logo {
-  font-size: 20px;
-  font-weight: bold;
-}
+header .logo { font-size: 20px; font-weight: bold; }
 
-header nav {
-  display: flex;
-  gap: 20px;
-}
+header nav { display: flex; gap: 20px; }
 
-header nav a {
-  color: var(--white);
-  text-decoration: none;
-  font-weight: 500;
-}
+header nav a { color: var(--white); text-decoration: none; font-weight: 500; }
 
-header .menu-icon {
-  font-size: 24px;
-  cursor: pointer;
-  display: none;
-}
+header .menu-icon { font-size: 24px; cursor: pointer; display: none; }
 
 /* Mobile nav */
 nav.active {
@@ -77,9 +58,7 @@ nav.active {
   flex-direction: column;
 }
 
-nav.active a {
-  margin: 10px 0;
-}
+nav.active a { margin: 10px 0; }
 
 /* FORM STYLING */
 .container {
@@ -92,81 +71,26 @@ nav.active a {
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-h2 {
-  text-align: center;
-  color: var(--main-green);
-  margin-bottom: 20px;
-}
+h2 { text-align: center; color: var(--main-green); margin-bottom: 20px; }
 
-input, select, button {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
+input, select, button { display: block; width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; }
 
-button {
-  background-color: var(--main-green);
-  color: var(--white);
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s;
-}
+button { background-color: var(--main-green); color: var(--white); border: none; cursor: pointer; transition: background 0.3s; }
+button:hover { background-color: var(--light-green); }
 
-button:hover {
-  background-color: var(--light-green);
-}
-
-#successBox {
-  color: green;
-  margin-top: 10px;
-  text-align: center;
-}
-
-#errorBox {
-  color: red;
-  margin-top: 10px;
-  white-space: pre-line;
-  text-align: center;
-}
+#successBox { color: green; margin-top: 10px; text-align: center; }
+#errorBox { color: red; margin-top: 10px; white-space: pre-line; text-align: center; }
 
 /* PASSWORD TOGGLE */
-.password-wrapper {
-  position: relative;
-}
-
-.toggle-eye {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  user-select: none;
-  font-size: 18px;
-}
+.password-wrapper { position: relative; }
+.toggle-eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; font-size: 18px; }
 
 /* FOOTER */
-footer {
-  background-color: var(--main-green);
-  color: var(--white);
-  text-align: center;
-  padding: 15px;
-  margin-top: auto;
-}
+footer { background-color: var(--main-green); color: var(--white); text-align: center; padding: 15px; margin-top: auto; }
 
-/* LOGIN LINK */
-.login-link {
-  text-align: center;
-  margin-top: 10px;
-}
-.login-link a {
-  color: var(--main-green);
-  font-weight: bold;
-  text-decoration: none;
-}
+/* LOGIN & FORGOT LINKS */
+.links { text-align: center; margin-top: 10px; font-size: 14px; }
+.links a { color: var(--main-green); font-weight: bold; text-decoration: none; margin: 0 5px; }
 
 /* LOADER */
 #loader {
@@ -179,21 +103,12 @@ footer {
   animation: spin 1s linear infinite;
   margin: 10px auto;
 }
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* RESPONSIVE */
 @media screen and (max-width: 768px) {
-  nav {
-    display: none;
-    flex-direction: column;
-  }
-  header .menu-icon {
-    display: block;
-  }
+  nav { display: none; flex-direction: column; }
+  header .menu-icon { display: block; }
 }
 </style>
 </head>
@@ -203,7 +118,7 @@ footer {
   <div class="logo">Driver App</div>
   <nav id="navMenu">
     <a href="#">Home</a>
-    <a href="#">Login</a>
+    <a href="login.html">Login</a>
     <a href="#">About</a>
   </nav>
   <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
@@ -239,8 +154,9 @@ footer {
   <div id="errorBox"></div>
   <div id="successBox"></div>
 
-  <div class="login-link">
-    Already have an account? <a href="login.html">Login</a>
+  <div class="links">
+    Already have an account? <a href="login.html">Login</a> |
+    <a href="forgot-password.html">Forgot Password?</a>
   </div>
 </div>
 
@@ -252,19 +168,13 @@ footer {
 /* PASSWORD TOGGLE */
 function togglePassword(id, el) {
   const input = document.getElementById(id);
-  if (input.type === "password") {
-    input.type = "text";
-    el.textContent = "🙈";
-  } else {
-    input.type = "password";
-    el.textContent = "👁️";
-  }
+  if (input.type === "password") { input.type = "text"; el.textContent = "🙈"; }
+  else { input.type = "password"; el.textContent = "👁️"; }
 }
 
 /* RESPONSIVE MENU */
 const menuToggle = document.getElementById('menuToggle');
 const navMenu = document.getElementById('navMenu');
-
 menuToggle.addEventListener('click', () => {
   navMenu.classList.toggle('active');
   menuToggle.innerHTML = navMenu.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
@@ -273,7 +183,6 @@ menuToggle.addEventListener('click', () => {
 /* FRONTEND VALIDATION & REGISTER */
 function validateFrontend(name, email, phone, sacco, password, confirm) {
   let errors = [];
-
   if (!name) errors.push("Name is required.");
   if (!email) errors.push("Email is required.");
   else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.push("Enter a valid email address.");
@@ -285,14 +194,13 @@ function validateFrontend(name, email, phone, sacco, password, confirm) {
   if (!/[0-9]/.test(password)) errors.push("At least one number required.");
   if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) errors.push("At least one special character required.");
   if (password !== confirm) errors.push("Passwords do not match.");
-
   return errors;
 }
 
 async function registerUser() {
+  const loader = document.getElementById("loader");
   document.getElementById("errorBox").textContent = "";
   document.getElementById("successBox").textContent = "";
-  const loader = document.getElementById("loader");
   loader.style.display = "block";
 
   const name = document.getElementById("name").value.trim();
@@ -316,11 +224,7 @@ async function registerUser() {
       body: JSON.stringify({ name, email, phone_number, sacco, password, confirm })
     });
     const regData = await res.json();
-    if (!regData.success) {
-      loader.style.display = "none";
-      document.getElementById("errorBox").textContent = regData.error;
-      return;
-    }
+    if (!regData.success) { loader.style.display = "none"; document.getElementById("errorBox").textContent = regData.error; return; }
 
     const res2 = await fetch("https://drivers-backend-4spp.onrender.com/continue-reg", {
       method: "POST",
@@ -329,13 +233,9 @@ async function registerUser() {
     });
     const contData = await res2.json();
     loader.style.display = "none";
-    if (!contData.success) {
-      document.getElementById("errorBox").textContent = contData.error;
-      return;
-    }
+    if (!contData.success) { document.getElementById("errorBox").textContent = contData.error; return; }
 
     document.getElementById("successBox").textContent = "Registration complete! Check your email to continue ✔";
-
   } catch (err) {
     loader.style.display = "none";
     document.getElementById("errorBox").textContent = "Network error: " + err;
