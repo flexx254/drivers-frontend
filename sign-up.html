@@ -32,10 +32,10 @@
   <input id="name" placeholder="Enter full name" />
   <input id="email" placeholder="Enter email" />
 
-  <!-- NEW PHONE NUMBER -->
+  <!-- PHONE NUMBER -->
   <input id="phone_number" placeholder="Enter phone number (+2547...)" />
 
-  <!-- NEW SACCO DROPDOWN -->
+  <!-- SACCO -->
   <select id="sacco">
     <option value="">Select Sacco</option>
     <option value="OOD">OOD</option>
@@ -72,7 +72,7 @@ function togglePassword(id, el) {
   }
 }
 
-function validateFrontend(name, email, password, confirm) {
+function validateFrontend(name, email, phone, sacco, password, confirm) {
   let errors = [];
 
   if (!name) errors.push("Name is required.");
@@ -85,6 +85,17 @@ function validateFrontend(name, email, password, confirm) {
     if (!emailRegex.test(email)) {
       errors.push("Enter a valid email address.");
     }
+  }
+
+  // PHONE NUMBER (+254XXXXXXXXX)
+  const phoneRegex = /^\+254\d{9}$/;
+  if (!phoneRegex.test(phone)) {
+    errors.push("Phone must be in +254XXXXXXXXX format.");
+  }
+
+  // SACCO
+  if (!sacco) {
+    errors.push("Please select a sacco.");
   }
 
   // PASSWORD RULES
@@ -111,7 +122,7 @@ async function registerUser() {
   const confirm = document.getElementById("confirm").value;
 
   // FRONTEND VALIDATION
-  const errors = validateFrontend(name, email, password, confirm);
+  const errors = validateFrontend(name, email, phone_number, sacco, password, confirm);
   if (errors.length > 0) {
     document.getElementById("errorBox").textContent = errors.join("\n");
     return;
@@ -137,7 +148,7 @@ async function registerUser() {
     return;
   }
 
-  // STEP 2 — SEND CONTINUE REGISTRATION EMAIL
+  // STEP 2 — SEND CONTINUE REG EMAIL
   let contData;
   try {
     const res2 = await fetch("https://drivers-backend-4spp.onrender.com/continue-reg", {
@@ -157,7 +168,6 @@ async function registerUser() {
     return;
   }
 
-  // ALL GOOD
   document.getElementById("successBox").textContent =
     "Registration complete! Check your email to continue ✔";
 }
