@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+  
   <title>Register</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body { font-family: sans-serif; padding: 20px; }
     input, select { display:block; width:100%; padding:10px; margin:10px 0; }
@@ -23,10 +27,117 @@
       user-select: none;
       font-size: 18px;
     }
+
+    /* HEADER */
+header {
+  width: 100%;
+  background: #2f4f4f;
+  height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+}
+.logo { display: flex; align-items: center; }
+.logo svg { width: 40px; height: 40px; fill: goldenrod; }
+.logo span { font-size: 1.6rem; margin-left: 10px; color: goldenrod; font-weight: bold; }
+nav { display: flex; gap: 30px; }
+nav a { color: white; text-decoration: none; transition: 0.3s; }
+nav a:hover { color: goldenrod; }
+
+/* MOBILE MENU BUTTON */
+.menu-icon { display: none; flex-direction: column; gap: 6px; cursor: pointer; }
+.menu-icon span { height: 3px; width: 28px; background: white; border-radius: 3px; }
+
+/* MOBILE NAVIGATION */
+.mobile-nav {
+  position: fixed;
+  right: -260px;
+  top: 0;
+  width: 260px;
+  height: 100%;
+  background: white;
+  padding: 100px 20px;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  transition: 0.4s ease;
+  z-index: 1500;
+}
+.mobile-nav a { color: #2f4f4f; font-size: 1.2rem; text-decoration: none; }
+
+/* OVERLAY */
+#overlay {
+  position: fixed;
+  display: none;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: 1000;
+}
+
+/* FOOTER */
+.bottom-nav {
+  width: 100%;
+  background: #2f4f4f;
+  color: white;
+  padding: 20px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  bottom: 0; left: 0;
+  z-index: 2000;
+}
+.bottom-menu { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; }
+.bottom-menu a { color: white; text-decoration: none; }
+.bottom-menu a:hover { color: goldenrod; }
+.social-icons { display: flex; justify-content: center; gap: 20px; }
+.social-icons i { font-size: 26px; transition: .3s; }
+.social-icons i:hover { color: goldenrod; }
   </style>
 </head>
 <body>
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M3 4h18v16H3V4zm2 2v12h14V6H5zm2 2h10v8H7V8z"/>
+    </svg>
+    <span>Hati Safi</span>
+  </div>
 
+  <nav>
+    <a href="#">Submit</a>
+    <a href="#">About Us</a>
+    <a href="#">FAQ</a>
+    <a href="#">Contact Us</a>
+    <a href="#">Testimonials</a>
+  </nav>
+
+  <div class="menu-icon" id="menu-icon">
+    <span></span>
+    <span></span>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobile-nav">
+  <a href="#">Submit</a>
+  <a href="#">About Us</a>
+  <a href="#">FAQ</a>
+  <a href="#">Contact Us</a>
+  <a href="#">Testimonials</a>
+</div>
+
+<div id="overlay"></div>
   <h2>Create Account</h2>
 
   <input id="name" placeholder="Enter full name" />
@@ -60,6 +171,28 @@
   <div id="errorBox"></div>
   <div id="successBox"></div>
 
+<!-- FOOTER -->
+<div class="bottom-nav">
+  <div class="bottom-menu">
+    <a href="#">Submit</a>
+    <a href="#">About Us</a>
+    <a href="#">FAQ</a>
+    <a href="#">Contact Us</a>
+    <a href="#">Testimonials</a>
+  </div>
+
+  <div class="social-icons">
+    <a href="#"><i class="fab fa-facebook-f"></i></a>
+    <a href="#"><i class="fab fa-twitter"></i></a>
+    <a href="#"><i class="fab fa-instagram"></i></a>
+    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+  </div>
+
+  <div class="copyright">
+    © 2025 Hati Safi. All Rights Reserved.
+  </div>
+</div>
+  
 <script>
 function togglePassword(id, el) {
   const input = document.getElementById(id);
@@ -171,6 +304,29 @@ async function registerUser() {
   document.getElementById("successBox").textContent =
     "Registration complete! Check your email to continue ✔";
 }
+
+
+const menuIcon = document.getElementById("menu-icon");
+const mobileNav = document.getElementById("mobile-nav");
+const overlay = document.getElementById("overlay");
+
+let menuOpen = false;
+menuIcon.addEventListener("click", () => {
+    menuOpen = !menuOpen;
+    if(menuOpen){
+        mobileNav.style.right = "0";
+        overlay.style.display = "block";
+        menuIcon.innerHTML = `<span style="transform: rotate(45deg);"></span><span style="transform: rotate(-45deg); position: relative; top:-3px;"></span>`;
+    } else { closeMenu(); }
+});
+overlay.addEventListener("click", closeMenu);
+function closeMenu(){
+    mobileNav.style.right = "-260px";
+    overlay.style.display = "none";
+    menuOpen = false;
+    menuIcon.innerHTML = `<span></span><span></span>`;
+  }
+  
 </script>
 
 </body>
