@@ -4,29 +4,25 @@
   <title>Register</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
-    input, select { 
-      display:block; 
-      width:100%; 
-      padding:10px; 
-      margin:10px 0; 
-      box-sizing:border-box;
-    }
-    .password-wrapper {
-      position: relative;
-      width:100%;
-    }
-    .toggle-eye {
-      position:absolute;
-      right:12px;
-      top:50%;
-      transform:translateY(-50%);
-      cursor:pointer;
-      font-size:18px;
-      user-select:none;
-    }
+    input, select { display:block; width:100%; padding:10px; margin:10px 0; }
     button { padding:10px 20px; width:100%; }
     #errorBox { color:red; margin-top:10px; white-space:pre-line; }
     #successBox { color:green; margin-top:10px; }
+
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .toggle-eye {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      user-select: none;
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
@@ -36,17 +32,8 @@
   <input id="name" placeholder="Enter full name" />
   <input id="email" placeholder="Enter email" />
 
-  <!-- PASSWORD FIELD WITH EYE ICON -->
-  <div class="password-wrapper">
-    <input id="password" type="password" placeholder="Enter password" />
-    <span class="toggle-eye" onclick="togglePassword('password', this)">👁️</span>
-  </div>
-
-  <!-- CONFIRM PASSWORD FIELD WITH EYE ICON -->
-  <div class="password-wrapper">
-    <input id="confirm" type="password" placeholder="Confirm password" />
-    <span class="toggle-eye" onclick="togglePassword('confirm', this)">👁️</span>
-  </div>
+  <!-- NEW PHONE NUMBER -->
+  <input id="phone_number" placeholder="Enter phone number (+2547...)" />
 
   <!-- NEW SACCO DROPDOWN -->
   <select id="sacco">
@@ -56,34 +43,41 @@
     <option value="NONE">NONE</option>
   </select>
 
+  <!-- PASSWORD WITH EYE -->
+  <div class="password-wrapper">
+    <input id="password" type="password" placeholder="Enter password" />
+    <span class="toggle-eye" onclick="togglePassword('password', this)">👁️</span>
+  </div>
+
+  <!-- CONFIRM PASSWORD WITH EYE -->
+  <div class="password-wrapper">
+    <input id="confirm" type="password" placeholder="Confirm password" />
+    <span class="toggle-eye" onclick="togglePassword('confirm', this)">👁️</span>
+  </div>
+
   <button onclick="registerUser()">Submit</button>
 
   <div id="errorBox"></div>
   <div id="successBox"></div>
 
 <script>
-// ----------------------------
-// PASSWORD VISIBILITY TOGGLE
-// ----------------------------
 function togglePassword(id, el) {
   const input = document.getElementById(id);
   if (input.type === "password") {
     input.type = "text";
-    el.textContent = "🙈"; // eye closed
+    el.textContent = "🙈";
   } else {
     input.type = "password";
-    el.textContent = "👁️"; // eye open
+    el.textContent = "👁️";
   }
 }
 
-// ----------------------------
-// VALIDATION LOGIC (unchanged)
-// ----------------------------
 function validateFrontend(name, email, password, confirm) {
   let errors = [];
 
   if (!name) errors.push("Name is required.");
 
+  // EMAIL
   if (!email) {
     errors.push("Email is required.");
   } else {
@@ -93,6 +87,7 @@ function validateFrontend(name, email, password, confirm) {
     }
   }
 
+  // PASSWORD RULES
   if (password.length < 8) errors.push("Password must be at least 8 characters.");
   if (!/[A-Z]/.test(password)) errors.push("At least one capital letter required.");
   if (!/[a-z]/.test(password)) errors.push("At least one lowercase letter required.");
@@ -104,31 +99,31 @@ function validateFrontend(name, email, password, confirm) {
   return errors;
 }
 
-// ----------------------------
-// MAIN REGISTRATION FUNCTION
-// ----------------------------
 async function registerUser() {
   document.getElementById("errorBox").textContent = "";
   document.getElementById("successBox").textContent = "";
 
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim().toLowerCase();
+  const phone_number = document.getElementById("phone_number").value.trim();
+  const sacco = document.getElementById("sacco").value;
   const password = document.getElementById("password").value;
   const confirm = document.getElementById("confirm").value;
-  const sacco = document.getElementById("sacco").value;
 
+  // FRONTEND VALIDATION
   const errors = validateFrontend(name, email, password, confirm);
   if (errors.length > 0) {
     document.getElementById("errorBox").textContent = errors.join("\n");
     return;
   }
 
+  // STEP 1 — REGISTER
   let regData;
   try {
     const res = await fetch("https://drivers-backend-4spp.onrender.com/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, confirm, sacco })
+      body: JSON.stringify({ name, email, phone_number, sacco, password, confirm })
     });
 
     regData = await res.json();
@@ -142,6 +137,7 @@ async function registerUser() {
     return;
   }
 
+  // STEP 2 — SEND CONTINUE REGISTRATION EMAIL
   let contData;
   try {
     const res2 = await fetch("https://drivers-backend-4spp.onrender.com/continue-reg", {
@@ -161,6 +157,7 @@ async function registerUser() {
     return;
   }
 
+  // ALL GOOD
   document.getElementById("successBox").textContent =
     "Registration complete! Check your email to continue ✔";
 }
