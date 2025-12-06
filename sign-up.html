@@ -1,132 +1,353 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Register</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    /* FORM CONTAINER */
-    .container {
-      max-width: 500px;     /* Limits width on large screens */
-      margin: 0 auto;       /* Centers the form */
-      padding: 20px;
-      box-sizing: border-box;
-    }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    /* GENERAL STYLES */
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      font-size: 16px;
-    }
+<title>Register</title>
 
-    input, select {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      box-sizing: border-box;
-      font-size: 16px;
-    }
+<style>
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    button {
-      padding: 10px 20px;
-      width: 100%;
-      font-size: 16px;
-      cursor: pointer;
-    }
+/* BODY */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding-bottom: 150px; /* space so footer doesn't overlap form */
+}
 
-    #errorBox {
-      color: red;
-      margin-top: 10px;
-      white-space: pre-line;
-    }
+/* HEADER */
+header {
+  width: 100%;
+  height: 70px;
+  background: #2f4f4f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 1001;
+}
 
-    #successBox {
-      color: green;
-      margin-top: 10px;
-    }
+.logo {
+  display: flex;
+  align-items: center;
+}
 
-    /* PASSWORD EYE */
-    .password-wrapper {
-      position: relative;
-      width: 100%;
-    }
+.logo svg {
+  width: 40px;
+  height: 40px;
+  fill: goldenrod;
+}
 
-    .toggle-eye {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      user-select: none;
-      font-size: 18px;
-    }
+.logo span {
+  color: goldenrod;
+  font-size: 1.5rem;
+  margin-left: 10px;
+  font-weight: bold;
+}
 
-    /* SMALL SCREENS */
-    @media (max-width: 400px) {
-      body {
-        padding: 10px;
-        font-size: 14px;
-      }
+nav {
+  display: flex;
+  gap: 30px;
+}
 
-      input, select, button {
-        padding: 8px;
-        font-size: 14px;
-      }
+nav a {
+  text-decoration: none;
+  color: white;
+  font-size: 1rem;
+  transition: color 0.3s;
+}
 
-      .toggle-eye {
-        font-size: 16px;
-      }
-    }
+nav a:hover {
+  color: goldenrod;
+}
 
-    /* LARGE SCREENS */
-    @media (min-width: 800px) {
-      button {
-        width: auto;
-        min-width: 200px;
-      }
-    }
-  </style>
+/* MOBILE MENU BUTTON */
+.menu-icon {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.menu-icon span {
+  display: block;
+  height: 3px;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.4s ease;
+}
+
+/* MOBILE MENU */
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  right: -250px;
+  width: 250px;
+  height: 50%;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  padding: 80px 20px;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+  transition: right 0.4s ease;
+  z-index: 1000;
+}
+
+.mobile-nav a {
+  text-decoration: none;
+  color: #2f4f4f;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  z-index: 8;
+}
+
+/* RESPONSIVE TOP NAV */
+@media (max-width: 768px) {
+  nav {
+    display: none;
+  }
+  .menu-icon {
+    display: flex;
+  }
+}
+
+/* BOTTOM FOOTER */
+.bottom-nav {
+  width: 100%;
+  background: #2f4f4f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 10px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1001;
+}
+
+.bottom-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.bottom-menu a {
+  text-decoration: none;
+  color: white;
+  font-size: 1rem;
+  transition: color 0.3s;
+}
+
+.bottom-menu a:hover {
+  color: goldenrod;
+}
+
+/* SOCIAL ICONS */
+.social-icons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.social-icons a {
+  color: white;
+}
+
+.social-icons i {
+  font-size: 26px;
+  transition: color 0.3s;
+}
+
+.social-icons i:hover {
+  color: goldenrod;
+}
+
+/* HIDE BOTTOM MENU ON MOBILE */
+@media (max-width: 768px) {
+  .bottom-menu {
+    display: none;
+  }
+}
+
+/* COPYRIGHT */
+.copyright {
+  font-size: 0.8rem;
+  color: #ccc;
+  text-align: center;
+}
+
+/* ========================= */
+/* YOUR REGISTER FORM CSS    */
+/* ========================= */
+
+.container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+input, select {
+  display:block;
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  font-size: 16px;
+}
+
+button {
+  padding:10px 20px;
+  width:100%;
+  font-size: 16px;
+}
+
+#errorBox {
+  color:red;
+  margin-top:10px;
+  white-space:pre-line;
+}
+
+#successBox {
+  color:green;
+  margin-top:10px;
+}
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  user-select: none;
+  font-size: 18px;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="container">
-
-    <h2>Create Account</h2>
-
-    <input id="name" placeholder="Enter full name" />
-    <input id="email" placeholder="Enter email" />
-
-    <!-- PHONE NUMBER -->
-    <input id="phone_number" placeholder="Enter phone number (+2547...)" />
-
-    <!-- SACCO -->
-    <select id="sacco">
-      <option value="">Select Sacco</option>
-      <option value="OOD">OOD</option>
-      <option value="DOD">DOD</option>
-      <option value="NONE">NONE</option>
-    </select>
-
-    <!-- PASSWORD WITH EYE -->
-    <div class="password-wrapper">
-      <input id="password" type="password" placeholder="Enter password" />
-      <span class="toggle-eye">👁️</span>
-    </div>
-
-    <!-- CONFIRM PASSWORD -->
-    <div class="password-wrapper">
-      <input id="confirm" type="password" placeholder="Confirm password" />
-      <span class="toggle-eye">👁️</span>
-    </div>
-
-    <button>Submit</button>
-
-    <div id="errorBox"></div>
-    <div id="successBox"></div>
-
+<!-- ====================== -->
+<!-- HEADER -->
+<!-- ====================== -->
+<header>
+  <div class="logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M3 4h18v16H3V4zm2 2v12h14V6H5zm2 2h10v8H7V8z"/>
+    </svg>
+    <span>Hati Safi</span>
   </div>
+
+  <nav>
+    <a href="#">Submit</a>
+    <a href="#">About Us</a>
+    <a href="#">FAQ</a>
+    <a href="#">Contact Us</a>
+    <a href="#">Testimonials</a>
+  </nav>
+
+  <div class="menu-icon" id="menu-icon">
+    <span style="width: 20px;"></span>
+    <span style="width: 30px;"></span>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobile-nav">
+  <a href="#">Submit</a>
+  <a href="#">About Us</a>
+  <a href="#">FAQ</a>
+  <a href="#">Contact Us</a>
+  <a href="#">Testimonials</a>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+
+<!-- ====================== -->
+<!-- YOUR REGISTRATION FORM -->
+<!-- ====================== -->
+<div class="container">
+  <h2>Create Account</h2>
+
+  <input id="name" placeholder="Enter full name" />
+  <input id="email" placeholder="Enter email" />
+
+  <input id="phone_number" placeholder="Enter phone number (+2547...)" />
+
+  <select id="sacco">
+    <option value="">Select Sacco</option>
+    <option value="OOD">OOD</option>
+    <option value="DOD">DOD</option>
+    <option value="NONE">NONE</option>
+  </select>
+
+  <div class="password-wrapper">
+    <input id="password" type="password" placeholder="Enter password" />
+    <span class="toggle-eye">👁️</span>
+  </div>
+
+  <div class="password-wrapper">
+    <input id="confirm" type="password" placeholder="Confirm password" />
+    <span class="toggle-eye">👁️</span>
+  </div>
+
+  <button>Submit</button>
+
+  <div id="errorBox"></div>
+  <div id="successBox"></div>
+</div>
+
+
+<!-- ====================== -->
+<!-- FOOTER -->
+<!-- ====================== -->
+<div class="bottom-nav">
+  <div class="bottom-menu">
+    <a href="#">Submit</a>
+    <a href="#">About Us</a>
+    <a href="#">FAQ</a>
+    <a href="#">Contact Us</a>
+    <a href="#">Testimonials</a>
+  </div>
+
+  <div class="social-icons">
+    <a href="#"><i class="fab fa-facebook-f"></i></a>
+    <a href="#"><i class="fab fa-twitter"></i></a>
+    <a href="#"><i class="fab fa-instagram"></i></a>
+    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+  </div>
+
+  <div class="copyright">
+    &copy; 2025 Hati Safi. All Rights Reserved.
+  </div>
+</div>
 
 </body>
 </html>
