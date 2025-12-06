@@ -462,6 +462,41 @@ async function registerUser() {
   document.getElementById("successBox").textContent =
     "Registration complete! Check your email to continue ✔";
 }
+
+  const menuIcon = document.getElementById('menu-icon');  
+  const mobileNav = document.getElementById('mobile-nav');  
+  const overlay = document.getElementById('overlay');  
+  
+  let menuOpen = false;  
+  
+  menuIcon.addEventListener('click', () => {  
+    menuOpen = !menuOpen;  
+    if (menuOpen) {  
+      mobileNav.style.right = '0';  
+      overlay.style.display = 'block';  
+      // Change to X  
+      menuIcon.innerHTML = `  
+        <span style="transform: rotate(45deg) translate(5px, 5px); width: 30px;"></span>  
+        <span style="transform: rotate(-45deg) translate(5px, -5px); width: 30px;"></span>  
+      `;  
+    } else {  
+      closeMenu();  
+    }  
+  });  
+  
+  overlay.addEventListener('click', closeMenu);  
+  
+  function closeMenu() {  
+    mobileNav.style.right = '-250px';  
+    overlay.style.display = 'none';  
+    menuOpen = false;  
+    // Change back to two uneven lines  
+    menuIcon.innerHTML = `  
+      <span style="width: 20px;"></span>  
+      <span style="width: 30px;"></span>  
+    `;  
+  }  
+  
 </script>
 
 </body>
