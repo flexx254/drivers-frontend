@@ -333,8 +333,105 @@ async function registerUser() {
     submitBtn.style.cursor = "pointer";
   }
   }
+<script>
+/* PASSWORD TOGGLE */
+function togglePassword(id, el) {
+  const input = document.getElementById(id);
+  if (input.type === "password") {
+    input.type = "text";
+    el.textContent = "🙈";
+  } else {
+    input.type = "password";
+    el.textContent = "👁️";
+  }
+}
 
-  // REGISTER
+/* RESPONSIVE MENU */
+const menuToggle = document.getElementById('menuToggle');
+const navMenu = document.getElementById('navMenu');
+
+menuToggle.addEventListener('click', () => {
+  navMenu.classList.toggle('active');
+  menuToggle.innerHTML = navMenu.classList.contains('active')
+    ? '<i class="fas fa-times"></i>'
+    : '<i class="fas fa-bars"></i>';
+});
+
+/* PHONE AUTO FORMAT */
+function autoInsertPrefix() {
+  const input = document.getElementById("phone_number");
+
+  if (!input.value.startsWith("+254")) {
+    input.value = "+254" + input.value.replace(/[^0-9]/g, "");
+  }
+
+  input.value = input.value.replace(/(?!^\+254)[^\d]/g, "");
+
+  if (input.value.length > 13) {
+    input.value = input.value.slice(0, 13);
+  }
+}
+
+/* FRONTEND VALIDATION */
+function validateFrontend(name, email, phone, sacco, password, confirm) {
+  let errors = [];
+
+  if (!name) errors.push("Name is required.");
+
+  if (!email) {
+    errors.push("Email is required.");
+  } else {
+    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    if (!emailRegex.test(email)) errors.push("Enter a valid email.");
+  }
+
+  const phoneRegex = /^\+254\d{9}$/;
+  if (!phoneRegex.test(phone)) errors.push("Phone must be +254XXXXXXXXX");
+
+  if (!sacco) errors.push("Please select a sacco.");
+
+  if (password.length < 8) errors.push("Password must be at least 8 characters.");
+  if (!/[A-Z]/.test(password)) errors.push("At least one capital letter required.");
+  if (!/[a-z]/.test(password)) errors.push("At least one lowercase letter required.");
+  if (!/[0-9]/.test(password)) errors.push("At least one number required.");
+  if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) errors.push("At least one special character required.");
+  if (password !== confirm) errors.push("Passwords do not match.");
+
+  return errors;
+}
+
+/* REGISTER USER */
+async function registerUser() {
+  document.getElementById("errorBox").textContent = "";
+  document.getElementById("successBox").textContent = "";
+
+  const spinner = document.getElementById("spinner");
+  const submitBtn = document.querySelector("button");
+
+  spinner.style.display = "block";
+  submitBtn.disabled = true;
+  submitBtn.style.opacity = "0.6";
+  submitBtn.style.cursor = "not-allowed";
+
+  // Collect values
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone_number = document.getElementById("phone_number").value.trim();
+  const sacco = document.getElementById("sacco").value;
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm").value;
+
+  // Validate
+  const errors = validateFrontend(name, email, phone_number, sacco, password, confirm);
+  if (errors.length > 0) {
+    document.getElementById("errorBox").textContent = errors.join("\n");
+    spinner.style.display = "none";
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = "1";
+    submitBtn.style.cursor = "pointer";
+    return;
+  }
+
   try {
     const res = await fetch("https://drivers-backend-4spp.onrender.com/register", {
       method: "POST",
@@ -360,30 +457,18 @@ async function registerUser() {
       return;
     }
 
-    document.getElementById("successBox").textContent = "Registration complete! Check your email to continue ✔";
+    document.getElementById("successBox").textContent =
+      "Registration complete! Check your email ✔";
 
   } catch (err) {
     document.getElementById("errorBox").textContent = "Network error: " + err;
+  } finally {
+    spinner.style.display = "none";
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = "1";
+    submitBtn.style.cursor = "pointer";
   }
 }
-
- function autoInsertPrefix() {
-  const input = document.getElementById("phone_number");
-
-  // If user starts typing and +254 is missing, add it automatically
-  if (!input.value.startsWith("+254")) {
-    input.value = "+254" + input.value.replace(/[^0-9]/g, "");
-  }
-
-  // Only numbers allowed after +254
-  input.value = input.value.replace(/(?!^\+254)[^\d]/g, "");
-
-  // Max length = +254 + 9 digits = 13 characters
-  if (input.value.length > 13) {
-    input.value = input.value.slice(0, 13);
-  }
-} 
 </script>
-
 </body>
 </html>
