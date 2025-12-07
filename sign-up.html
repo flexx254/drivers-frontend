@@ -203,7 +203,7 @@ footer {
 
   <input id="name" placeholder="Enter full name" />
   <input id="email" placeholder="Enter email" />
-  <input id="phone_number" placeholder="Enter phone number (+2547...)" />
+  <input id="phone_number" placeholder="+2547..." value="+254" oninput="enforcePhoneFormat()" />
 
   <select id="sacco">
     <option value="">Select Sacco</option>
@@ -342,6 +342,23 @@ async function registerUser() {
     document.getElementById("errorBox").textContent = "Network error: " + err;
   }
 }
+
+  function enforcePhoneFormat() {
+  const input = document.getElementById("phone_number");
+
+  // Ensure it always starts with +254
+  if (!input.value.startsWith("+254")) {
+    input.value = "+254";
+  }
+
+  // Remove any letters or spaces
+  input.value = input.value.replace(/[^\d+]/g, "");
+
+  // Limit to +254 plus 9 more digits = 13 characters total
+  if (input.value.length > 13) {
+    input.value = input.value.slice(0, 13);
+  }
+  }
 </script>
 
 </body>
