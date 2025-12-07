@@ -166,6 +166,33 @@ footer {
     display: block;
   }
 }
+
+/* BUTTON SPINNER */
+button.loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+button.loading::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border: 3px solid white;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to { transform: translateY(-50%) rotate(360deg); }
+  }
+  
 </style>
 </head>
 <body>
@@ -271,7 +298,12 @@ function validateFrontend(name, email, phone, sacco, password, confirm) {
   return errors;
 }
 
+
 async function registerUser() {
+  const btn = document.querySelector("button");
+  btn.classList.add("loading");
+  btn.disabled = true;
+
   document.getElementById("errorBox").textContent = "";
   document.getElementById("successBox").textContent = "";
 
@@ -285,10 +317,11 @@ async function registerUser() {
   const errors = validateFrontend(name, email, phone_number, sacco, password, confirm);
   if (errors.length > 0) {
     document.getElementById("errorBox").textContent = errors.join("\n");
+    btn.classList.remove("loading");
+    btn.disabled = false;
     return;
   }
 
-  // REGISTER
   try {
     const res = await fetch("https://drivers-backend-4spp.onrender.com/register", {
       method: "POST",
@@ -299,6 +332,8 @@ async function registerUser() {
     const regData = await res.json();
     if (!regData.success) {
       document.getElementById("errorBox").textContent = regData.error;
+      btn.classList.remove("loading");
+      btn.disabled = false;
       return;
     }
 
@@ -311,15 +346,24 @@ async function registerUser() {
     const contData = await res2.json();
     if (!contData.success) {
       document.getElementById("errorBox").textContent = contData.error;
+      btn.classList.remove("loading");
+      btn.disabled = false;
       return;
     }
 
-    document.getElementById("successBox").textContent = "Registration complete! Check your email to continue ✔";
+    document.getElementById("successBox").textContent =
+      "Registration complete! Check your email to continue ✔";
 
   } catch (err) {
     document.getElementById("errorBox").textContent = "Network error: " + err;
+
+  } finally {
+    btn.classList.remove("loading");
+    btn.disabled = false;
+
   }
-}
+  }
+  
 </script>
 
 </body>
