@@ -166,38 +166,6 @@ footer {
     display: block;
   }
 }
-
-.extra-links {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.extra-links a {
-  font-size: 14px;
-  color: var(--main-green);
-  text-decoration: none;
-}
-
-.extra-links a:hover {
-  text-decoration: underline;
-  }
-
-  .spinner {
-  width: 28px;
-  height: 28px;
-  border: 3px solid #ccc;
-  border-top: 3px solid var(--main-green);
-  border-radius: 50%;
-  margin: 10px auto;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-  100% { transform: rotate(360deg); }
-  }
-  
 </style>
 </head>
 <body>
@@ -217,7 +185,7 @@ footer {
 
   <input id="name" placeholder="Enter full name" />
   <input id="email" placeholder="Enter email" />
-  <input id="phone_number" placeholder="+2547..." oninput="autoInsertPrefix()" />
+  <input id="phone_number" placeholder="Enter phone number (+2547...)" />
 
   <select id="sacco">
     <option value="">Select Sacco</option>
@@ -237,11 +205,6 @@ footer {
   </div>
 
   <button onclick="registerUser()">Submit</button>
-  <div id="spinner" class="spinner" style="display:none;"></div>
-  <div class="extra-links">
-  <a href="/login">Already have an account? Sign In</a>
-  <a href="/forgot-password">Forgot Password?</a>
-  </div>
   <div id="errorBox"></div>
   <div id="successBox"></div>
 </div>
@@ -312,126 +275,20 @@ async function registerUser() {
   document.getElementById("errorBox").textContent = "";
   document.getElementById("successBox").textContent = "";
 
-  const spinner = document.getElementById("spinner");
-  const submitBtn = document.querySelector("button");
-
-  spinner.style.display = "block";
-  submitBtn.disabled = true;
-  submitBtn.style.opacity = "0.6";
-  submitBtn.style.cursor = "not-allowed";
-
-  try {
-    // your existing code...
-  } 
-  catch (err) {
-    document.getElementById("errorBox").textContent = "Network error: " + err;
-  }
-  finally {
-    spinner.style.display = "none";
-    submitBtn.disabled = false;
-    submitBtn.style.opacity = "1";
-    submitBtn.style.cursor = "pointer";
-  }
-  }
-<script>
-/* PASSWORD TOGGLE */
-function togglePassword(id, el) {
-  const input = document.getElementById(id);
-  if (input.type === "password") {
-    input.type = "text";
-    el.textContent = "🙈";
-  } else {
-    input.type = "password";
-    el.textContent = "👁️";
-  }
-}
-
-/* RESPONSIVE MENU */
-const menuToggle = document.getElementById('menuToggle');
-const navMenu = document.getElementById('navMenu');
-
-menuToggle.addEventListener('click', () => {
-  navMenu.classList.toggle('active');
-  menuToggle.innerHTML = navMenu.classList.contains('active')
-    ? '<i class="fas fa-times"></i>'
-    : '<i class="fas fa-bars"></i>';
-});
-
-/* PHONE AUTO FORMAT */
-function autoInsertPrefix() {
-  const input = document.getElementById("phone_number");
-
-  if (!input.value.startsWith("+254")) {
-    input.value = "+254" + input.value.replace(/[^0-9]/g, "");
-  }
-
-  input.value = input.value.replace(/(?!^\+254)[^\d]/g, "");
-
-  if (input.value.length > 13) {
-    input.value = input.value.slice(0, 13);
-  }
-}
-
-/* FRONTEND VALIDATION */
-function validateFrontend(name, email, phone, sacco, password, confirm) {
-  let errors = [];
-
-  if (!name) errors.push("Name is required.");
-
-  if (!email) {
-    errors.push("Email is required.");
-  } else {
-    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-    if (!emailRegex.test(email)) errors.push("Enter a valid email.");
-  }
-
-  const phoneRegex = /^\+254\d{9}$/;
-  if (!phoneRegex.test(phone)) errors.push("Phone must be +254XXXXXXXXX");
-
-  if (!sacco) errors.push("Please select a sacco.");
-
-  if (password.length < 8) errors.push("Password must be at least 8 characters.");
-  if (!/[A-Z]/.test(password)) errors.push("At least one capital letter required.");
-  if (!/[a-z]/.test(password)) errors.push("At least one lowercase letter required.");
-  if (!/[0-9]/.test(password)) errors.push("At least one number required.");
-  if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) errors.push("At least one special character required.");
-  if (password !== confirm) errors.push("Passwords do not match.");
-
-  return errors;
-}
-
-/* REGISTER USER */
-async function registerUser() {
-  document.getElementById("errorBox").textContent = "";
-  document.getElementById("successBox").textContent = "";
-
-  const spinner = document.getElementById("spinner");
-  const submitBtn = document.querySelector("button");
-
-  spinner.style.display = "block";
-  submitBtn.disabled = true;
-  submitBtn.style.opacity = "0.6";
-  submitBtn.style.cursor = "not-allowed";
-
-  // Collect values
   const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
+  const email = document.getElementById("email").value.trim().toLowerCase();
   const phone_number = document.getElementById("phone_number").value.trim();
   const sacco = document.getElementById("sacco").value;
   const password = document.getElementById("password").value;
   const confirm = document.getElementById("confirm").value;
 
-  // Validate
   const errors = validateFrontend(name, email, phone_number, sacco, password, confirm);
   if (errors.length > 0) {
     document.getElementById("errorBox").textContent = errors.join("\n");
-    spinner.style.display = "none";
-    submitBtn.disabled = false;
-    submitBtn.style.opacity = "1";
-    submitBtn.style.cursor = "pointer";
     return;
   }
 
+  // REGISTER
   try {
     const res = await fetch("https://drivers-backend-4spp.onrender.com/register", {
       method: "POST",
@@ -457,18 +314,13 @@ async function registerUser() {
       return;
     }
 
-    document.getElementById("successBox").textContent =
-      "Registration complete! Check your email ✔";
+    document.getElementById("successBox").textContent = "Registration complete! Check your email to continue ✔";
 
   } catch (err) {
     document.getElementById("errorBox").textContent = "Network error: " + err;
-  } finally {
-    spinner.style.display = "none";
-    submitBtn.disabled = false;
-    submitBtn.style.opacity = "1";
-    submitBtn.style.cursor = "pointer";
   }
 }
 </script>
+
 </body>
 </html>
