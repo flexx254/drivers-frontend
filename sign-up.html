@@ -183,6 +183,20 @@ footer {
 .extra-links a:hover {
   text-decoration: underline;
   }
+
+  .spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #ccc;
+  border-top: 3px solid var(--main-green);
+  border-radius: 50%;
+  margin: 10px auto;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+  }
   
 </style>
 </head>
@@ -223,6 +237,7 @@ footer {
   </div>
 
   <button onclick="registerUser()">Submit</button>
+  <div id="spinner" class="spinner" style="display:none;"></div>
   <div class="extra-links">
   <a href="/login">Already have an account? Sign In</a>
   <a href="/forgot-password">Forgot Password?</a>
@@ -297,17 +312,26 @@ async function registerUser() {
   document.getElementById("errorBox").textContent = "";
   document.getElementById("successBox").textContent = "";
 
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const phone_number = document.getElementById("phone_number").value.trim();
-  const sacco = document.getElementById("sacco").value;
-  const password = document.getElementById("password").value;
-  const confirm = document.getElementById("confirm").value;
+  const spinner = document.getElementById("spinner");
+  const submitBtn = document.querySelector("button");
 
-  const errors = validateFrontend(name, email, phone_number, sacco, password, confirm);
-  if (errors.length > 0) {
-    document.getElementById("errorBox").textContent = errors.join("\n");
-    return;
+  spinner.style.display = "block";
+  submitBtn.disabled = true;
+  submitBtn.style.opacity = "0.6";
+  submitBtn.style.cursor = "not-allowed";
+
+  try {
+    // your existing code...
+  } 
+  catch (err) {
+    document.getElementById("errorBox").textContent = "Network error: " + err;
+  }
+  finally {
+    spinner.style.display = "none";
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = "1";
+    submitBtn.style.cursor = "pointer";
+  }
   }
 
   // REGISTER
