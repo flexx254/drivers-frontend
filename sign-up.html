@@ -370,6 +370,30 @@ async function registerUser() {
 
   }
   }
+
+  let firstTyped = false;
+
+function autoInsertPrefix() {
+  const input = document.getElementById("phone_number");
+  let value = input.value;
+
+  // If this is the first input ever
+  if (!firstTyped) {
+    firstTyped = true;
+    input.value = "+254";
+    return;
+  }
+
+  // Always force +254 at the start
+  if (!value.startsWith("+254")) {
+    value = "+254" + value.replace(/[^\d]/g, "");
+  }
+
+  // Digits allowed only after +254
+  const digits = value.slice(4).replace(/[^\d]/g, "").slice(0, 9);
+
+  input.value = "+254" + digits;
+  }
   
 </script>
 
