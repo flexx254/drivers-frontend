@@ -212,7 +212,14 @@ button.loading::after {
 
   <input id="name" placeholder="Enter full name" />
   <input id="email" placeholder="Enter email" />
-  <input id="phone_number" placeholder="Enter phone number (+2547...)" />
+  <label for="phone">Phone</label>
+  <input id="phone" name="phone" type="tel" 
+       value="+254" maxlength="13" 
+       placeholder="+2547xxxxxxxx" 
+       autocomplete="tel" required
+       aria-describedby="phoneHelp" />
+<div id="phoneHelp" class="input-help">Start with <code>+254</code>. Example: <code>+2547XXXXXXXX</code></div>
+<div id="phoneError" class="error" aria-live="polite" style="display:none;"></div>
 
   <select id="sacco">
     <option value="">Select Sacco</option>
