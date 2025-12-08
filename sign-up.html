@@ -212,16 +212,13 @@ button.loading::after {
 
   <input id="name" placeholder="Enter full name" />
   <input id="email" placeholder="Enter email" />
-
-  <label for="phone">Phone</label>
-  <input id="phone"
-       name="phone"
-       type="tel"
-       placeholder="+2547..."
-       autocomplete="tel"
-       required
-       oninput="autoInsertPrefix()" />
-
+<label for="phone">Phone</label>
+<input id="phone" name="phone" type="tel" 
+       value="+254" maxlength="13" 
+       placeholder="+2547xxxxxxxx" 
+       autocomplete="tel" required
+       aria-describedby="phoneHelp" />
+<div id="phoneHelp" class="input-help">Start with <code>+254</code>. Example: <code>+2547XXXXXXXX</code></div>
 <div id="phoneError" class="error" aria-live="polite" style="display:none;"></div>
 
   <select id="sacco">
