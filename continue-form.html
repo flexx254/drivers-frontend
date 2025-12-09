@@ -199,7 +199,7 @@ setupPreview("psv_badge","psv_preview");
 setupPreview("good_conduct","gc_preview");
 
 // ---------------------
-// FIXED FILE UPLOAD
+// FILE UPLOAD FUNCTION
 // ---------------------
 async function uploadFile(tokenVal, fileInputId, expiryId, route){
     const fileInput = document.getElementById(fileInputId);
@@ -208,19 +208,10 @@ async function uploadFile(tokenVal, fileInputId, expiryId, route){
     const form = new FormData();
     form.append("token", tokenVal);
 
-    // Correct keys for the backend
-    if(fileInputId === "profile_pic"){
-        form.append("profile_picture", fileInput.files[0]);
-    }
-    if(fileInputId === "driving_license"){
-        form.append("driving_license", fileInput.files[0]);
-    }
-    if(fileInputId === "psv_badge"){
-        form.append("psv_badge", fileInput.files[0]);
-    }
-    if(fileInputId === "good_conduct"){
-        form.append("good_conduct", fileInput.files[0]);
-    }
+    if(fileInputId === "profile_pic") form.append("profile_picture", fileInput.files[0]);
+    if(fileInputId === "driving_license") form.append("driving_license", fileInput.files[0]);
+    if(fileInputId === "psv_badge") form.append("psv_badge", fileInput.files[0]);
+    if(fileInputId === "good_conduct") form.append("good_conduct", fileInput.files[0]);
 
     if(expiryId){
         const expiryValue = document.getElementById(expiryId).value || "";
@@ -243,12 +234,15 @@ async function uploadProfilePicture(tokenVal){
     return uploadFile(tokenVal, "profile_pic", null, "update-profile-picture");
 }
 
-function showSpinner() {
+// ---------------------
+// SPINNER FUNCTIONS
+// ---------------------
+function showSpinner(){
     const btn = document.querySelector("button");
     btn.disabled = true;
 
     let spin = document.getElementById("btnSpinner");
-    if (!spin) {
+    if(!spin){
         spin = document.createElement("div");
         spin.id = "btnSpinner";
         spin.className = "spinner";
@@ -257,15 +251,18 @@ function showSpinner() {
     spin.style.display = "block";
 }
 
-function hideSpinner() {
+function hideSpinner(){
     const btn = document.querySelector("button");
     const spin = document.getElementById("btnSpinner");
     btn.disabled = false;
-    if (spin) spin.style.display = "none";
-  }
-  
+    if(spin) spin.style.display = "none";
+}
+
+// ---------------------
+// SAVE DETAILS FUNCTION
+// ---------------------
 async function saveDetails(){
-    showSpinner();   // ← START SPINNER
+    showSpinner();
 
     const tokenVal = document.getElementById("token").value.trim();
     const id = document.getElementById("id_number").value.trim();
@@ -276,64 +273,60 @@ async function saveDetails(){
     if(!plate){ showMessage("Number plate is required.","error"); hideSpinner(); return; }
 
     // --- Update ID ---
-    const formID = new FormData();
-    formID.append("token", tokenVal);
-    formID.append("id_number", id);
-
     try{
-        const res = await fetch("https://drivers-backend-4spp.onrender.com/update-id", {
-            method:"POST",
-            body:formID
-        });
-        const data = await res.json();
-        if(!data.success){
-            showMessage(data.error || "Error saving ID number","error");
-            hideSpinner();
-            return;
-        }
+        const formID = new FormData();
+        formID.append("token", tokenVal);
+        formID.append("id_number", id);
+        const resID = await fetch("https://drivers-backend-4spp.onrender.com/update-id", {method:"POST", body:formID});
+        const dataID = await resID.json();
+        if(!dataID.success){ showMessage(dataID.error || "Error saving ID number","error"); hideSpinner(); return; }
     }catch(e){
-        showMessage("Network error updating ID number.","error");
-        hideSpinner();
-        return;
+        showMessage("Network error updating ID number.","error"); hideSpinner(); return;
     }
 
     // --- Update number plate ---
-    const formPlate = new FormData();
-    formPlate.append("token", tokenVal);
-    formPlate.append("number_plate", plate);
-
     try{
-        const res = await fetch("https://drivers-backend-4spp.onrender.com/update-number-plate", {
-            method:"POST",
-            body:formPlate
-        });
-        const data = await res.json();
-        if(!data.success){
-            showMessage(data.error || "Error saving number plate","error");
-            hideSpinner();
-            return;
-        }
+        const formPlate = new FormData();
+        formPlate.append("token", tokenVal);
+        formPlate.append("number_plate", plate);
+        const resPlate = await fetch("https://drivers-backend-4spp.onrender.com/update-number-plate", {method:"POST", body:formPlate});
+        const dataPlate = await resPlate.json();
+        if(!dataPlate.success){ showMessage(dataPlate.error || "Error saving number plate","error"); hideSpinner(); return; }
     }catch(e){
-        showMessage("Network error updating number plate.","error");
-        hideSpinner();
-        return;
+        showMessage("Network error updating number plate.","error"); hideSpinner(); return;
     }
 
- 
+    // --- Upload profile picture ---
+    const resultProfile = await uploadProfilePicture(tokenVal);
+    if(!resultProfile.success){ showMessage(resultProfile.error,"error"); hideSpinner(); return; }
 
-/* RESPONSIVE MENU */
+    // --- Upload other documents ---
+    const docs = [
+        {id:"driving_license", expiry:"license_expiry", route:"update-driving-license"},
+        {id:"psv_badge", expiry:"psv_badge_expiry", route:"update-psv-badge"},
+        {id:"good_conduct", expiry:"good_conduct_expiry", route:"update-good-conduct"}
+    ];
+
+    for(const doc of docs){
+        const res = await uploadFile(tokenVal, doc.id, doc.expiry, doc.route);
+        if(!res.success){ showMessage(res.error,"error"); hideSpinner(); return; }
+    }
+
+    hideSpinner();
+    showMessage("All details saved successfully!","success");
+}
+
+// ---------------------
+// RESPONSIVE MENU
+// ---------------------
 const menuToggle = document.getElementById('menuToggle');
 const navMenu = document.getElementById('navMenu');
 
 menuToggle.addEventListener('click', () => {
   navMenu.classList.toggle('active');
-  if (navMenu.classList.contains('active')) {
-    menuToggle.innerHTML = '<i class="fas fa-times"></i>';
-  } else {
-    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
-  }
+  menuToggle.innerHTML = navMenu.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
 });
-            
+        
     </script>
 
 </body>
