@@ -15,7 +15,7 @@ body { font-family: Arial, sans-serif; margin:0; padding:0px; background:#f5f5f5
 h2 { color:#1b8f2a; text-align:center; margin-bottom:20px; }
 label { font-weight:bold; color:#1b8f2a; display:block; margin-bottom:6px; }
 input { width:100%; padding:12px; border:2px solid #1b8f2a; border-radius:8px; font-size:16px; margin-bottom:20px; }
-button { width:100%; background:#1b8f2a; color:white; padding:14px; border:none; border-radius:8px; font-size:18px; cursor:pointer; }
+button { width:100%; background:#1b8f2a; color:white; padding:14px; border:none; border-radius:8px; font-size:18px; cursor:pointer; position:relative;}
 button:active { background:#166d20; }
 .msg { display:none; padding:12px; margin-top:15px; border-radius:8px; font-size:15px; }
 .success { background:#d8ffd8; color:#0f6e12; }
@@ -81,6 +81,22 @@ nav.active a {
   }
 }
 
+  .spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: none;
+  position: absolute;
+  right: 18px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+    }
+
 /* FOOTER */
 footer {
   background-color: var(--main-green);
@@ -140,7 +156,10 @@ footer {
 <label for="good_conduct_expiry">Good Conduct Expiry Date</label>
 <input type="date" id="good_conduct_expiry">
 
-<button onclick="saveDetails()">Save Details</button>
+<button id="saveBtn" onclick="saveDetails()">
+  Save Details
+  <div class="spinner" id="btnSpinner"></div>
+</button>
 <div id="msgBox" class="msg"></div>
 
 </div>
@@ -224,17 +243,37 @@ async function uploadProfilePicture(tokenVal){
     return uploadFile(tokenVal, "profile_pic", null, "update-profile-picture");
 }
 
-// ---------------------
-// SAVE DETAILS
-// ---------------------
+function showSpinner() {
+    const btn = document.querySelector("button");
+    btn.disabled = true;
+
+    let spin = document.getElementById("btnSpinner");
+    if (!spin) {
+        spin = document.createElement("div");
+        spin.id = "btnSpinner";
+        spin.className = "spinner";
+        btn.appendChild(spin);
+    }
+    spin.style.display = "block";
+}
+
+function hideSpinner() {
+    const btn = document.querySelector("button");
+    const spin = document.getElementById("btnSpinner");
+    btn.disabled = false;
+    if (spin) spin.style.display = "none";
+  }
+  
 async function saveDetails(){
+    showSpinner();   // ← START SPINNER
+
     const tokenVal = document.getElementById("token").value.trim();
     const id = document.getElementById("id_number").value.trim();
     const plate = document.getElementById("number_plate").value.trim();
 
-    if(!tokenVal){ showMessage("Token missing. Open the link from your email.","error"); return; }
-    if(!id){ showMessage("ID number is required.","error"); return; }
-    if(!plate){ showMessage("Number plate is required.","error"); return; }
+    if(!tokenVal){ showMessage("Token missing. Open the link from your email.","error"); hideSpinner(); return; }
+    if(!id){ showMessage("ID number is required.","error"); hideSpinner(); return; }
+    if(!plate){ showMessage("Number plate is required.","error"); hideSpinner(); return; }
 
     // --- Update ID ---
     const formID = new FormData();
@@ -249,10 +288,12 @@ async function saveDetails(){
         const data = await res.json();
         if(!data.success){
             showMessage(data.error || "Error saving ID number","error");
+            hideSpinner();
             return;
         }
     }catch(e){
         showMessage("Network error updating ID number.","error");
+        hideSpinner();
         return;
     }
 
@@ -269,12 +310,43 @@ async function saveDetails(){
         const data = await res.json();
         if(!data.success){
             showMessage(data.error || "Error saving number plate","error");
+            hideSpinner();
             return;
         }
     }catch(e){
         showMessage("Network error updating number plate.","error");
+        hideSpinner();
         return;
     }
+
+    // --- Upload profile picture ---
+    let result = await uploadProfilePicture(tokenVal);
+    if(!result.success){
+        showMessage(result.error,"error");
+        hideSpinner();
+        return;
+    }
+
+    // --- Upload documents ---
+    const docs = [
+        {id:"driving_license", expiry:"license_expiry", route:"update-driving-license"},
+        {id:"psv_badge", expiry:"psv_badge_expiry", route:"update-psv-badge"},
+        {id:"good_conduct", expiry:"good_conduct_expiry", route:"update-good-conduct"}
+    ];
+
+    for(const doc of docs){
+        result = await uploadFile(tokenVal, doc.id, doc.expiry, doc.route);
+        if(!result.success){
+            showMessage(result.error,"error");
+            hideSpinner();
+            return;
+        }
+    }
+
+    hideSpinner(); // ← STOP SPINNER
+    showMessage("All details saved successfully!","success");
+  }
+
 
     // --- Upload profile picture ---
     let result = await uploadProfilePicture(tokenVal);
