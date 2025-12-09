@@ -193,10 +193,10 @@ button.loading::after {
   to { transform: translateY(-50%) rotate(360deg); }
   }
 
-
- .extra-links {
+.extra-links {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;  /* makes them vertical */
+  gap: 6px;                /* space between the links */
   margin-top: 10px;
 }
 
@@ -208,7 +208,7 @@ button.loading::after {
 
 .extra-links a:hover {
   text-decoration: underline;
-} 
+  }
   
 </style>
 </head>
