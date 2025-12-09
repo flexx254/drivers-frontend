@@ -192,6 +192,23 @@ button.loading::after {
   from { transform: translateY(-50%) rotate(0deg); }
   to { transform: translateY(-50%) rotate(360deg); }
   }
+
+
+ .extra-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.extra-links a {
+  font-size: 14px;
+  color: var(--main-green);
+  text-decoration: none;
+}
+
+.extra-links a:hover {
+  text-decoration: underline;
+} 
   
 </style>
 </head>
@@ -243,6 +260,10 @@ button.loading::after {
   <div id="errorBox"></div>
   <div id="successBox"></div>
 </div>
+  <div class="extra-links">
+  <a href="/login">Already have an account? Sign In</a>
+  <a href="/forgot-password">Forgot Password?</a>
+  </div>
 
 <footer>
   &copy; 2025 Driver App. All rights reserved.
