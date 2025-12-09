@@ -319,59 +319,7 @@ async function saveDetails(){
         return;
     }
 
-    // --- Upload profile picture ---
-    let result = await uploadProfilePicture(tokenVal);
-    if(!result.success){
-        showMessage(result.error,"error");
-        hideSpinner();
-        return;
-    }
-
-    // --- Upload documents ---
-    const docs = [
-        {id:"driving_license", expiry:"license_expiry", route:"update-driving-license"},
-        {id:"psv_badge", expiry:"psv_badge_expiry", route:"update-psv-badge"},
-        {id:"good_conduct", expiry:"good_conduct_expiry", route:"update-good-conduct"}
-    ];
-
-    for(const doc of docs){
-        result = await uploadFile(tokenVal, doc.id, doc.expiry, doc.route);
-        if(!result.success){
-            showMessage(result.error,"error");
-            hideSpinner();
-            return;
-        }
-    }
-
-    hideSpinner(); // ← STOP SPINNER
-    showMessage("All details saved successfully!","success");
-  }
-
-
-    // --- Upload profile picture ---
-    let result = await uploadProfilePicture(tokenVal);
-    if(!result.success){
-        showMessage(result.error,"error");
-        return;
-    }
-
-    // --- Upload documents ---
-    const docs = [
-        {id:"driving_license", expiry:"license_expiry", route:"update-driving-license"},
-        {id:"psv_badge", expiry:"psv_badge_expiry", route:"update-psv-badge"},
-        {id:"good_conduct", expiry:"good_conduct_expiry", route:"update-good-conduct"}
-    ];
-
-    for(const doc of docs){
-        result = await uploadFile(tokenVal, doc.id, doc.expiry, doc.route);
-        if(!result.success){
-            showMessage(result.error,"error");
-            return;
-        }
-    }
-
-    showMessage("All details saved successfully!","success");
-}
+ 
 
 /* RESPONSIVE MENU */
 const menuToggle = document.getElementById('menuToggle');
