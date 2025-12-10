@@ -143,16 +143,21 @@ footer {
   </footer>
 
 <script>
-// Toggle password visibility
-document.getElementById("togglePass").addEventListener("click", () => {
-    const pwd = document.getElementById("password");
-    if(pwd.type === "password"){
-        pwd.type = "text";
-    } else {
-        pwd.type = "password";
-    }
-});
 
+const toggle = document.getElementById("togglePass");
+const pwd = document.getElementById("password");
+
+toggle.addEventListener("click", () => {
+  if (pwd.type === "password") {
+    // Show password
+    pwd.type = "text";
+    toggle.textContent = "👁️";  // keep the eye
+  } else {
+    // Hide password
+    pwd.type = "password";
+    toggle.textContent = "🙈";  // monkey covers eyes
+  }
+});
 // Show messages
 function showMessage(text, type){
     const msg = document.getElementById("msgBox");
