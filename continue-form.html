@@ -93,11 +93,12 @@ nav.active a {
   right: 18px;
   top: 50%;
   transform: translateY(-50%);
-  }
+}
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
-    }
+  0% { transform: translateY(-50%) rotate(0deg); }
+  100% { transform: translateY(-50%) rotate(360deg); }
+       }
 
 /* FOOTER */
 footer {
