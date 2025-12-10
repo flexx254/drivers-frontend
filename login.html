@@ -4,7 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Driver Login</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> 
 <style>
+
+    :root {
+  --main-green: #1b8f2a;
+  --white: #ffffff;
+    }
 body { font-family: Arial, sans-serif; margin:0; padding:20px; background:#f5f5f5; }
 .container { max-width:400px; margin:auto; background:white; padding:22px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.12); }
 h2 { color:#1b8f2a; text-align:center; margin-bottom:20px; }
@@ -17,9 +23,89 @@ button:active { background:#166d20; }
 .error { background:#ffd6d6; color:#a30000; }
 .toggle-pass { cursor:pointer; position:absolute; right:18px; top:42px; font-size:18px; color:#1b8f2a; }
 .password-wrapper { position:relative; }
+
+  /* HEADER */
+header {
+  background-color: var(--main-green);
+  color: var(--white);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+header .logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+header .menu-icon {
+  font-size: 24px;
+  cursor: pointer;
+  display: none;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+nav.active {
+  display: block;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: var(--main-green);
+  padding: 15px;
+  border-radius: 5px;
+  width: 150px;
+}
+
+nav.active a {
+  display: block;
+  margin: 10px 0;
+}
+
+/* RESPONSIVE */
+@media screen and (max-width: 768px) {
+  nav {
+    display: none;
+    flex-direction: column;
+  }
+  header .menu-icon {
+    display: block;
+  }
+  }
+
+  /* FOOTER */
+footer {
+  background-color: var(--main-green);
+  color: var(--white);
+  text-align: center;
+  padding: 15px;
+  margin-top: auto;
+  }
 </style>
 </head>
 <body>
+
+   <header>
+
+    <div class="logo">Driver App</div>
+  <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
+  <nav id="navMenu">
+    <a href="#">Home</a>
+    <a href="#">Login</a>
+    <a href="#">About</a>
+  </nav>
+   </header>
 
 <div class="container">
 <h2>Driver Login</h2>
@@ -36,6 +122,10 @@ button:active { background:#166d20; }
 <button onclick="login()">Login</button>
 <div id="msgBox" class="msg"></div>
 </div>
+
+  <footer>
+  &copy; 2025 Driver App. All rights reserved.
+  </footer>
 
 <script>
 // Toggle password visibility
@@ -88,6 +178,17 @@ async function login(){
         console.error(e);
     }
 }
+
+  // ---------------------
+// RESPONSIVE MENU
+// ---------------------
+const menuToggle = document.getElementById('menuToggle');
+const navMenu = document.getElementById('navMenu');
+
+menuToggle.addEventListener('click', () => {
+  navMenu.classList.toggle('active');
+  menuToggle.innerHTML = navMenu.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+});
 </script>
 
 </body>
