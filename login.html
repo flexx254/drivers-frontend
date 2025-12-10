@@ -28,7 +28,15 @@ button:active { background:#166d20; }
 .msg { display:none; padding:12px; margin-top:15px; border-radius:8px; font-size:15px; }
 .success { background:#d8ffd8; color:#0f6e12; }
 .error { background:#ffd6d6; color:#a30000; }
-.toggle-pass { cursor:pointer; position:absolute; right:18px; top:42px; font-size:18px; color:#1b8f2a; }
+.toggle-pass {
+  cursor: pointer;
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: var(--main-green);
+}
 .password-wrapper { position:relative; }
 
   /* HEADER */
