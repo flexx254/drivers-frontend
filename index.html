@@ -25,33 +25,74 @@
     }
 
     /* HEADER */
-    .app-header {
-      width: 100%;
-      background: var(--green);
-      padding: 15px 20px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-    }
+/* HEADER */
+header {
+  background-color: var(--main-green);
+  color: var(--white);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
 
-    .header-content {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      color: #fff;
-    }
+header .logo {
+  font-size: 20px;
+  font-weight: bold;
+}
 
-    .header-content h1 {
-      font-size: 22px;
-      margin: 0;
-      flex: 1;
-    }
+header .menu-icon {
+  font-size: 24px;
+  cursor: pointer;
+  display: none;
+}
 
-    #menuToggle {
-      font-size: 22px;
-      cursor: pointer;
-    }
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+nav.active {
+  display: block;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: var(--main-green);
+  padding: 15px;
+  border-radius: 5px;
+  width: 150px;
+}
+
+nav.active a {
+  display: block;
+  margin: 10px 0;
+}
+
+/* RESPONSIVE */
+@media screen and (max-width: 768px) {
+  nav {
+    display: none;
+    flex-direction: column;
+  }
+  header .menu-icon {
+    display: block;
+  }
+}
+
+/* FOOTER */
+footer {
+  background-color: var(--main-green);
+  color: var(--white);
+  text-align: center;
+  padding: 15px;
+  margin-top: auto;
+  }
 
     /* MAIN CONTENT */
     main {
@@ -180,12 +221,21 @@
       font-size: 22px;
     }
   </style></head>
-<body>  <!-- HEADER -->  <header class="app-header">
-    <div class="header-content">
-      <i class="fas fa-bars" id="menuToggle"></i>
-      <h1>d4d</h1>
-    </div>
-  </header>  <!-- MAIN -->  <main><!-- HERO -->
+<body>
+  
+  <header>
+  <div class="logo">Driver App</div>
+  <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
+  <nav id="navMenu">
+    <a href="#">Home</a>
+    <a href="#">Login</a>
+    <a href="#">About</a>
+  </nav>
+</header>
+
+
+  
+  <!-- MAIN -->  <main><!-- HERO -->
 <section class="hero card">
   <h2>Drivers for Drivers</h2>
   <p>
@@ -264,9 +314,21 @@
       <i class="fas fa-car"></i>
       <i class="fas fa-user"></i>
     </div>
+    <footer>
+  &copy; 2025 Driver App. All rights reserved.
+    </footer>
   </footer>  <script>
-    document.getElementById("menuToggle").addEventListener("click", () => {
-      alert("Menu clicked - add your dropdown later!");
-    });
+    /* RESPONSIVE MENU */
+const menuToggle = document.getElementById('menuToggle');
+const navMenu = document.getElementById('navMenu');
+
+menuToggle.addEventListener('click', () => {
+  navMenu.classList.toggle('active');
+  if (navMenu.classList.contains('active')) {
+    menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+  } else {
+    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+  }
+});
   </script></body>
 </html>
