@@ -31,10 +31,22 @@ header {
   position: relative;
 }
 
-header .logo {
-  font-size: 20px;
-  font-weight: bold;
+ header .logo {
+  display: flex;
+  align-items: center;
 }
+
+header .logo img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+ }
+
+ @media (max-width: 480px) {
+  header .logo img {
+    height: 28px;
+  }
+        }
 
 header .menu-icon {
   font-size: 24px;
@@ -92,7 +104,9 @@ footer {
 </head>
 <body>
 <header>
-  <div class="logo">Driver App</div>
+  <div class="logo">
+  <img src="assets/logo/d4d-logo.png" alt="D4D Logo">
+  </div>
   <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
   <nav id="navMenu">
     <a href="#">Home</a>
