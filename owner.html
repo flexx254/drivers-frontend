@@ -224,6 +224,32 @@ async function saveCarOwnerDetails(){
     showMessage("Network error. Please try again.","error");
   }
 }
+
+
+function showMessage(text, type){
+  const msg = document.getElementById("msgBox");
+  msg.textContent = text;
+  msg.className = "msg " + type;
+  msg.style.display = "block";
+}
+
+<script>
+function setupPreview(inputId, previewId){
+  document.getElementById(inputId).addEventListener("change", function(){
+    const preview = document.getElementById(previewId);
+    if(this.files && this.files[0] && this.files[0].type.startsWith("image/")){
+      preview.src = URL.createObjectURL(this.files[0]);
+      preview.style.display = "block";
+    }
+  });
+}
+
+setupPreview("car_image","car_preview");
+setupPreview("logbook","logbook_preview");
+setupPreview("inspection_report","inspection_preview");
+setupPreview("uber_report","uber_preview");
+
+  
 </script>
 
 </body>
