@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Owner Details</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root {
+  --main-green: #1b8f2a;
+  --white: #ffffff;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f5f5f5;
+}
+
+/* HEADER */
+header {
+  background-color: var(--main-green);
+  color: var(--white);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header img {
+  height: 32px;
+}
+
+/* FORM CONTAINER */
+.container {
+  max-width: 500px;
+  margin: 20px auto;
+  background: white;
+  padding: 22px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+
+h2 {
+  color: var(--main-green);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+  color: var(--main-green);
+  display: block;
+  margin-bottom: 6px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--main-green);
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+button {
+  width: 100%;
+  background: var(--main-green);
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  position: relative;
+}
+
+button:active {
+  background: #166d20;
+}
+
+/* PREVIEW */
+img.preview {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  display: none;
+  margin-bottom: 15px;
+  border: 2px solid var(--main-green);
+  border-radius: 8px;
+}
+
+/* MESSAGE */
+.msg {
+  display: none;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.success {
+  background: #d8ffd8;
+  color: #0f6e12;
+}
+
+.error {
+  background: #ffd6d6;
+  color: #a30000;
+}
+
+/* FOOTER */
+footer {
+  background-color: var(--main-green);
+  color: white;
+  text-align: center;
+  padding: 15px;
+  margin-top: 30px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="assets/logo/d4d-logo.png" alt="D4D Logo">
+</header>
+
+<div class="container">
+
+<h2>Car Owner Details</h2>
+
+<!-- Full Names -->
+<label for="owner_name">Full Names</label>
+<input type="text" id="owner_name" placeholder="e.g. John Mwangi Doe">
+
+<!-- Phone Number (NEW FIELD) -->
+<label for="phone_number">Phone Number</label>
+<input type="tel" id="phone_number" placeholder="+2547XXXXXXXX">
+
+<!-- Number Plate -->
+<label for="car_plate">Car Number Plate</label>
+<input type="text" id="car_plate" placeholder="e.g. KDK 123A">
+
+<!-- Car Image -->
+<label>Upload Car Image</label>
+<img id="car_preview" class="preview">
+<input type="file" id="car_image" accept="image/*">
+
+<!-- Logbook -->
+<label>Upload Logbook</label>
+<img id="logbook_preview" class="preview">
+<input type="file" id="logbook" accept="image/*,application/pdf">
+
+<!-- Inspection Report -->
+<label>Upload Inspection Report</label>
+<img id="inspection_preview" class="preview">
+<input type="file" id="inspection_report" accept="image/*,application/pdf">
+
+<!-- Uber Report (Optional) -->
+<label>Upload Uber Report <small>(Optional)</small></label>
+<img id="uber_preview" class="preview">
+<input type="file" id="uber_report" accept="image/*,application/pdf">
+
+<button onclick="saveCarOwnerDetails()">Save Car Owner Details</button>
+
+<div id="msgBox" class="msg"></div>
+
+</div>
+
+<footer>
+  &copy; 2025 D4D – Drivers for Drivers
+</footer>
+
+<script>
+function setupPreview(inputId, previewId){
+  document.getElementById(inputId).addEventListener("change", function(){
+    const preview = document.getElementById(previewId);
+    if(this.files && this.files[0] && this.files[0].type.startsWith("image/")){
+      preview.src = URL.createObjectURL(this.files[0]);
+      preview.style.display = "block";
+    }
+  });
+}
+
+setupPreview("car_image","car_preview");
+setupPreview("logbook","logbook_preview");
+setupPreview("inspection_report","inspection_preview");
+setupPreview("uber_report","uber_preview");
+
+function showMessage(text, type){
+  const msg = document.getElementById("msgBox");
+  msg.textContent = text;
+  msg.className = "msg " + type;
+  msg.style.display = "block";
+}
+
+function saveCarOwnerDetails(){
+  const name = document.getElementById("owner_name").value.trim();
+  const phone = document.getElementById("phone_number").value.trim();
+  const plate = document.getElementById("car_plate").value.trim();
+
+  if(!name || !phone || !plate){
+    showMessage("Please fill in all required fields.","error");
+    return;
+  }
+
+  showMessage("Car owner details saved successfully.","success");
+}
+</script>
+
+</body>
+  </html>
