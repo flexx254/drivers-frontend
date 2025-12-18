@@ -100,6 +100,23 @@ footer {
   padding: 15px;
   margin-top: auto;
   } 
+ .car-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 15px;
+  padding: 12px;
+  border: 1px solid #1b8f2a;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+.car-card img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #1b8f2a;
+ }
 </style>
 </head>
 <body>
@@ -125,6 +142,9 @@ footer {
   
   <div id="result"></div>
   <div id="msg" class="msg"></div>
+
+<h2>Available Cars</h2>
+<div id="availableCars" style="margin-top:20px;"></div>
 </div>
 <footer>
   &copy; 2025 Driver App. All rights reserved.
@@ -180,6 +200,42 @@ menuToggle.addEventListener('click', () => {
     menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
   }
 });
+
+
+ async function loadAvailableCars() {
+    const container = document.getElementById("availableCars");
+    container.innerHTML = ""; // clear previous
+
+    try {
+        const res = await fetch("https://drivers-backend-4spp.onrender.com/available-cars");
+        const data = await res.json();
+
+        if(!data.success || !data.cars.length){
+            container.innerHTML = "<p>No available cars found.</p>";
+            return;
+        }
+
+        data.cars.forEach(car => {
+            const card = document.createElement("div");
+            card.className = "car-card";
+            card.innerHTML = `
+                <img src="${car.car_image_url || 'https://via.placeholder.com/60'}" alt="Car">
+                <div>
+                    <strong>${car.car_make} ${car.car_model}</strong><br>
+                    ${car.number_plate}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+    } catch (e) {
+        container.innerHTML = "<p>Failed to load available cars. Try again later.</p>";
+        console.error(e);
+    }
+}
+
+// Load cars on page load
+window.addEventListener("DOMContentLoaded", loadAvailableCars);
 </script>
 
 </body>
