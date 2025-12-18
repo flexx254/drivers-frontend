@@ -216,17 +216,21 @@ menuToggle.addEventListener('click', () => {
         }
 
         data.cars.forEach(car => {
-            const card = document.createElement("div");
-            card.className = "car-card";
-            card.innerHTML = `
-                <img src="${car.car_image_url || 'https://via.placeholder.com/60'}" alt="Car">
-                <div>
-                    <strong>${car.car_make} ${car.car_model}</strong><br>
-                    ${car.number_plate}
-                </div>
-            `;
-            container.appendChild(card);
-        });
+    const card = document.createElement("div");
+    card.className = "car-card";
+    card.innerHTML = `
+        <img src="${car.car_image_url || 'https://via.placeholder.com/60'}" alt="Car">
+        <div style="flex:1">
+            <strong>${car.car_make} ${car.car_model}</strong><br>
+            ${car.number_plate}
+        </div>
+        <button class="connect-btn"
+            onclick="connectOwner('${car.number_plate}')">
+            Connect
+        </button>
+    `;
+    container.appendChild(card);
+});
 
     } catch (e) {
         container.innerHTML = "<p>Failed to load available cars. Try again later.</p>";
