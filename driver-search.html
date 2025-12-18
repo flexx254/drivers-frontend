@@ -117,6 +117,21 @@ footer {
   object-fit: cover;
   border: 2px solid #1b8f2a;
  }
+
+.connect-btn {
+  background: var(--main-green);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.connect-btn:active {
+  background: #166d20;
+   }
+ 
 </style>
 </head>
 <body>
@@ -240,6 +255,20 @@ menuToggle.addEventListener('click', () => {
 
 // Load cars on page load
 window.addEventListener("DOMContentLoaded", loadAvailableCars);
+
+
+function connectOwner(numberPlate) {
+    // For now, just confirm the action
+    const confirmConnect = confirm(
+        `Do you want to connect with the owner of ${numberPlate}?`
+    );
+
+    if (!confirmConnect) return;
+
+    // Later this can call a backend route
+    alert("Owner connection request sent for " + numberPlate);
+ }
+ 
 </script>
 
 </body>
