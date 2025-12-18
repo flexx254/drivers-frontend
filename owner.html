@@ -193,7 +193,7 @@ async function saveCarOwnerDetails(){
   const uber = document.getElementById("uber_report").files[0];
   const make = document.getElementById("car_make").value.trim();
   const model = document.getElementById("car_model").value.trim();
-  if(!name || !phone || !plate || !carImage || !logbook || !inspection){
+  if(!name || !phone || !plate || !make || model || !carImage || !logbook || !inspection){
     showMessage("Please fill all required fields and upload documents.","error");
     return;
   }
