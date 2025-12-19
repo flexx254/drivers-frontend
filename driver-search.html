@@ -258,18 +258,30 @@ menuToggle.addEventListener('click', () => {
 // Load cars on page load
 window.addEventListener("DOMContentLoaded", loadAvailableCars);
 
-
 function connectOwner(numberPlate) {
-    // For now, just confirm the action
+    // Step 1: Confirm action
     const confirmConnect = confirm(
         `Do you want to connect with the owner of ${numberPlate}?`
     );
-
     if (!confirmConnect) return;
 
-    // Later this can call a backend route
-    alert("Owner connection request sent for " + numberPlate);
- }
+    // Step 2: Ask for residential area
+    const location = prompt(
+        "Enter your residential area (e.g. Donholm, Umoja):"
+    );
+
+    // Step 3: Validate input
+    if (!location || !location.trim()) {
+        alert("Location is required.");
+        return;
+    }
+
+    // Step 4: Temporary confirmation
+    alert(
+        `Request sent for ${numberPlate}\nLocation: ${location.trim()}`
+    );
+}
+
  
 </script>
 
