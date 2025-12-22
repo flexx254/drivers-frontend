@@ -1,1 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Dashboard</title>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root {
+  --main-green:#1b8f2a;
+  --white:#fff;
+}
+
+body { margin:0; font-family:Arial,sans-serif; background:#f5f5f5; }
+
+/* HEADER */
+header {
+  background:var(--main-green);
+  color:var(--white);
+  padding:15px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+header img { height:32px; }
+
+.menu-icon { display:none; font-size:24px; cursor:pointer; }
+
+nav { display:flex; gap:20px; }
+nav a { color:white; text-decoration:none; }
+
+nav.active {
+  display:block;
+  position:absolute;
+  top:60px;
+  right:20px;
+  background:var(--main-green);
+  padding:15px;
+  border-radius:6px;
+}
+
+@media(max-width:768px){
+  nav{display:none; flex-direction:column;}
+  .menu-icon{display:block;}
+}
+
+/* MAIN */
+.container {
+  max-width:600px;
+  margin:20px auto;
+  background:white;
+  padding:22px;
+  border-radius:10px;
+  box-shadow:0 3px 10px rgba(0,0,0,.12);
+}
+
+h2 { color:var(--main-green); text-align:center; }
+
+/* OWNER CARD */
+.owner-card {
+  display:flex;
+  gap:15px;
+  align-items:center;
+  padding:12px;
+  border:1px solid var(--main-green);
+  border-radius:8px;
+  background:#f9f9f9;
+  margin-top:15px;
+}
+
+.owner-card img {
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--main-green);
+}
+
+.owner-info { flex:1; }
+.location { color:var(--main-green); font-weight:bold; }
+
+.connect-btn {
+  background:var(--main-green);
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.phone {
+  margin-top:6px;
+  font-weight:bold;
+  display:none;
+}
+
+/* FOOTER */
+footer {
+  background:var(--main-green);
+  color:white;
+  text-align:center;
+  padding:15px;
+  margin-top:40px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="assets/logo/d4d-logo.png" alt="D4D">
+  <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
+  <nav id="navMenu">
+    <a href="#">Home</a>
+    <a href="#">Dashboard</a>
+    <a href="#">Logout</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h2>Available Owners</h2>
+  <div id="owners"></div>
+</div>
+
+<footer>&copy; 2025 D4D Platform</footer>
+
+<script>
+/* MENU */
+const menuToggle=document.getElementById("menuToggle");
+const navMenu=document.getElementById("navMenu");
+menuToggle.onclick=()=>{
+  navMenu.classList.toggle("active");
+  menuToggle.innerHTML=navMenu.classList.contains("active")
+    ?'<i class="fas fa-times"></i>'
+    :'<i class="fas fa-bars"></i>';
+};
+
+/* LOAD OWNERS */
+const ownersDiv=document.getElementById("owners");
+
+fetch("https://drivers-backend-4spp.onrender.com/owners-with-location")
+.then(r=>r.json())
+.then(data=>{
+  if(!Array.isArray(data)||!data.length){
+    ownersDiv.innerHTML="<p>No owners available.</p>";
+    return;
+  }
+
+  data.forEach(owner=>{
+    const card=document.createElement("div");
+    card.className="owner-card";
+    card.innerHTML=`
+      <img src="${owner.profile_pic_url}" alt="Profile">
+      <div class="owner-info">
+        <strong>${owner.full_name}</strong><br>
+        <span class="location">${owner.location}</span>
+        <div class="phone"></div>
+      </div>
+      <button class="connect-btn">Connect</button>
+    `;
+
+    const btn=card.querySelector(".connect-btn");
+    const phoneEl=card.querySelector(".phone");
+
+    btn.onclick=async()=>{
+      if(!confirm("Are you sure you want to connect?")) return;
+
+      btn.disabled=true;
+      btn.textContent="Connecting...";
+
+      try{
+        const res=await fetch(
+          "https://drivers-backend-4spp.onrender.com/connect-owner",
+          {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({owner_id:owner.id})
+          }
+        );
+
+        const result=await res.json();
+
+        if(res.ok){
+          alert("Connected successfully");
+          phoneEl.textContent=result.phone_number;
+          phoneEl.style.display="block";
+          btn.textContent="Connected";
+        }else{
+          alert(result.message||"Failed");
+          btn.disabled=false;
+          btn.textContent="Connect";
+        }
+      }catch{
+        alert("Network error");
+        btn.disabled=false;
+        btn.textContent="Connect";
+      }
+    };
+
+    ownersDiv.appendChild(card);
+  });
+})
+.catch(()=>{
+  ownersDiv.innerHTML="<p>Error loading owners.</p>";
+});
+</script>
+
+</body>
+  </html>
