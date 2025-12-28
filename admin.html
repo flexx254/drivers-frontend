@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin - Purpose Config</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* RESET */
+* { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
+
+/* THEME COLORS */
+:root { --main-green:#006400; --light-green:#228B22; --white:#ffffff; }
+
+/* BODY */
+body { background:#f5f5f5; color:#333; min-height:100vh; display:flex; flex-direction:column; }
+
+/* HEADER */
+header { background:var(--main-green); color:var(--white); padding:15px 20px; text-align:center; font-size:18px; font-weight:bold; }
+
+/* CONTAINER */
+.container { flex:1; max-width:500px; margin:40px auto; background:#fff; padding:30px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,.1); }
+
+h2 { text-align:center; color:var(--main-green); margin-bottom:20px; }
+
+label { display:block; margin-top:15px; font-weight:bold; }
+
+input[type="number"], input[type="date"], button {
+  width:100%; padding:10px; margin-top:5px; font-size:16px; border-radius:5px; border:1px solid #ccc;
+}
+
+button { background:var(--main-green); color:white; border:none; cursor:pointer; margin-top:20px; }
+button:hover { background:var(--light-green); }
+
+</style>
+</head>
+
+<body>
+
+<header>Admin: Configure Payment Purposes</header>
+
+<div class="container">
+  <h2>Purpose Totals & Deadlines</h2>
+
+  <!-- Registration -->
+  <label>Registration Total</label>
+  <input type="number" id="registration_total" placeholder="Amount in KES" step="0.01" min="0">
+
+  <label>Registration Deadline</label>
+  <input type="date" id="registration_deadline">
+
+  <!-- Partner Connection -->
+  <label>Partner Connection Total</label>
+  <input type="number" id="partner_connection_total" placeholder="Amount in KES" step="0.01" min="0">
+
+  <label>Partner Connection Deadline</label>
+  <input type="date" id="partner_connection_deadline">
+
+  <!-- Insurance -->
+  <label>Insurance Total</label>
+  <input type="number" id="insurance_total" placeholder="Amount in KES" step="0.01" min="0">
+
+  <label>Insurance Deadline</label>
+  <input type="date" id="insurance_deadline">
+
+  <button onclick="savePurposes()">Save Configuration</button>
+</div>
+
+<script>
+async function savePurposes() {
+  const payload = {
+    registration_total: parseFloat(document.getElementById('registration_total').value) || null,
+    registration_deadline: document.getElementById('registration_deadline').value || null,
+
+    partner_connection_total: parseFloat(document.getElementById('partner_connection_total').value) || null,
+    partner_connection_deadline: document.getElementById('partner_connection_deadline').value || null,
+
+    insurance_total: parseFloat(document.getElementById('insurance_total').value) || null,
+    insurance_deadline: document.getElementById('insurance_deadline').value || null
+  };
+
+  console.log("Saving payload:", payload);
+
+  // TODO: POST to backend route, e.g., /admin/update-purposes
+  alert("Payload logged in console. Implement backend POST to save.");
+}
+</script>
+
+</body>
+  </html>
