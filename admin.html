@@ -43,6 +43,11 @@
 <script>
 const backendURL = 'https://drivers-backend-4spp.onrender.com';
 
+// Convert full ISO timestamp to YYYY-MM-DD
+function formatDateForInput(isoDate) {
+    return isoDate ? isoDate.split('T')[0] : '';
+}
+
 // Load current values on page load
 async function loadCurrentValues() {
     try {
@@ -50,11 +55,11 @@ async function loadCurrentValues() {
         const data = await res.json();
         if (data.success && data.purposes) {
             document.getElementById('registration_total').value = data.purposes.registration_total || 0;
-            document.getElementById('registration_deadline').value = data.purposes.registration_deadline || '';
+            document.getElementById('registration_deadline').value = formatDateForInput(data.purposes.registration_deadline);
             document.getElementById('partner_connection_total').value = data.purposes.partner_connection_total || 0;
-            document.getElementById('partner_connection_deadline').value = data.purposes.partner_connection_deadline || '';
+            document.getElementById('partner_connection_deadline').value = formatDateForInput(data.purposes.partner_connection_deadline);
             document.getElementById('insurance_total').value = data.purposes.insurance_total || 0;
-            document.getElementById('insurance_deadline').value = data.purposes.insurance_deadline || '';
+            document.getElementById('insurance_deadline').value = formatDateForInput(data.purposes.insurance_deadline);
         } else {
             showMessage("Failed to load current values", "red");
         }
@@ -98,7 +103,7 @@ document.getElementById('purposeForm').addEventListener('submit', async function
     } catch(err) {
         showMessage("Server error: " + err.message, "red");
     }
-});
+};
 
 // Load current values when page opens
 loadCurrentValues();
