@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -16,45 +15,32 @@
   font-family: sans-serif;
 }
 
-/* THEME COLORS */
 :root {
   --main-green: #006400;
   --light-green: #228B22;
-  --white: #ffffff;
 }
 
-/* BODY */
 body {
-  background-color: #f5f5f5;
-  color: #333;
+  background: #f5f5f5;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* HEADER */
-header {
-  background-color: var(--main-green);
-  color: var(--white);
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+header, footer {
+  background: var(--main-green);
+  color: white;
+  padding: 15px;
+  text-align: center;
 }
 
-header .logo img {
-  height: 32px;
-}
-
-/* CONTAINER */
 .container {
   flex: 1;
   max-width: 400px;
   margin: 40px auto;
-  background: #fff;
+  background: white;
   padding: 30px;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,.1);
 }
 
 h2 {
@@ -67,13 +53,6 @@ input, select, button {
   width: 100%;
   padding: 10px;
   margin: 10px 0;
-  font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-input[readonly] {
-  background: #eee;
 }
 
 button {
@@ -87,7 +66,6 @@ button:hover {
   background: var(--light-green);
 }
 
-/* OVERLAY */
 #paymentOverlay {
   position: fixed;
   inset: 0;
@@ -121,23 +99,18 @@ button:hover {
   to { transform: rotate(360deg); }
 }
 
-/* FOOTER */
-footer {
-  background: var(--main-green);
-  color: white;
-  text-align: center;
-  padding: 15px;
+.status {
+  margin-top: 10px;
+  font-weight: bold;
 }
+.success { color: green; }
+.error { color: red; }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="logo">
-    <img src="assets/logo/d4d-logo.png" alt="D4D">
-  </div>
-</header>
+<header>Driver App</header>
 
 <div class="container">
   <h2>Make Payment</h2>
@@ -148,102 +121,102 @@ footer {
   <label>MPESA Number</label>
   <input id="mpesa" placeholder="+2547XXXXXXXX">
 
-  <label>Purpose of Payment</label>
+  <label>Purpose</label>
   <select id="purpose">
-    <option value="">Select purpose</option>
+    <option value="">Select</option>
     <option value="registration">Registration</option>
     <option value="partner_connection">Partner Connection</option>
     <option value="insurance">Insurance</option>
   </select>
 
-  <button onclick="startPayment()">Proceed to Pay</button>
+  <button onclick="startVerification()">Proceed to Pay</button>
 </div>
 
-<footer>
-  &copy; 2025 Driver App
-</footer>
+<footer>&copy; 2025 Driver App</footer>
 
-<!-- PAYMENT OVERLAY -->
+<!-- OVERLAY -->
 <div id="paymentOverlay">
   <div class="overlay-box">
-    <h3>Send Payment</h3>
-    <p>
-      Send money via MPESA to:<br>
-      <strong>0728 639 425</strong>
-    </p>
-
+    <h3>Send MPESA Payment</h3>
+    <p>Pay to <strong>0728 639 425</strong></p>
     <div class="spinner"></div>
-
-    <p>Waiting for payment confirmation…</p>
+    <div id="statusText" class="status">Waiting for confirmation…</div>
   </div>
 </div>
 
 <script>
-/* LOAD USER NAME */
+let poller = null;
+
+/* LOAD USER */
 async function loadUser() {
   try {
-    const res = await fetch("https://drivers-backend-4spp.onrender.com/me", {
-      credentials: "include"
-    });
-
-    const data = await res.json();
-    if (data.full_name) {
-      document.getElementById("fullName").value = data.full_name;
-    }
-  } catch (e) {
-    console.error(e);
-  }
+    const r = await fetch("https://drivers-backend-4spp.onrender.com/me", { credentials: "include" });
+    const d = await r.json();
+    if (d.full_name) fullName.value = d.full_name;
+  } catch {}
 }
 loadUser();
 
-/* START PAYMENT */
-let poller = null;
-
-async function startPayment() {
-  const mpesa = document.getElementById("mpesa").value.trim();
-  const purpose = document.getElementById("purpose").value;
+/* START VERIFY LOOP */
+function startVerification() {
+  const mpesa = mpesaInput.value.trim();
+  const purpose = purposeSelect.value;
 
   if (!/^\+254\d{9}$/.test(mpesa)) {
-    alert("Enter valid MPESA number");
+    alert("Invalid MPESA number");
     return;
   }
 
   if (!purpose) {
-    alert("Select payment purpose");
+    alert("Select purpose");
     return;
   }
 
-  document.getElementById("paymentOverlay").style.display = "flex";
+  paymentOverlay.style.display = "flex";
+  statusText.textContent = "Waiting for confirmation…";
 
-  const res = await fetch("https://drivers-backend-4spp.onrender.com/start-payment", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ mpesa, purpose })
-  });
-
-  const data = await res.json();
-  if (!data.reference) return;
-
-  poller = setInterval(() => checkPayment(data.reference), 5000);
+  poller = setInterval(() => verifyPayment(mpesa, purpose), 5000);
 }
 
-/* POLL PAYMENT STATUS */
-async function checkPayment(reference) {
-  const res = await fetch(
-    `https://drivers-backend-4spp.onrender.com/check-payment?ref=${reference}`,
-    { credentials: "include" }
-  );
+async function verifyPayment(mpesa, purpose) {
+  try {
+    const res = await fetch("https://drivers-backend-4spp.onrender.com/verify-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ phone: mpesa, purpose })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (data.status === "paid") {
-    clearInterval(poller);
-    alert("Payment confirmed ✔");
-    window.location.href = "/dashboard";
+    if (data.status === "confirmed") {
+      clearInterval(poller);
+      statusText.textContent = "Payment Confirmed ✔";
+      statusText.className = "status success";
+
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1500);
+    }
+
+    if (data.status === "used") {
+      clearInterval(poller);
+      statusText.textContent = "Payment already used";
+      statusText.className = "status error";
+    }
+
+  } catch {
+    statusText.textContent = "Checking…";
   }
 }
+
+/* ELEMENTS */
+const mpesaInput = document.getElementById("mpesa");
+const purposeSelect = document.getElementById("purpose");
+const paymentOverlay = document.getElementById("paymentOverlay");
+const statusText = document.getElementById("statusText");
+const fullName = document.getElementById("fullName");
 </script>
 
 </body>
-</html>
+  </html>
