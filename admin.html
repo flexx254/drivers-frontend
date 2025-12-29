@@ -3,110 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin: Update Purposes</title>
+<title>Set Purpose Figures</title>
 <style>
-    body { font-family: Arial; background: #f5f5f5; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: 50px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0px 3px 10px rgba(0,0,0,0.2); }
-    h2 { color: #1b8f2a; text-align: center; margin-bottom: 20px; }
-    label { display: block; margin-top: 15px; font-weight: bold; }
-    input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; }
-    button { background: #1b8f2a; color: white; border: none; padding: 12px 20px; margin-top: 20px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; }
-    button:hover { background: #166f20; }
-    #message { margin-top: 20px; text-align: center; font-weight: bold; }
+  body { font-family: Arial, sans-serif; padding: 20px; background: #f7f7f7; }
+  .container { background: #fff; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+  label { display: block; margin-top: 15px; font-weight: bold; }
+  input[type="number"], input[type="date"] { width: 100%; padding: 8px; margin-top: 5px; }
+  button { margin-top: 20px; padding: 10px 20px; background: #4CAF50; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+  button:hover { background: #45a049; }
+  .message { margin-top: 15px; font-weight: bold; }
+  .error { color: red; }
+  .success { color: green; }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Update Purpose Totals & Deadlines</h2>
-    <form id="purposeForm">
-        <label for="registration_total">Registration Total</label>
-        <input type="number" id="registration_total" required>
-        <label for="registration_deadline">Registration Deadline</label>
-        <input type="date" id="registration_deadline" required>
+  <h2>Set Purpose Figures</h2>
+  <form id="purposeForm">
+    <label>Registration Total</label>
+    <input type="number" id="registration_total" required>
 
-        <label for="partner_connection_total">Partner Connection Total</label>
-        <input type="number" id="partner_connection_total" required>
-        <label for="partner_connection_deadline">Partner Connection Deadline</label>
-        <input type="date" id="partner_connection_deadline" required>
+    <label>Registration Deadline</label>
+    <input type="date" id="registration_deadline" required>
 
-        <label for="insurance_total">Insurance Total</label>
-        <input type="number" id="insurance_total" required>
-        <label for="insurance_deadline">Insurance Deadline</label>
-        <input type="date" id="insurance_deadline" required>
+    <label>Partner Connection Total</label>
+    <input type="number" id="partner_connection_total" required>
 
-        <button type="submit">Update</button>
-    </form>
-    <div id="message"></div>
+    <label>Partner Connection Deadline</label>
+    <input type="date" id="partner_connection_deadline" required>
+
+    <label>Insurance Total</label>
+    <input type="number" id="insurance_total" required>
+
+    <label>Insurance Deadline</label>
+    <input type="date" id="insurance_deadline" required>
+
+    <button type="submit">Update Figures</button>
+  </form>
+
+  <div class="message" id="message"></div>
 </div>
 
 <script>
-const backendURL = 'https://drivers-backend-4spp.onrender.com';
+const backendURL = "https://drivers-backend-4spp.onrender.com/set-purpose-figures";
+const form = document.getElementById("purposeForm");
+const messageDiv = document.getElementById("message");
 
-// Convert full ISO timestamp to YYYY-MM-DD
-function formatDateForInput(isoDate) {
-    return isoDate ? isoDate.split('T')[0] : '';
-}
-
-// Load current values on page load
-async function loadCurrentValues() {
-    try {
-        const res = await fetch(`${backendURL}/admin/get-purposes`);
-        const data = await res.json();
-        if (data.success && data.purposes) {
-            document.getElementById('registration_total').value = data.purposes.registration_total || 0;
-            document.getElementById('registration_deadline').value = formatDateForInput(data.purposes.registration_deadline);
-            document.getElementById('partner_connection_total').value = data.purposes.partner_connection_total || 0;
-            document.getElementById('partner_connection_deadline').value = formatDateForInput(data.purposes.partner_connection_deadline);
-            document.getElementById('insurance_total').value = data.purposes.insurance_total || 0;
-            document.getElementById('insurance_deadline').value = formatDateForInput(data.purposes.insurance_deadline);
-        } else {
-            showMessage("Failed to load current values", "red");
-        }
-    } catch(err) {
-        showMessage("Server error: " + err.message, "red");
+// Fetch current purpose figures on load
+async function loadCurrentFigures() {
+  try {
+    const resp = await fetch(`${backendURL}/get-purpose-figures`);
+    const data = await resp.json();
+    if (data.success && data.purpose) {
+      const p = data.purpose;
+      document.getElementById("registration_total").value = p.registration_total;
+      document.getElementById("registration_deadline").value = p.registration_deadline;
+      document.getElementById("partner_connection_total").value = p.partner_connection_total;
+      document.getElementById("partner_connection_deadline").value = p.partner_connection_deadline;
+      document.getElementById("insurance_total").value = p.insurance_total;
+      document.getElementById("insurance_deadline").value = p.insurance_deadline;
     }
+  } catch (err) {
+    console.error(err);
+    messageDiv.textContent = "Failed to load current figures";
+    messageDiv.className = "message error";
+  }
 }
 
-function showMessage(msg, color) {
-    const el = document.getElementById('message');
-    el.style.color = color;
-    el.textContent = msg;
-}
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  messageDiv.textContent = "";
+  const payload = {
+    registration_total: document.getElementById("registration_total").value,
+    registration_deadline: document.getElementById("registration_deadline").value,
+    partner_connection_total: document.getElementById("partner_connection_total").value,
+    partner_connection_deadline: document.getElementById("partner_connection_deadline").value,
+    insurance_total: document.getElementById("insurance_total").value,
+    insurance_deadline: document.getElementById("insurance_deadline").value,
+  };
 
-// Handle form submission
-document.getElementById('purposeForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    showMessage("Updating...", "black");
-
-    const payload = {
-        registration_total: Number(document.getElementById('registration_total').value),
-        registration_deadline: document.getElementById('registration_deadline').value,
-        partner_connection_total: Number(document.getElementById('partner_connection_total').value),
-        partner_connection_deadline: document.getElementById('partner_connection_deadline').value,
-        insurance_total: Number(document.getElementById('insurance_total').value),
-        insurance_deadline: document.getElementById('insurance_deadline').value
-    };
-
-    try {
-        const res = await fetch(`${backendURL}/admin/update-purposes`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (data.success) {
-            showMessage(data.message, "green");
-        } else {
-            showMessage(data.error || "Update failed", "red");
-        }
-    } catch(err) {
-        showMessage("Server error: " + err.message, "red");
+  try {
+    const resp = await fetch(`${backendURL}/set-purpose-figures`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const result = await resp.json();
+    if (result.success) {
+      messageDiv.textContent = result.message;
+      messageDiv.className = "message success";
+    } else {
+      messageDiv.textContent = result.error;
+      messageDiv.className = "message error";
     }
-};
+  } catch (err) {
+    messageDiv.textContent = "Server error";
+    messageDiv.className = "message error";
+  }
+});
 
-// Load current values when page opens
-loadCurrentValues();
+// Load current figures on page load
+loadCurrentFigures();
 </script>
 
 </body>
