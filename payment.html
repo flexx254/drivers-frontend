@@ -175,7 +175,46 @@ function startVerification() {
   paymentOverlay.style.display = "flex";
   statusText.textContent = "Waiting for confirmation…";
 
-  poller = setInterval(() => verifyPayment(mpesa, purpose), 5000);
+  async function startVerification() {
+  const mpesa = mpesaInput.value.trim();
+  const purpose = purposeSelect.value;
+
+  if (!/^\+254\d{9}$/.test(mpesa)) {
+    alert("Invalid MPESA number");
+    return;
+  }
+
+  if (!purpose) {
+    alert("Select purpose");
+    return;
+  }
+
+  // 1️⃣ Create payment intent
+  const res = await fetch(
+    "https://drivers-backend-4spp.onrender.com/create-payment-intent",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ phone: mpesa, purpose })
+    }
+  );
+
+  const data = await res.json();
+
+  if (data.status !== "ok") {
+    alert("Unable to start payment");
+    return;
+  }
+
+  const intentId = data.intent_id;
+
+  paymentOverlay.style.display = "flex";
+  statusText.textContent = "Waiting for confirmation…";
+
+  // 2️⃣ Poll using intent ID
+  poller = setInterval(() => verifyPayment(intentId), 5000);
+}
 }
 
 async function verifyPayment(mpesa, purpose) {
