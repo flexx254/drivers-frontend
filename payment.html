@@ -129,7 +129,7 @@ button:hover {
     <option value="insurance">Insurance</option>
   </select>
 
-  <button onclick="startVerification()">Proceed to Pay</button>
+  <button onclick="startPayment()">Proceed to Pay</button>
 </div>
 
 <footer>&copy; 2025 Driver App</footer>
@@ -146,40 +146,34 @@ button:hover {
 
 <script>
 let poller = null;
+let intentId = null;
+
+/* ELEMENTS */
+const mpesaInput = document.getElementById("mpesa");
+const purposeSelect = document.getElementById("purpose");
+const paymentOverlay = document.getElementById("paymentOverlay");
+const statusText = document.getElementById("statusText");
+const fullName = document.getElementById("fullName");
 
 /* LOAD USER */
 async function loadUser() {
   try {
-    const r = await fetch("https://drivers-backend-4spp.onrender.com/me", { credentials: "include" });
+    const r = await fetch(
+      "https://drivers-backend-4spp.onrender.com/me",
+      { credentials: "include" }
+    );
     const d = await r.json();
     if (d.full_name) fullName.value = d.full_name;
   } catch {}
 }
 loadUser();
 
-/* START VERIFY LOOP */
-function startVerification() {
-  const mpesa = mpesaInput.value.trim();
+/* START PAYMENT */
+async function startPayment() {
+  const phone = mpesaInput.value.trim();
   const purpose = purposeSelect.value;
 
-  if (!/^\+254\d{9}$/.test(mpesa)) {
-    alert("Invalid MPESA number");
-    return;
-  }
-
-  if (!purpose) {
-    alert("Select purpose");
-    return;
-  }
-
-  paymentOverlay.style.display = "flex";
-  statusText.textContent = "Waiting for confirmation…";
-
-  async function startVerification() {
-  const mpesa = mpesaInput.value.trim();
-  const purpose = purposeSelect.value;
-
-  if (!/^\+254\d{9}$/.test(mpesa)) {
+  if (!/^\+254\d{9}$/.test(phone)) {
     alert("Invalid MPESA number");
     return;
   }
@@ -196,7 +190,7 @@ function startVerification() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ phone: mpesa, purpose })
+      body: JSON.stringify({ phone, purpose })
     }
   );
 
@@ -207,24 +201,29 @@ function startVerification() {
     return;
   }
 
-  const intentId = data.intent_id;
+  intentId = data.intent_id;
 
+  // 2️⃣ Show overlay
   paymentOverlay.style.display = "flex";
   statusText.textContent = "Waiting for confirmation…";
+  statusText.className = "status";
 
-  // 2️⃣ Poll using intent ID
-  poller = setInterval(() => verifyPayment(intentId), 5000);
-}
+  // 3️⃣ Start polling
+  poller = setInterval(checkPayment, 5000);
 }
 
-async function verifyPayment(mpesa, purpose) {
+/* VERIFY PAYMENT */
+async function checkPayment() {
   try {
-    const res = await fetch("https://drivers-backend-4spp.onrender.com/verify-payment", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ phone: mpesa, purpose })
-    });
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/verify-payment",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ intent_id: intentId })
+      }
+    );
 
     const data = await res.json();
 
@@ -248,13 +247,6 @@ async function verifyPayment(mpesa, purpose) {
     statusText.textContent = "Checking…";
   }
 }
-
-/* ELEMENTS */
-const mpesaInput = document.getElementById("mpesa");
-const purposeSelect = document.getElementById("purpose");
-const paymentOverlay = document.getElementById("paymentOverlay");
-const statusText = document.getElementById("statusText");
-const fullName = document.getElementById("fullName");
 </script>
 
 </body>
