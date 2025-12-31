@@ -115,9 +115,6 @@ button:hover {
 <div class="container">
   <h2>Make Payment</h2>
 
-  <label>Full Name</label>
-  <input id="fullName" readonly>
-
   <label>MPESA Number</label>
   <input id="mpesa" placeholder="+2547XXXXXXXX">
 
@@ -134,7 +131,7 @@ button:hover {
 
 <footer>&copy; 2025 Driver App</footer>
 
-<!-- OVERLAY -->
+<!-- PAYMENT OVERLAY -->
 <div id="paymentOverlay">
   <div class="overlay-box">
     <h3>Send MPESA Payment</h3>
@@ -148,25 +145,10 @@ button:hover {
 let poller = null;
 let intentId = null;
 
-/* ELEMENTS */
 const mpesaInput = document.getElementById("mpesa");
 const purposeSelect = document.getElementById("purpose");
 const paymentOverlay = document.getElementById("paymentOverlay");
 const statusText = document.getElementById("statusText");
-const fullName = document.getElementById("fullName");
-
-/* LOAD USER */
-async function loadUser() {
-  try {
-    const r = await fetch(
-      "https://drivers-backend-4spp.onrender.com/me",
-      { credentials: "include" }
-    );
-    const d = await r.json();
-    if (d.full_name) fullName.value = d.full_name;
-  } catch {}
-}
-loadUser();
 
 /* START PAYMENT */
 async function startPayment() {
@@ -183,7 +165,6 @@ async function startPayment() {
     return;
   }
 
-  // 1️⃣ Create payment intent
   const res = await fetch(
     "https://drivers-backend-4spp.onrender.com/create-payment-intent",
     {
@@ -203,17 +184,17 @@ async function startPayment() {
 
   intentId = data.intent_id;
 
-  // 2️⃣ Show overlay
   paymentOverlay.style.display = "flex";
   statusText.textContent = "Waiting for confirmation…";
   statusText.className = "status";
 
-  // 3️⃣ Start polling
   poller = setInterval(checkPayment, 5000);
 }
 
 /* VERIFY PAYMENT */
 async function checkPayment() {
+  if (!intentId) return;
+
   try {
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/verify-payment",
@@ -240,6 +221,12 @@ async function checkPayment() {
     if (data.status === "used") {
       clearInterval(poller);
       statusText.textContent = "Payment already used";
+      statusText.className = "status error";
+    }
+
+    if (data.status === "expired") {
+      clearInterval(poller);
+      statusText.textContent = "Payment expired";
       statusText.className = "status error";
     }
 
