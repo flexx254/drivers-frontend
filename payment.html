@@ -131,26 +131,23 @@ button:hover {
 
 <footer>&copy; 2025 Driver App</footer>
 
-<!-- PAYMENT OVERLAY -->
+<!-- OVERLAY -->
 <div id="paymentOverlay">
   <div class="overlay-box">
     <h3>Send MPESA Payment</h3>
     <p>Pay to <strong>0728 639 425</strong></p>
     <div class="spinner"></div>
-    <div id="statusText" class="status">Waiting for confirmation…</div>
+    <div id="statusText" class="status">Creating payment intent…</div>
   </div>
 </div>
 
 <script>
-let poller = null;
-let intentId = null;
-
 const mpesaInput = document.getElementById("mpesa");
 const purposeSelect = document.getElementById("purpose");
 const paymentOverlay = document.getElementById("paymentOverlay");
 const statusText = document.getElementById("statusText");
 
-/* START PAYMENT */
+/* CREATE PAYMENT INTENT ONLY */
 async function startPayment() {
   const phone = mpesaInput.value.trim();
   const purpose = purposeSelect.value;
@@ -165,76 +162,36 @@ async function startPayment() {
     return;
   }
 
-  const res = await fetch(
-    "https://drivers-backend-4spp.onrender.com/create-payment-intent",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ phone, purpose })
-    }
-  );
-
-  const data = await res.json();
-
-  if (data.status !== "ok") {
-    alert("Unable to start payment");
-    return;
-  }
-
-  intentId = data.intent_id;
-
   paymentOverlay.style.display = "flex";
-  statusText.textContent = "Waiting for confirmation…";
+  statusText.textContent = "Creating payment intent…";
   statusText.className = "status";
-
-  poller = setInterval(checkPayment, 5000);
-}
-
-/* VERIFY PAYMENT */
-async function checkPayment() {
-  if (!intentId) return;
 
   try {
     const res = await fetch(
-      "https://drivers-backend-4spp.onrender.com/verify-payment",
+      "https://drivers-backend-4spp.onrender.com/create-payment-intent",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ intent_id: intentId })
+        body: JSON.stringify({ phone, purpose })
       }
     );
 
     const data = await res.json();
 
-    if (data.status === "confirmed") {
-      clearInterval(poller);
-      statusText.textContent = "Payment Confirmed ✔";
+    if (data.status === "ok") {
+      statusText.textContent = "Payment intent created ✔";
       statusText.className = "status success";
-
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 1500);
-    }
-
-    if (data.status === "used") {
-      clearInterval(poller);
-      statusText.textContent = "Payment already used";
+    } else {
+      statusText.textContent = "Failed to create payment intent";
       statusText.className = "status error";
     }
 
-    if (data.status === "expired") {
-      clearInterval(poller);
-      statusText.textContent = "Payment expired";
-      statusText.className = "status error";
-    }
-
-  } catch {
-    statusText.textContent = "Checking…";
+  } catch (e) {
+    statusText.textContent = "Network error";
+    statusText.className = "status error";
   }
 }
 </script>
 
 </body>
-  </html>
+</html>
