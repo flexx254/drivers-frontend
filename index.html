@@ -5,7 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>D4D – Drivers for Drivers</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<!-- =====================
+     SECURITY HEADERS
+====================== -->
+<meta http-equiv="Content-Security-Policy"
+content="
+  default-src 'self';
+  style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline';
+  font-src https://cdnjs.cloudflare.com;
+  img-src 'self' data:;
+  script-src 'self' 'unsafe-inline';
+  object-src 'none';
+  base-uri 'self';
+  frame-ancestors 'none';
+">
+
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-Frame-Options" content="DENY">
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  integrity="sha512-7tnfX2k7R+zqzH4U1K1d1sFJ6C4QpZ1nZJ5qZB0+9YcZJxX+z8f4MZxFZC1pZ6Pp4j2R4kHn3Z4RZ9YQ=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+/>
 
 <style>
 /* =====================
@@ -34,9 +59,7 @@ body {
   padding-bottom: 96px;
 }
 
-/* =====================
-   HEADER
-====================== */
+/* HEADER */
 header {
   position: fixed;
   top: 0;
@@ -70,6 +93,7 @@ nav {
 nav a {
   color: white;
   font-weight: 500;
+  text-decoration: none;
 }
 
 nav.active {
@@ -94,9 +118,7 @@ nav.active a {
   .menu-icon { display: block; }
 }
 
-/* =====================
-   MAIN
-====================== */
+/* MAIN */
 main {
   max-width: 1000px;
   margin: auto;
@@ -112,9 +134,7 @@ section { margin-bottom: 32px; }
   box-shadow: var(--shadow-soft);
 }
 
-/* =====================
-   HERO
-====================== */
+/* HERO */
 .hero {
   background: linear-gradient(135deg, #e8f5e9, #ffffff);
 }
@@ -131,9 +151,7 @@ section { margin-bottom: 32px; }
   max-width: 700px;
 }
 
-/* =====================
-   BUTTONS
-====================== */
+/* BUTTONS */
 .btn-group {
   margin-top: 22px;
   display: flex;
@@ -148,17 +166,11 @@ section { margin-bottom: 32px; }
   font-weight: 700;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .btn.primary {
   background: linear-gradient(135deg, var(--main-green), var(--light-green));
   color: white;
-  box-shadow: var(--shadow-soft);
-}
-
-.btn.primary:hover {
-  transform: translateY(-2px);
 }
 
 .btn.outline {
@@ -167,9 +179,7 @@ section { margin-bottom: 32px; }
   color: var(--main-green);
 }
 
-/* =====================
-   VALUES GRID
-====================== */
+/* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -189,42 +199,15 @@ section { margin-bottom: 32px; }
 
 .value-card p {
   font-size: 15px;
-  line-height: 1.6;
 }
 
-/* =====================
-   COMMUNITY
-====================== */
+/* COMMUNITY */
 .community {
   background: linear-gradient(135deg, var(--light-green), var(--main-green));
   color: white;
 }
 
-/* =====================
-   STEPS
-====================== */
-.step {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  margin-bottom: 18px;
-}
-
-.step-number {
-  width: 38px;
-  height: 38px;
-  background: var(--main-green);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-/* =====================
-   APP FOOTER
-====================== */
+/* FOOTER */
 .app-footer {
   position: fixed;
   bottom: 0;
@@ -240,15 +223,10 @@ section { margin-bottom: 32px; }
 .app-footer i {
   font-size: 22px;
   color: #888;
-  transition: all 0.2s ease;
 }
 
 .app-footer i.active {
   color: var(--main-green);
-}
-
-.app-footer i:active {
-  transform: scale(0.9);
 }
 
 .copyright {
@@ -265,8 +243,12 @@ section { margin-bottom: 32px; }
   <div class="logo">
     <img src="assets/logo/d4d-logo.png" alt="D4D Logo">
   </div>
-  <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
-  <nav id="navMenu">
+
+  <button class="menu-icon" id="menuToggle" aria-label="Toggle navigation" type="button">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <nav id="navMenu" aria-label="Primary navigation">
     <a href="#">Home</a>
     <a href="#">Login</a>
     <a href="#">About</a>
@@ -283,8 +265,8 @@ section { margin-bottom: 32px; }
     connecting drivers, car owners, welfare programs, and long-term opportunities.
   </p>
   <div class="btn-group">
-    <button class="btn primary">Join as Driver</button>
-    <button class="btn outline">Join as Car Owner</button>
+    <button class="btn primary" type="button">Join as Driver</button>
+    <button class="btn outline" type="button">Join as Car Owner</button>
   </div>
 </section>
 
@@ -316,15 +298,6 @@ section { margin-bottom: 32px; }
   <p>D4D is not a ride-hailing app. It is a driver-owned ecosystem.</p>
 </section>
 
-<section class="card">
-  <h3 style="color:var(--main-green)">Join the D4D Movement</h3>
-  <p>When drivers support drivers, everyone wins.</p>
-  <div class="btn-group">
-    <button class="btn primary">Get Started</button>
-    <button class="btn outline">Contact D4D</button>
-  </div>
-</section>
-
 <div class="copyright">© 2025 D4D – Drivers for Drivers</div>
 
 </main>
@@ -336,15 +309,14 @@ section { margin-bottom: 32px; }
 </div>
 
 <script>
-const menuToggle = document.getElementById('menuToggle');
-const navMenu = document.getElementById('navMenu');
+const menuToggle = document.getElementById("menuToggle");
+const navMenu = document.getElementById("navMenu");
+const icon = menuToggle.querySelector("i");
 
-menuToggle.onclick = () => {
-  navMenu.classList.toggle('active');
-  menuToggle.innerHTML = navMenu.classList.contains('active')
-    ? '<i class="fas fa-times"></i>'
-    : '<i class="fas fa-bars"></i>';
-};
+menuToggle.addEventListener("click", () => {
+  const open = navMenu.classList.toggle("active");
+  icon.className = open ? "fas fa-times" : "fas fa-bars";
+});
 </script>
 
 </body>
