@@ -12,7 +12,7 @@
 content="
   default-src 'self';
   style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline';
-  font-src https://cdnjs.cloudflare.com;
+  font-src 'self' https://cdnjs.cloudflare.com data:;
   img-src 'self' data:;
   script-src 'self' 'unsafe-inline';
   object-src 'none';
@@ -24,18 +24,13 @@ content="
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <meta http-equiv="X-Frame-Options" content="DENY">
 
+<!-- Font Awesome CSS -->
 <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-  integrity="sha512-7tnfX2k7R+zqzH4U1K1d1sFJ6C4QpZ1nZJ5qZB0+9YcZJxX+z8f4MZxFZC1pZ6Pp4j2R4kHn3Z4RZ9YQ=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
 />
 
 <style>
-/* =====================
-   THEME VARIABLES
-====================== */
 :root {
   --main-green: #005a2a;
   --light-green: #1b8f2a;
@@ -83,6 +78,8 @@ header {
   color: white;
   cursor: pointer;
   display: none;
+  background: none;
+  border: none;
 }
 
 nav {
@@ -166,6 +163,7 @@ section { margin-bottom: 32px; }
   font-weight: 700;
   border: none;
   cursor: pointer;
+  text-align: center;
 }
 
 .btn.primary {
@@ -265,22 +263,25 @@ section { margin-bottom: 32px; }
     connecting drivers, car owners, welfare programs, and long-term opportunities.
   </p>
   <div class="btn-group">
+    <!-- Join as Driver → LOGIN -->
     <a
-  href="https://flexx254.github.io/drivers-frontend/sign-up.html"
-  class="btn primary"
-  role="button"
-  aria-label="Register as Driver"
->
-  Join as Driver
-</a>
-<a
-  href="https://flexx254.github.io/drivers-frontend/owner.html"
-  class="btn outline"
-  role="button"
-  aria-label="Join as Car Owner"
->
-  Join as Car Owner
-</a>
+      href="https://flexx254.github.io/drivers-frontend/login.html"
+      class="btn primary"
+      role="button"
+      aria-label="Login as Driver"
+    >
+      Join as Driver
+    </a>
+
+    <!-- Join as Car Owner → OWNER -->
+    <a
+      href="https://flexx254.github.io/drivers-frontend/owner.html"
+      class="btn outline"
+      role="button"
+      aria-label="Join as Car Owner"
+    >
+      Join as Car Owner
+    </a>
   </div>
 </section>
 
@@ -334,4 +335,4 @@ menuToggle.addEventListener("click", () => {
 </script>
 
 </body>
-</html>
+         </html>
