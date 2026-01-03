@@ -198,60 +198,9 @@ footer {
 </footer>
 
 <script>
-async function saveCarOwnerDetails(){
-
-  const name = document.getElementById("owner_name").value.trim();
-  const phone = document.getElementById("phone_number").value.trim();
-  const plate = document.getElementById("car_plate").value.trim();
-
-  const carImage = document.getElementById("car_image").files[0];
-  const logbook = document.getElementById("logbook").files[0];
-  const inspection = document.getElementById("inspection_report").files[0];
-  const uber = document.getElementById("uber_report").files[0];
-  const make = document.getElementById("car_make").value.trim();
-  const model = document.getElementById("car_model").value.trim();
-  if(!name || !phone || !plate || !make || !model || !carImage || !logbook || !inspection){
-    showMessage("Please fill all required fields and upload documents.","error");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("full_name", name);
-  formData.append("phone_number", phone);
-  formData.append("number_plate", plate);
-  formData.append("car_make", make);
-  formData.append("car_model", model);
-  formData.append("car_image", carImage);
-  formData.append("logbook", logbook);
-  formData.append("inspection_report", inspection);
-  if(uber) formData.append("uber_report", uber);
-
-  try {
-    showMessage("Uploading details, please wait...","success");
-
-    const res = await fetch(
-      "https://drivers-backend-4spp.onrender.com/register-owner",
-      {
-        method: "POST",
-        body: formData
-      }
-    );
-
-    const data = await res.json();
-
-    if(!res.ok){
-      showMessage(data.error || "Submission failed.","error");
-      return;
-    }
-
-    showMessage("Car owner registered successfully.","success");
-
-  } catch(err){
-    showMessage("Network error. Please try again.","error");
-  }
-}
-
-
+// -----------------------------
+// SHOW MESSAGES
+// -----------------------------
 function showMessage(text, type){
   const msg = document.getElementById("msgBox");
   msg.textContent = text;
@@ -259,7 +208,9 @@ function showMessage(text, type){
   msg.style.display = "block";
 }
 
-
+// -----------------------------
+// FILE PREVIEW
+// -----------------------------
 function setupPreview(inputId, previewId){
   document.getElementById(inputId).addEventListener("change", function(){
     const preview = document.getElementById(previewId);
@@ -275,10 +226,9 @@ setupPreview("logbook","logbook_preview");
 setupPreview("inspection_report","inspection_preview");
 setupPreview("uber_report","uber_preview");
 
-
-
-
-  // TOGGLE PASSWORD VISIBILITY
+// -----------------------------
+// TOGGLE PASSWORD VISIBILITY
+// -----------------------------
 function setupToggle(inputId, toggleId){
   const input = document.getElementById(inputId);
   const toggle = document.getElementById(toggleId);
@@ -286,10 +236,10 @@ function setupToggle(inputId, toggleId){
   toggle.addEventListener("click", () => {
     if(input.type === "password"){
       input.type = "text";
-      toggle.className = "fa-regular fa-eye"; // open monkey
+      toggle.className = "fa-regular fa-eye";
     } else {
       input.type = "password";
-      toggle.className = "fa-regular fa-eye-slash"; // closed monkey
+      toggle.className = "fa-regular fa-eye-slash";
     }
   });
 }
@@ -297,33 +247,42 @@ function setupToggle(inputId, toggleId){
 setupToggle("password","togglePassword");
 setupToggle("confirm_password","toggleConfirmPassword");
 
-// STRONG PASSWORD CHECK
+// -----------------------------
+// STRONG PASSWORD VALIDATION
+// -----------------------------
 function validatePassword(password){
   // Minimum 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
   const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   return regex.test(password);
 }
 
+// -----------------------------
+// SUBMIT FORM
+// -----------------------------
 async function saveCarOwnerDetails(){
   const name = document.getElementById("owner_name").value.trim();
   const phone = document.getElementById("phone_number").value.trim();
   const plate = document.getElementById("car_plate").value.trim();
+  const make = document.getElementById("car_make").value.trim();
+  const model = document.getElementById("car_model").value.trim();
   const carImage = document.getElementById("car_image").files[0];
   const logbook = document.getElementById("logbook").files[0];
   const inspection = document.getElementById("inspection_report").files[0];
   const uber = document.getElementById("uber_report").files[0];
-  const make = document.getElementById("car_make").value.trim();
-  const model = document.getElementById("car_model").value.trim();
-  
   const password = document.getElementById("password").value;
   const confirmPassword = document.getElementById("confirm_password").value;
 
+  // -----------------------------
+  // VALIDATE REQUIRED FIELDS
+  // -----------------------------
   if(!name || !phone || !plate || !make || !model || !carImage || !logbook || !inspection || !password || !confirmPassword){
     showMessage("Please fill all required fields and upload documents.","error");
     return;
   }
 
-  // Password validation
+  // -----------------------------
+  // PASSWORD VALIDATION
+  // -----------------------------
   if(!validatePassword(password)){
     showMessage("Password must be at least 8 characters, include uppercase, lowercase, number, and special character.","error");
     return;
@@ -334,6 +293,9 @@ async function saveCarOwnerDetails(){
     return;
   }
 
+  // -----------------------------
+  // SEND TO SERVER
+  // -----------------------------
   const formData = new FormData();
   formData.append("full_name", name);
   formData.append("phone_number", phone);
@@ -343,7 +305,7 @@ async function saveCarOwnerDetails(){
   formData.append("car_image", carImage);
   formData.append("logbook", logbook);
   formData.append("inspection_report", inspection);
-  formData.append("password", password); // send securely hashed on server
+  formData.append("password", password); // server should hash
   if(uber) formData.append("uber_report", uber);
 
   try {
@@ -363,10 +325,13 @@ async function saveCarOwnerDetails(){
 
     showMessage("Car owner registered successfully.","success");
 
+    // Optionally reset form
+    document.querySelector(".container").reset && document.querySelector(".container").reset();
+
   } catch(err){
     showMessage("Network error. Please try again.","error");
   }
-  }
+}
 </script>
 
 </body>
