@@ -251,7 +251,6 @@ setupToggle("confirm_password","toggleConfirmPassword");
 // STRONG PASSWORD VALIDATION
 // -----------------------------
 function validatePassword(password){
-  // Minimum 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
   const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   return regex.test(password);
 }
@@ -260,31 +259,34 @@ function validatePassword(password){
 // SUBMIT FORM
 // -----------------------------
 async function saveCarOwnerDetails(){
+
   const name = document.getElementById("owner_name").value.trim();
   const phone = document.getElementById("phone_number").value.trim();
   const plate = document.getElementById("car_plate").value.trim();
   const make = document.getElementById("car_make").value.trim();
   const model = document.getElementById("car_model").value.trim();
+
   const carImage = document.getElementById("car_image").files[0];
   const logbook = document.getElementById("logbook").files[0];
   const inspection = document.getElementById("inspection_report").files[0];
   const uber = document.getElementById("uber_report").files[0];
+
   const password = document.getElementById("password").value;
   const confirmPassword = document.getElementById("confirm_password").value;
 
   // -----------------------------
-  // VALIDATE REQUIRED FIELDS
+  // VALIDATION
   // -----------------------------
   if(!name || !phone || !plate || !make || !model || !carImage || !logbook || !inspection || !password || !confirmPassword){
     showMessage("Please fill all required fields and upload documents.","error");
     return;
   }
 
-  // -----------------------------
-  // PASSWORD VALIDATION
-  // -----------------------------
   if(!validatePassword(password)){
-    showMessage("Password must be at least 8 characters, include uppercase, lowercase, number, and special character.","error");
+    showMessage(
+      "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",
+      "error"
+    );
     return;
   }
 
@@ -294,7 +296,7 @@ async function saveCarOwnerDetails(){
   }
 
   // -----------------------------
-  // SEND TO SERVER
+  // FORM DATA (🔥 FIXED)
   // -----------------------------
   const formData = new FormData();
   formData.append("full_name", name);
@@ -302,10 +304,13 @@ async function saveCarOwnerDetails(){
   formData.append("number_plate", plate);
   formData.append("car_make", make);
   formData.append("car_model", model);
+
+  formData.append("password", password);
+  formData.append("confirm", confirmPassword); // ✅ CRITICAL FIX
+
   formData.append("car_image", carImage);
   formData.append("logbook", logbook);
   formData.append("inspection_report", inspection);
-  formData.append("password", password); // server should hash
   if(uber) formData.append("uber_report", uber);
 
   try {
@@ -313,7 +318,10 @@ async function saveCarOwnerDetails(){
 
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/register-owner",
-      { method: "POST", body: formData }
+      {
+        method: "POST",
+        body: formData
+      }
     );
 
     const data = await res.json();
@@ -325,10 +333,7 @@ async function saveCarOwnerDetails(){
 
     showMessage("Car owner registered successfully.","success");
 
-    // Optionally reset form
-    document.querySelector(".container").reset && document.querySelector(".container").reset();
-
-  } catch(err){
+  } catch (err){
     showMessage("Network error. Please try again.","error");
   }
 }
