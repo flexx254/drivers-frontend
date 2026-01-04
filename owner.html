@@ -11,6 +11,7 @@
 :root {
   --main-green: #1b8f2a;
   --white: #ffffff;
+  --danger: #a30000;
 }
 
 body {
@@ -25,7 +26,6 @@ header {
   color: var(--white);
   padding: 15px 20px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
 
@@ -62,9 +62,31 @@ input {
   border: 2px solid var(--main-green);
   border-radius: 8px;
   font-size: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
+/* PASSWORD FIELD */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper i {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--main-green);
+}
+
+.password-hint {
+  font-size: 14px;
+  color: var(--danger);
+  margin-bottom: 16px;
+  display: none;
+}
+
+/* BUTTON */
 button {
   width: 100%;
   background: var(--main-green);
@@ -74,7 +96,6 @@ button {
   border-radius: 8px;
   font-size: 18px;
   cursor: pointer;
-  position: relative;
 }
 
 button:active {
@@ -108,7 +129,7 @@ img.preview {
 
 .error {
   background: #ffd6d6;
-  color: #a30000;
+  color: var(--danger);
 }
 
 /* FOOTER */
@@ -132,40 +153,51 @@ footer {
 
 <h2>Car Owner Details</h2>
 
-<!-- Full Names -->
-<label for="owner_name">Full Names</label>
+<label>Full Names</label>
 <input type="text" id="owner_name" placeholder="e.g. John Mwangi Doe">
 
-<!-- Phone Number (NEW FIELD) -->
-<label for="phone_number">Phone Number</label>
+<label>Phone Number</label>
 <input type="tel" id="phone_number" placeholder="+2547XXXXXXXX">
 
-<!-- Number Plate -->
-<label for="car_plate">Car Number Plate</label>
+<label>Car Number Plate</label>
 <input type="text" id="car_plate" placeholder="e.g. KDK 123A">
-<!-- Car Make -->
-<label for="car_make">Car Make</label>
-<input type="text" id="car_make" placeholder="e.g. Toyota, Suzuki, Mitsubishi">
 
-<!-- Car Model -->
-<label for="car_model">Car Model</label>
-<input type="text" id="car_model" placeholder="e.g. Vitz, Alto, EK">
-<!-- Car Image -->
+<label>Car Make</label>
+<input type="text" id="car_make" placeholder="e.g. Toyota">
+
+<label>Car Model</label>
+<input type="text" id="car_model" placeholder="e.g. Vitz">
+
+<!-- PASSWORD -->
+<label>Create Password</label>
+<div class="password-wrapper">
+  <input type="password" id="password">
+  <i class="fa-solid fa-eye" onclick="togglePassword('password',this)"></i>
+</div>
+
+<label>Confirm Password</label>
+<div class="password-wrapper">
+  <input type="password" id="confirm_password">
+  <i class="fa-solid fa-eye" onclick="togglePassword('confirm_password',this)"></i>
+</div>
+
+<div id="passwordHint" class="password-hint">
+Password must be at least 8 characters and include uppercase, lowercase, number and symbol.
+</div>
+
+<!-- IMAGE UPLOADS -->
 <label>Upload Car Image</label>
 <img id="car_preview" class="preview">
 <input type="file" id="car_image" accept="image/*">
 
-<!-- Logbook -->
 <label>Upload Logbook</label>
 <img id="logbook_preview" class="preview">
 <input type="file" id="logbook" accept="image/*,application/pdf">
 
-<!-- Inspection Report -->
 <label>Upload Inspection Report</label>
 <img id="inspection_preview" class="preview">
 <input type="file" id="inspection_report" accept="image/*,application/pdf">
 
-<!-- Uber Report (Optional) -->
 <label>Upload Uber Report <small>(Optional)</small></label>
 <img id="uber_preview" class="preview">
 <input type="file" id="uber_report" accept="image/*,application/pdf">
@@ -177,78 +209,84 @@ footer {
 </div>
 
 <footer>
-  &copy; 2025 D4D – Drivers for Drivers
+&copy; 2025 D4D – Drivers for Drivers
 </footer>
 
 <script>
+function togglePassword(id, icon){
+  const input = document.getElementById(id);
+  input.type = input.type === "password" ? "text" : "password";
+  icon.classList.toggle("fa-eye");
+  icon.classList.toggle("fa-eye-slash");
+}
+
+function validPassword(p){
+  return /[A-Z]/.test(p) &&
+         /[a-z]/.test(p) &&
+         /\d/.test(p) &&
+         /[^A-Za-z0-9]/.test(p) &&
+         p.length >= 8;
+}
+
 async function saveCarOwnerDetails(){
 
-  const name = document.getElementById("owner_name").value.trim();
-  const phone = document.getElementById("phone_number").value.trim();
-  const plate = document.getElementById("car_plate").value.trim();
+  const password = passwordEl.value;
+  const confirm = confirmEl.value;
 
-  const carImage = document.getElementById("car_image").files[0];
-  const logbook = document.getElementById("logbook").files[0];
-  const inspection = document.getElementById("inspection_report").files[0];
-  const uber = document.getElementById("uber_report").files[0];
-  const make = document.getElementById("car_make").value.trim();
-  const model = document.getElementById("car_model").value.trim();
-  if(!name || !phone || !plate || !make || !model || !carImage || !logbook || !inspection){
-    showMessage("Please fill all required fields and upload documents.","error");
+  if(!validPassword(password)){
+    passwordHint.style.display = "block";
+    showMessage("Password does not meet security requirements.","error");
+    return;
+  }
+
+  if(password !== confirm){
+    showMessage("Passwords do not match.","error");
     return;
   }
 
   const formData = new FormData();
-  formData.append("full_name", name);
-  formData.append("phone_number", phone);
-  formData.append("number_plate", plate);
-  formData.append("car_make", make);
-  formData.append("car_model", model);
-  formData.append("car_image", carImage);
-  formData.append("logbook", logbook);
-  formData.append("inspection_report", inspection);
-  if(uber) formData.append("uber_report", uber);
+  formData.append("full_name", owner_name.value.trim());
+  formData.append("phone_number", phone_number.value.trim());
+  formData.append("number_plate", car_plate.value.trim());
+  formData.append("car_make", car_make.value.trim());
+  formData.append("car_model", car_model.value.trim());
+  formData.append("password", password);
+  formData.append("confirm_password", confirm);
+  formData.append("car_image", car_image.files[0]);
+  formData.append("logbook", logbook.files[0]);
+  formData.append("inspection_report", inspection_report.files[0]);
+  if(uber_report.files[0]) formData.append("uber_report", uber_report.files[0]);
 
-  try {
-    showMessage("Uploading details, please wait...","success");
+  try{
+    showMessage("Submitting details...","success");
 
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/register-owner",
-      {
-        method: "POST",
-        body: formData
-      }
+      { method:"POST", body: formData }
     );
 
     const data = await res.json();
-
-    if(!res.ok){
-      showMessage(data.error || "Submission failed.","error");
-      return;
-    }
+    if(!res.ok) return showMessage(data.error,"error");
 
     showMessage("Car owner registered successfully.","success");
 
-  } catch(err){
-    showMessage("Network error. Please try again.","error");
+  }catch{
+    showMessage("Network error.","error");
   }
 }
 
-
-function showMessage(text, type){
-  const msg = document.getElementById("msgBox");
-  msg.textContent = text;
-  msg.className = "msg " + type;
-  msg.style.display = "block";
+function showMessage(t,type){
+  msgBox.textContent=t;
+  msgBox.className="msg "+type;
+  msgBox.style.display="block";
 }
 
-
-function setupPreview(inputId, previewId){
-  document.getElementById(inputId).addEventListener("change", function(){
-    const preview = document.getElementById(previewId);
-    if(this.files && this.files[0] && this.files[0].type.startsWith("image/")){
-      preview.src = URL.createObjectURL(this.files[0]);
-      preview.style.display = "block";
+function setupPreview(i,p){
+  document.getElementById(i).addEventListener("change",function(){
+    if(this.files[0]?.type.startsWith("image/")){
+      const img=document.getElementById(p);
+      img.src=URL.createObjectURL(this.files[0]);
+      img.style.display="block";
     }
   });
 }
@@ -258,7 +296,9 @@ setupPreview("logbook","logbook_preview");
 setupPreview("inspection_report","inspection_preview");
 setupPreview("uber_report","uber_preview");
 
-  
+const passwordEl = document.getElementById("password");
+const confirmEl = document.getElementById("confirm_password");
+const passwordHint = document.getElementById("passwordHint");
 </script>
 
 </body>
