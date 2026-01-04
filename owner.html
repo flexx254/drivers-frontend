@@ -65,25 +65,6 @@ input {
   margin-bottom: 20px;
 }
 
-/* PASSWORD */
-.password-wrapper {
-  position: relative;
-}
-
-.password-wrapper input {
-  padding-right: 42px;
-}
-
-.toggle-password {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: var(--main-green);
-  font-size: 18px;
-}
-
 button {
   width: 100%;
   background: var(--main-green);
@@ -93,6 +74,7 @@ button {
   border-radius: 8px;
   font-size: 18px;
   cursor: pointer;
+  position: relative;
 }
 
 button:active {
@@ -147,48 +129,43 @@ footer {
 </header>
 
 <div class="container">
+
 <h2>Car Owner Details</h2>
 
-<label>Full Names</label>
-<input type="text" id="owner_name">
+<!-- Full Names -->
+<label for="owner_name">Full Names</label>
+<input type="text" id="owner_name" placeholder="e.g. John Mwangi Doe">
 
-<label>Phone Number</label>
+<!-- Phone Number (NEW FIELD) -->
+<label for="phone_number">Phone Number</label>
 <input type="tel" id="phone_number" placeholder="+2547XXXXXXXX">
 
-<label>Car Number Plate</label>
-<input type="text" id="car_plate">
+<!-- Number Plate -->
+<label for="car_plate">Car Number Plate</label>
+<input type="text" id="car_plate" placeholder="e.g. KDK 123A">
+<!-- Car Make -->
+<label for="car_make">Car Make</label>
+<input type="text" id="car_make" placeholder="e.g. Toyota, Suzuki, Mitsubishi">
 
-<label>Car Make</label>
-<input type="text" id="car_make">
-
-<label>Car Model</label>
-<input type="text" id="car_model">
-
-<!-- PASSWORD -->
-<label>Create Password</label>
-<div class="password-wrapper">
-  <input type="password" id="password" placeholder="Minimum 8 characters">
-  <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('password', this)"></i>
-</div>
-
-<label>Confirm Password</label>
-<div class="password-wrapper">
-  <input type="password" id="confirm_password">
-  <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('confirm_password', this)"></i>
-</div>
-
+<!-- Car Model -->
+<label for="car_model">Car Model</label>
+<input type="text" id="car_model" placeholder="e.g. Vitz, Alto, EK">
+<!-- Car Image -->
 <label>Upload Car Image</label>
 <img id="car_preview" class="preview">
 <input type="file" id="car_image" accept="image/*">
 
+<!-- Logbook -->
 <label>Upload Logbook</label>
 <img id="logbook_preview" class="preview">
 <input type="file" id="logbook" accept="image/*,application/pdf">
 
+<!-- Inspection Report -->
 <label>Upload Inspection Report</label>
 <img id="inspection_preview" class="preview">
 <input type="file" id="inspection_report" accept="image/*,application/pdf">
 
+<!-- Uber Report (Optional) -->
 <label>Upload Uber Report <small>(Optional)</small></label>
 <img id="uber_preview" class="preview">
 <input type="file" id="uber_report" accept="image/*,application/pdf">
@@ -196,6 +173,7 @@ footer {
 <button onclick="saveCarOwnerDetails()">Save Car Owner Details</button>
 
 <div id="msgBox" class="msg"></div>
+
 </div>
 
 <footer>
@@ -203,48 +181,20 @@ footer {
 </footer>
 
 <script>
-function togglePassword(inputId, icon){
-  const input = document.getElementById(inputId);
-  if(input.type === "password"){
-    input.type = "text";
-    icon.classList.remove("fa-eye");
-    icon.classList.add("fa-eye-slash");
-  } else {
-    input.type = "password";
-    icon.classList.remove("fa-eye-slash");
-    icon.classList.add("fa-eye");
-  }
-}
-
 async function saveCarOwnerDetails(){
 
-  const name = owner_name.value.trim();
-  const phone = phone_number.value.trim();
-  const plate = car_plate.value.trim();
-  const make = car_make.value.trim();
-  const model = car_model.value.trim();
-  const password = password.value;
-  const confirmPassword = confirm_password.value;
+  const name = document.getElementById("owner_name").value.trim();
+  const phone = document.getElementById("phone_number").value.trim();
+  const plate = document.getElementById("car_plate").value.trim();
 
-  const carImage = car_image.files[0];
-  const logbookFile = logbook.files[0];
-  const inspectionFile = inspection_report.files[0];
-  const uberFile = uber_report.files[0];
-
-  if(!name || !phone || !plate || !make || !model ||
-     !password || !confirmPassword ||
-     !carImage || !logbookFile || !inspectionFile){
-    showMessage("Please fill all required fields.","error");
-    return;
-  }
-
-  if(password.length < 8){
-    showMessage("Password must be at least 8 characters.","error");
-    return;
-  }
-
-  if(password !== confirmPassword){
-    showMessage("Passwords do not match.","error");
+  const carImage = document.getElementById("car_image").files[0];
+  const logbook = document.getElementById("logbook").files[0];
+  const inspection = document.getElementById("inspection_report").files[0];
+  const uber = document.getElementById("uber_report").files[0];
+  const make = document.getElementById("car_make").value.trim();
+  const model = document.getElementById("car_model").value.trim();
+  if(!name || !phone || !plate || !make || !model || !carImage || !logbook || !inspection){
+    showMessage("Please fill all required fields and upload documents.","error");
     return;
   }
 
@@ -254,19 +204,20 @@ async function saveCarOwnerDetails(){
   formData.append("number_plate", plate);
   formData.append("car_make", make);
   formData.append("car_model", model);
-  formData.append("password", password);
-  formData.append("confirm_password", confirmPassword);
   formData.append("car_image", carImage);
-  formData.append("logbook", logbookFile);
-  formData.append("inspection_report", inspectionFile);
-  if(uberFile) formData.append("uber_report", uberFile);
+  formData.append("logbook", logbook);
+  formData.append("inspection_report", inspection);
+  if(uber) formData.append("uber_report", uber);
 
   try {
     showMessage("Uploading details, please wait...","success");
 
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/register-owner",
-      { method: "POST", body: formData }
+      {
+        method: "POST",
+        body: formData
+      }
     );
 
     const data = await res.json();
@@ -278,21 +229,24 @@ async function saveCarOwnerDetails(){
 
     showMessage("Car owner registered successfully.","success");
 
-  } catch {
+  } catch(err){
     showMessage("Network error. Please try again.","error");
   }
 }
 
+
 function showMessage(text, type){
-  msgBox.textContent = text;
-  msgBox.className = "msg " + type;
-  msgBox.style.display = "block";
+  const msg = document.getElementById("msgBox");
+  msg.textContent = text;
+  msg.className = "msg " + type;
+  msg.style.display = "block";
 }
+
 
 function setupPreview(inputId, previewId){
   document.getElementById(inputId).addEventListener("change", function(){
     const preview = document.getElementById(previewId);
-    if(this.files[0]?.type.startsWith("image/")){
+    if(this.files && this.files[0] && this.files[0].type.startsWith("image/")){
       preview.src = URL.createObjectURL(this.files[0]);
       preview.style.display = "block";
     }
@@ -303,7 +257,9 @@ setupPreview("car_image","car_preview");
 setupPreview("logbook","logbook_preview");
 setupPreview("inspection_report","inspection_preview");
 setupPreview("uber_report","uber_preview");
+
+  
 </script>
 
 </body>
-</html>
+  </html>
