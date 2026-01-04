@@ -212,7 +212,26 @@ Password must be at least 8 characters and include uppercase, lowercase, number 
 &copy; 2025 D4D – Drivers for Drivers
 </footer>
 
+
 <script>
+/* ---------------- ELEMENT REFERENCES ---------------- */
+const owner_name = document.getElementById("owner_name");
+const phone_number = document.getElementById("phone_number");
+const car_plate = document.getElementById("car_plate");
+const car_make = document.getElementById("car_make");
+const car_model = document.getElementById("car_model");
+
+const car_image = document.getElementById("car_image");
+const logbook = document.getElementById("logbook");
+const inspection_report = document.getElementById("inspection_report");
+const uber_report = document.getElementById("uber_report");
+
+const passwordEl = document.getElementById("password");
+const confirmEl = document.getElementById("confirm_password");
+const passwordHint = document.getElementById("passwordHint");
+const msgBox = document.getElementById("msgBox");
+
+/* ---------------- PASSWORD TOGGLE ---------------- */
 function togglePassword(id, icon){
   const input = document.getElementById(id);
   input.type = input.type === "password" ? "text" : "password";
@@ -220,6 +239,7 @@ function togglePassword(id, icon){
   icon.classList.toggle("fa-eye-slash");
 }
 
+/* ---------------- PASSWORD VALIDATION ---------------- */
 function validPassword(p){
   return /[A-Z]/.test(p) &&
          /[a-z]/.test(p) &&
@@ -228,11 +248,36 @@ function validPassword(p){
          p.length >= 8;
 }
 
+/* ---------------- MESSAGE HANDLER ---------------- */
+function showMessage(text, type){
+  msgBox.textContent = text;
+  msgBox.className = "msg " + type;
+  msgBox.style.display = "block";
+}
+
+/* ---------------- IMAGE PREVIEW ---------------- */
+function setupPreview(inputId, previewId){
+  document.getElementById(inputId).addEventListener("change", function(){
+    if(this.files[0] && this.files[0].type.startsWith("image/")){
+      const img = document.getElementById(previewId);
+      img.src = URL.createObjectURL(this.files[0]);
+      img.style.display = "block";
+    }
+  });
+}
+
+setupPreview("car_image","car_preview");
+setupPreview("logbook","logbook_preview");
+setupPreview("inspection_report","inspection_preview");
+setupPreview("uber_report","uber_preview");
+
+/* ---------------- FORM SUBMISSION ---------------- */
 async function saveCarOwnerDetails(){
 
-  const password = passwordEl.value;
-  const confirm = confirmEl.value;
+  const password = passwordEl.value.trim();
+  const confirm = confirmEl.value.trim();
 
+  /* PASSWORD CHECK */
   if(!validPassword(password)){
     passwordHint.style.display = "block";
     showMessage("Password does not meet security requirements.","error");
@@ -244,61 +289,64 @@ async function saveCarOwnerDetails(){
     return;
   }
 
+  /* REQUIRED FIELD CHECK */
+  if(
+    !owner_name.value.trim() ||
+    !phone_number.value.trim() ||
+    !car_plate.value.trim() ||
+    !car_make.value.trim() ||
+    !car_model.value.trim() ||
+    !car_image.files[0] ||
+    !logbook.files[0] ||
+    !inspection_report.files[0]
+  ){
+    showMessage("Please fill all required fields and upload documents.","error");
+    return;
+  }
+
+  /* FORM DATA */
   const formData = new FormData();
   formData.append("full_name", owner_name.value.trim());
   formData.append("phone_number", phone_number.value.trim());
   formData.append("number_plate", car_plate.value.trim());
   formData.append("car_make", car_make.value.trim());
   formData.append("car_model", car_model.value.trim());
+
+  /* 🔑 PASSWORD (backend hashes → password_hash) */
   formData.append("password", password);
   formData.append("confirm_password", confirm);
+
   formData.append("car_image", car_image.files[0]);
   formData.append("logbook", logbook.files[0]);
   formData.append("inspection_report", inspection_report.files[0]);
-  if(uber_report.files[0]) formData.append("uber_report", uber_report.files[0]);
+  if(uber_report.files[0]) {
+    formData.append("uber_report", uber_report.files[0]);
+  }
 
   try{
     showMessage("Submitting details...","success");
 
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/register-owner",
-      { method:"POST", body: formData }
+      {
+        method: "POST",
+        body: formData
+      }
     );
 
     const data = await res.json();
-    if(!res.ok) return showMessage(data.error,"error");
+
+    if(!res.ok){
+      showMessage(data.error || "Submission failed.","error");
+      return;
+    }
 
     showMessage("Car owner registered successfully.","success");
 
-  }catch{
-    showMessage("Network error.","error");
+  }catch(err){
+    showMessage("Network error. Please try again.","error");
   }
 }
-
-function showMessage(t,type){
-  msgBox.textContent=t;
-  msgBox.className="msg "+type;
-  msgBox.style.display="block";
-}
-
-function setupPreview(i,p){
-  document.getElementById(i).addEventListener("change",function(){
-    if(this.files[0]?.type.startsWith("image/")){
-      const img=document.getElementById(p);
-      img.src=URL.createObjectURL(this.files[0]);
-      img.style.display="block";
-    }
-  });
-}
-
-setupPreview("car_image","car_preview");
-setupPreview("logbook","logbook_preview");
-setupPreview("inspection_report","inspection_preview");
-setupPreview("uber_report","uber_preview");
-
-const passwordEl = document.getElementById("password");
-const confirmEl = document.getElementById("confirm_password");
-const passwordHint = document.getElementById("passwordHint");
 </script>
 
 </body>
