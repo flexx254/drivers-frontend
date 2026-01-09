@@ -149,35 +149,37 @@ footer {
   <img src="assets/logo/d4d-logo.png" alt="D4D Logo">
 </header>
 
-<div class="container">
+ <div class="container">
 
 <h2>Car Owner Details</h2>
 
+<form id="ownerForm" enctype="multipart/form-data">
+
 <label>Full Names</label>
-<input type="text" id="owner_name" placeholder="e.g. John Mwangi Doe">
+<input type="text" id="owner_name" name="full_name" placeholder="e.g. John Mwangi Doe">
 
 <label>Phone Number</label>
-<input type="tel" id="phone_number" placeholder="+2547XXXXXXXX">
+<input type="tel" id="phone_number" name="phone_number" placeholder="+2547XXXXXXXX">
 
 <label>Car Number Plate</label>
-<input type="text" id="car_plate" placeholder="e.g. KDK 123A">
+<input type="text" id="car_plate" name="number_plate" placeholder="e.g. KDK 123A">
 
 <label>Car Make</label>
-<input type="text" id="car_make" placeholder="e.g. Toyota">
+<input type="text" id="car_make" name="car_make" placeholder="e.g. Toyota">
 
 <label>Car Model</label>
-<input type="text" id="car_model" placeholder="e.g. Vitz">
+<input type="text" id="car_model" name="car_model" placeholder="e.g. Vitz">
 
 <!-- PASSWORD -->
 <label>Create Password</label>
 <div class="password-wrapper">
-  <input type="password" id="password">
+  <input type="password" id="password" name="password">
   <i class="fa-solid fa-eye" onclick="togglePassword('password',this)"></i>
 </div>
 
 <label>Confirm Password</label>
 <div class="password-wrapper">
-  <input type="password" id="confirm_password">
+  <input type="password" id="confirm_password" name="confirm_password">
   <i class="fa-solid fa-eye" onclick="togglePassword('confirm_password',this)"></i>
 </div>
 
@@ -188,25 +190,26 @@ Password must be at least 8 characters and include uppercase, lowercase, number 
 <!-- IMAGE UPLOADS -->
 <label>Upload Car Image</label>
 <img id="car_preview" class="preview">
-<input type="file" id="car_image" accept="image/*">
+<input type="file" id="car_image" name="car_image" accept="image/*">
 
 <label>Upload Logbook</label>
 <img id="logbook_preview" class="preview">
-<input type="file" id="logbook" accept="image/*,application/pdf">
+<input type="file" id="logbook" name="logbook" accept="image/*,application/pdf">
 
 <label>Upload Inspection Report</label>
 <img id="inspection_preview" class="preview">
-<input type="file" id="inspection_report" accept="image/*,application/pdf">
+<input type="file" id="inspection_report" name="inspection_report" accept="image/*,application/pdf">
 
 <label>Upload Uber Report <small>(Optional)</small></label>
 <img id="uber_preview" class="preview">
-<input type="file" id="uber_report" accept="image/*,application/pdf">
+<input type="file" id="uber_report" name="uber_report" accept="image/*,application/pdf">
 
-<button onclick="saveCarOwnerDetails()">Save Car Owner Details</button>
+<button type="button" onclick="saveCarOwnerDetails()">Save Car Owner Details</button>
 
 <div id="msgBox" class="msg"></div>
 
-</div>
+</form>
+</div> 
 
 <footer>
 &copy; 2025 D4D – Drivers for Drivers
