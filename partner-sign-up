@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Register</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+/* THEME COLORS */
+:root {
+  --main-green: #006400;
+  --light-green: #228B22;
+  --white: #ffffff;
+}
+
+/* BODY */
+body {
+  background-color: #f5f5f5;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+header {
+  background-color: var(--main-green);
+  color: var(--white);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+header .logo {
+  display: flex;
+  align-items: center;
+}
+
+header .logo img {
+  height: 32px;
+}
+
+@media (max-width: 480px) {
+  header .logo img {
+    height: 28px;
+  }
+}
+
+header .menu-icon {
+  font-size: 24px;
+  cursor: pointer;
+  display: none;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: var(--white);
+  text-decoration: none;
+}
+
+nav.active {
+  display: block;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: var(--main-green);
+  padding: 15px;
+  border-radius: 5px;
+  width: 150px;
+}
+
+nav.active a {
+  display: block;
+  margin: 10px 0;
+}
+
+/* FORM */
+.container {
+  flex: 1;
+  max-width: 400px;
+  margin: 40px auto;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+  text-align: center;
+  color: var(--main-green);
+  margin-bottom: 20px;
+}
+
+input, button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+button {
+  background-color: var(--main-green);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--light-green);
+}
+
+#successBox {
+  color: green;
+  text-align: center;
+}
+
+#errorBox {
+  color: red;
+  white-space: pre-line;
+  text-align: center;
+}
+
+/* PASSWORD */
+.password-wrapper {
+  position: relative;
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* FOOTER */
+footer {
+  background-color: var(--main-green);
+  color: white;
+  text-align: center;
+  padding: 15px;
+  margin-top: auto;
+}
+
+@media screen and (max-width: 768px) {
+  nav {
+    display: none;
+    flex-direction: column;
+  }
+  header .menu-icon {
+    display: block;
+  }
+}
+
+/* BUTTON SPINNER */
+button.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+button.loading::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border: 3px solid white;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+.extra-links {
+  margin-top: 10px;
+}
+
+.extra-links a {
+  font-size: 14px;
+  color: var(--main-green);
+  display: block;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <img src="assets/logo/d4d-logo.png" alt="D4D Logo">
+  </div>
+  <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
+  <nav id="navMenu">
+    <a href="#">Home</a>
+    <a href="#">Login</a>
+    <a href="#">About</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h2>Create Account</h2>
+
+  <input id="name" placeholder="Enter full name">
+  <input id="email" placeholder="Enter email">
+
+  <input id="phone_number" type="tel" value="+254"
+         placeholder="+2547xxxxxxxx"
+         oninput="autoInsertPrefix()">
+
+  <div class="password-wrapper">
+    <input id="password" type="password" placeholder="Enter password">
+    <span class="toggle-eye" onclick="togglePassword('password', this)">👁️</span>
+  </div>
+
+  <div class="password-wrapper">
+    <input id="confirm" type="password" placeholder="Confirm password">
+    <span class="toggle-eye" onclick="togglePassword('confirm', this)">👁️</span>
+  </div>
+
+  <button onclick="registerUser()">Submit</button>
+
+  <div id="errorBox"></div>
+  <div id="successBox"></div>
+
+  <div class="extra-links">
+    <a href="/login">Already have an account? Sign In</a>
+    <a href="/forgot-password">Forgot Password?</a>
+  </div>
+</div>
+
+<footer>
+  &copy; 2025 Driver App. All rights reserved.
+</footer>
+
+<script>
+function togglePassword(id, el) {
+  const input = document.getElementById(id);
+  input.type = input.type === "password" ? "text" : "password";
+  el.textContent = input.type === "password" ? "👁️" : "🙈";
+}
+
+const menuToggle = document.getElementById("menuToggle");
+const navMenu = document.getElementById("navMenu");
+
+menuToggle.onclick = () => {
+  navMenu.classList.toggle("active");
+};
+
+function validateFrontend(name, email, phone, password, confirm) {
+  let errors = [];
+
+  if (!name) errors.push("Name is required.");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.push("Valid email required.");
+  if (!/^\+254\d{9}$/.test(phone)) errors.push("Phone must be +254XXXXXXXXX.");
+
+  if (password.length < 8) errors.push("Password must be at least 8 characters.");
+  if (!/[A-Z]/.test(password)) errors.push("One uppercase letter required.");
+  if (!/[a-z]/.test(password)) errors.push("One lowercase letter required.");
+  if (!/\d/.test(password)) errors.push("One number required.");
+  if (!/[!@#$%^&*]/.test(password)) errors.push("One special character required.");
+  if (password !== confirm) errors.push("Passwords do not match.");
+
+  return errors;
+}
+
+async function registerUser() {
+  const btn = document.querySelector("button");
+  btn.classList.add("loading");
+
+  const name = nameEl.value.trim();
+  const email = emailEl.value.trim().toLowerCase();
+  const phone_number = phone_numberEl.value.trim();
+  const password = passwordEl.value;
+  const confirm = confirmEl.value;
+
+  const errors = validateFrontend(name, email, phone_number, password, confirm);
+  if (errors.length) {
+    errorBox.textContent = errors.join("\n");
+    btn.classList.remove("loading");
+    return;
+  }
+
+  try {
+    const res = await fetch("https://drivers-backend-4spp.onrender.com/partner-reg", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, phone_number, password, confirm })
+    });
+
+    const data = await res.json();
+    if (!data.success) throw data.error;
+
+    successBox.textContent = "Registration complete! Check your email ✔";
+  } catch (e) {
+    errorBox.textContent = e;
+  } finally {
+    btn.classList.remove("loading");
+  }
+}
+
+let firstTyped = false;
+function autoInsertPrefix() {
+  const input = phone_numberEl;
+  if (!firstTyped) {
+    firstTyped = true;
+    input.value = "+254";
+    return;
+  }
+  const digits = input.value.replace(/\D/g, "").slice(3, 12);
+  input.value = "+254" + digits;
+}
+
+const nameEl = document.getElementById("name");
+const emailEl = document.getElementById("email");
+const phone_numberEl = document.getElementById("phone_number");
+const passwordEl = document.getElementById("password");
+const confirmEl = document.getElementById("confirm");
+const errorBox = document.getElementById("errorBox");
+const successBox = document.getElementById("successBox");
+</script>
+
+</body>
+</html>
