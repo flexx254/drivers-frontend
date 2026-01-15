@@ -43,7 +43,9 @@ content="
   --shadow-soft: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -54,7 +56,7 @@ body {
   padding-bottom: 96px;
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 header {
   position: fixed;
   top: 0;
@@ -116,14 +118,16 @@ nav.active a {
   .menu-icon { display: block; }
 }
 
-/* MAIN */
+/* ================= MAIN ================= */
 main {
   max-width: 1000px;
   margin: auto;
   padding: 20px;
 }
 
-section { margin-bottom: 32px; }
+section {
+  margin-bottom: 32px;
+}
 
 .card {
   background: white;
@@ -132,7 +136,7 @@ section { margin-bottom: 32px; }
   box-shadow: var(--shadow-soft);
 }
 
-/* HERO WITH BACKGROUND IMAGE */
+/* ================= HERO (IMAGE BACKGROUND) ================= */
 .hero {
   position: relative;
   background:
@@ -143,21 +147,27 @@ section { margin-bottom: 32px; }
     url("happy.png") center / cover no-repeat;
   color: white;
   overflow: hidden;
+  padding: 32px;
 }
 
+/* HERO TEXT (IMAGE SAFE) */
 .hero h2 {
   margin-top: 0;
-  font-size: 30px;
-  color: var(--main-green);
+  font-size: 32px;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 3px 10px rgba(0,0,0,0.35);
 }
 
 .hero p {
   font-size: 16px;
   line-height: 1.7;
   max-width: 700px;
+  color: #f1f5f2;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
-/* BUTTONS */
+/* ================= BUTTONS ================= */
 .btn-group {
   margin-top: 22px;
   display: flex;
@@ -183,11 +193,15 @@ section { margin-bottom: 32px; }
 
 .btn.outline {
   background: transparent;
-  border: 2px solid var(--main-green);
-  color: var(--main-green);
+  border: 2px solid #ffffff;
+  color: #ffffff;
 }
 
-/* GRID */
+.btn.outline:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* ================= GRID ================= */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -209,13 +223,13 @@ section { margin-bottom: 32px; }
   font-size: 15px;
 }
 
-/* COMMUNITY */
+/* ================= COMMUNITY ================= */
 .community {
   background: linear-gradient(135deg, var(--light-green), var(--main-green));
   color: white;
 }
 
-/* FOOTER */
+/* ================= FOOTER ================= */
 .app-footer {
   position: fixed;
   bottom: 0;
@@ -243,7 +257,7 @@ section { margin-bottom: 32px; }
   color: #777;
 }
 
-/* DESKTOP OVERLAY (NON-MOBILE ONLY) */
+/* ================= DESKTOP OVERLAY ================= */
 .desktop-overlay {
   position: fixed;
   inset: 0;
@@ -289,12 +303,10 @@ section { margin-bottom: 32px; }
   }
 }
 
-
-     /* TEMPORARILY DISABLE JOIN AS CAR OWNER */
+/* ================= TEMPORARILY DISABLE CAR OWNER ================= */
 a[aria-label="Join as Car Owner"] {
   display: none !important;
      }
-
 </style>
 </head>
 
