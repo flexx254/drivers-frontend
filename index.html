@@ -132,9 +132,17 @@ section { margin-bottom: 32px; }
   box-shadow: var(--shadow-soft);
 }
 
-/* HERO */
+/* HERO WITH BACKGROUND IMAGE */
 .hero {
-  background: linear-gradient(135deg, #e8f5e9, #ffffff);
+  position: relative;
+  background:
+    linear-gradient(
+      rgba(0, 90, 42, 0.65),
+      rgba(0, 90, 42, 0.65)
+    ),
+    url("happy.png") center / cover no-repeat;
+  color: white;
+  overflow: hidden;
 }
 
 .hero h2 {
