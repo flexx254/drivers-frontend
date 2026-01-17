@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>D4D – Drivers for Drivers</title>
 
-<!-- =====================
-     SECURITY HEADERS
-====================== -->
+<!-- ================= SECURITY HEADERS ================= -->
 <meta http-equiv="Content-Security-Policy"
 content="
   default-src 'self';
@@ -19,315 +17,136 @@ content="
   base-uri 'self';
   frame-ancestors 'none';
 ">
-
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <meta http-equiv="X-Frame-Options" content="DENY">
 
-<!-- Font Awesome CSS -->
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-/>
+<!-- Font Awesome -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
 <style>
 :root {
-  --main-green: #005a2a;
-  --light-green: #1b8f2a;
-  --accent-green: #2ecc71;
-  --white: #ffffff;
-  --grey: #f4f6f5;
-  --dark: #1f1f1f;
-  --radius: 16px;
-  --shadow: 0 10px 25px rgba(0,0,0,0.08);
-  --shadow-soft: 0 4px 12px rgba(0,0,0,0.08);
+  --main-green:#005a2a;
+  --light-green:#1b8f2a;
+  --accent-green:#2ecc71;
+  --grey:#f4f6f5;
+  --dark:#1f1f1f;
+  --radius:16px;
+  --shadow:0 10px 25px rgba(0,0,0,.08);
+  --shadow-soft:0 4px 12px rgba(0,0,0,.08);
 }
 
-* {
-  box-sizing: border-box;
-}
+*{box-sizing:border-box}
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  background: var(--grey);
-  color: var(--dark);
-  padding-top: 76px;
-  padding-bottom: 96px;
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--grey);
+  color:var(--dark);
+  padding-top:76px;
+  padding-bottom:96px;
 }
 
 /* ================= HEADER ================= */
-header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 76px;
-  background: linear-gradient(90deg, var(--main-green), var(--light-green));
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  box-shadow: var(--shadow);
-  z-index: 1000;
+header{
+  position:fixed;top:0;width:100%;height:76px;
+  background:linear-gradient(90deg,var(--main-green),var(--light-green));
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;box-shadow:var(--shadow);z-index:1000;
 }
 
-.logo img {
-  height: 38px;
-}
+.menu-icon{font-size:24px;color:#fff;background:none;border:none;display:none}
+nav{display:flex;gap:22px}
+nav a{color:#fff;text-decoration:none;font-weight:500}
 
-.menu-icon {
-  font-size: 24px;
-  color: white;
-  cursor: pointer;
-  display: none;
-  background: none;
-  border: none;
+nav.active{
+  position:absolute;top:76px;right:16px;
+  background:#fff;padding:16px;border-radius:var(--radius);
+  box-shadow:var(--shadow)
 }
+nav.active a{display:block;color:var(--main-green);margin:12px 0}
 
-nav {
-  display: flex;
-  gap: 22px;
-}
-
-nav a {
-  color: white;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-nav.active {
-  position: absolute;
-  top: 76px;
-  right: 16px;
-  background: white;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 16px;
-}
-
-nav.active a {
-  display: block;
-  color: var(--main-green);
-  margin: 12px 0;
-  font-weight: 600;
-}
-
-@media (max-width: 768px) {
-  nav { display: none; }
-  nav.active { display: block; }
-  .menu-icon { display: block; }
+@media(max-width:768px){
+  nav{display:none}
+  nav.active{display:block}
+  .menu-icon{display:block}
 }
 
 /* ================= MAIN ================= */
-main {
-  max-width: 1000px;
-  margin: auto;
-  padding: 20px;
-}
+main{max-width:1000px;margin:auto;padding:20px}
+section{margin-bottom:32px}
+.card{background:#fff;padding:24px;border-radius:var(--radius);box-shadow:var(--shadow-soft)}
 
-section {
-  margin-bottom: 32px;
-}
-
-.card {
-  background: white;
-  padding: 24px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-soft);
-}
-
-/* ================= HERO (IMAGE BACKGROUND) ================= */
-.hero {
-  position: relative;
+/* ================= HERO ================= */
+.hero{
   background:
-    linear-gradient(
-      rgba(0, 90, 42, 0.65),
-      rgba(0, 90, 42, 0.65)
-    ),
-    url("assets/logo/happydriver.png") center / cover no-repeat;
-  color: white;
-  overflow: hidden;
-  padding: 32px;
+  linear-gradient(rgba(0,90,42,.65),rgba(0,90,42,.65)),
+  url("assets/logo/happydriver.png") center/cover no-repeat;
+  color:#fff
 }
 
-/* HERO TEXT (IMAGE SAFE) */
-.hero h2 {
-  margin-top: 0;
-  font-size: 32px;
-  font-weight: 800;
-  color: #ffffff;
-  text-shadow: 0 3px 10px rgba(0,0,0,0.35);
-}
-
-.hero p {
-  font-size: 16px;
-  line-height: 1.7;
-  max-width: 700px;
-  color: #f1f5f2;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.3);
-}
+.hero h2{margin:0;font-size:32px;font-weight:800}
+.hero p{line-height:1.7;max-width:700px}
 
 /* ================= BUTTONS ================= */
-.btn-group {
-  margin-top: 22px;
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.btn {
-  padding: 14px 26px;
-  border-radius: 30px;
-  font-size: 14px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-}
-
-.btn.primary {
-  background: linear-gradient(135deg, var(--main-green), var(--light-green));
-  color: white;
-}
-
-.btn.outline {
-  background: transparent;
-  border: 2px solid #ffffff;
-  color: #ffffff;
-}
-
-.btn.outline:hover {
-  background: rgba(255,255,255,0.15);
-}
+.btn-group{margin-top:22px;display:flex;gap:14px;flex-wrap:wrap}
+.btn{padding:14px 26px;border-radius:30px;font-weight:700;border:none;text-decoration:none}
+.btn.primary{background:linear-gradient(135deg,var(--main-green),var(--light-green));color:#fff}
+.btn.outline{border:2px solid #fff;color:#fff}
 
 /* ================= GRID ================= */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 18px;
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+
+/* ================= ICON RHYTHM ================= */
+.icon-main{text-align:center;margin-bottom:12px}
+.icon-main i{font-size:42px;color:var(--light-green)}
+
+.icon-line{
+  display:flex;gap:10px;
+  font-size:15px;line-height:1.75;
+  margin-bottom:14px
+}
+.icon-line i{
+  font-size:14px;color:var(--accent-green);
+  margin-top:4px;flex-shrink:0
 }
 
-.value-card i {
-  font-size: 32px;
-  color: var(--light-green);
-  margin-bottom: 12px;
-}
-
-.value-card h3 {
-  margin: 6px 0;
-  color: var(--main-green);
-}
-
-.value-card p {
-  font-size: 15px;
-  line-height: 1.8;
-        
-}
+.value-card h3{text-align:center;color:var(--main-green)}
 
 /* ================= COMMUNITY ================= */
-.community {
-  background: linear-gradient(135deg, var(--light-green), var(--main-green));
-  color: white;
+.community{
+  background:linear-gradient(135deg,var(--light-green),var(--main-green));
+  color:#fff
 }
 
 /* ================= FOOTER ================= */
-.app-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 76px;
-  background: white;
-  border-top: 1px solid #ddd;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+.app-footer{
+  position:fixed;bottom:0;width:100%;height:76px;
+  background:#fff;border-top:1px solid #ddd;
+  display:flex;justify-content:space-around;align-items:center
 }
+.app-footer i{font-size:22px;color:#888}
+.app-footer i.active{color:var(--main-green)}
 
-.app-footer i {
-  font-size: 22px;
-  color: #888;
-}
-
-.app-footer i.active {
-  color: var(--main-green);
-}
-
-.copyright {
-  text-align: center;
-  font-size: 12px;
-  color: #777;
-}
-
-/* ================= DESKTOP OVERLAY ================= */
-.desktop-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 24px;
-}
-
-.desktop-overlay .overlay-content {
-  background: white;
-  border-radius: var(--radius);
-  padding: 32px 24px;
-  max-width: 420px;
-  box-shadow: var(--shadow);
-}
-
-.desktop-overlay i {
-  font-size: 48px;
-  color: var(--main-green);
-  margin-bottom: 16px;
-}
-
-.desktop-overlay h2 {
-  margin: 0 0 12px;
-  color: var(--main-green);
-}
-
-.desktop-overlay p {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.6;
-  color: #444;
-}
-
-/* Hide overlay on mobile */
-@media (max-width: 768px) {
-  .desktop-overlay {
-    display: none;
+.desktop-overlay{display:none}
+@media(min-width:769px){
+  .desktop-overlay{
+    display:flex;position:fixed;inset:0;
+    background:rgba(0,0,0,.85);
+    justify-content:center;align-items:center;z-index:9999
   }
 }
-
-/* ================= TEMPORARILY DISABLE CAR OWNER ================= */
-a[aria-label="Join as Car Owner"] {
-  display: none !important;
-     }
 </style>
 </head>
 
 <body>
 
 <header>
-  <div class="logo">
-    <img src="assets/logo/d4d-logo.png" alt="D4D Logo">
-  </div>
-
-  <button class="menu-icon" id="menuToggle" aria-label="Toggle navigation" type="button">
-    <i class="fas fa-bars"></i>
-  </button>
-
-  <nav id="navMenu" aria-label="Primary navigation">
-    <a href="#">Home</a>
-    <a href="#">Login</a>
-    <a href="#">About</a>
-    <a href="#">Contact</a>
+  <img src="assets/logo/d4d-logo.png" height="38">
+  <button class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></button>
+  <nav id="navMenu">
+    <a href="#">Home</a><a href="#">Login</a><a href="#">About</a><a href="#">Contact</a>
   </nav>
 </header>
 
@@ -335,97 +154,75 @@ a[aria-label="Join as Car Owner"] {
 
 <section class="hero card">
   <h2>Driver for Drivers</h2>
-  <p>
+  <p>D4D is a driver-first community solving unfair terms, lack of protection,
+  and unstable opportunities through unity and technology.</p>
 
-D4D is a driver-first community built to solve real challenges drivers face every day using tech — unfair terms, lack of protection, and unstable opportunities.
-By standing together, drivers and car owners gain access to welfare support, verified partnerships, insurance options, and a stronger collective voice.
-    
-  </p>
   <div class="btn-group">
-    <!-- Join as Driver → LOGIN -->
-    <a
-      href="https://flexx254.github.io/drivers-frontend/login.html"
-      class="btn primary"
-      role="button"
-      aria-label="Login as Driver"
-    >
-      Join as Driver
-    </a>
-
-    <!-- Join as Car Owner → OWNER -->
-    <a
-      href="https://flexx254.github.io/drivers-frontend/owner.html"
-      class="btn outline"
-      role="button"
-      aria-label="Join as Car Owner"
-      
-    >
-      Join as Car Owner
-    </a>
+    <a href="https://flexx254.github.io/drivers-frontend/login.html" class="btn primary">Join as Driver</a>
   </div>
 </section>
 
 <section class="grid">
+
+<!-- DRIVER–OWNER MATCHING -->
 <div class="card value-card">
-  <i class="fas fa-handshake"></i>
+  <div class="icon-main"><i class="fas fa-handshake"></i></div>
   <h3>Driver–Owner Matching</h3>
-  <p>
-   D4D is building a trust-based matching system designed to connect drivers and car owners through verified information, clear expectations, and shared accountability — not informal brokers or blind arrangements.</p>
-<p>The matching process is supported by structured digital records that help both parties make informed decisions before and during a working relationship. Driver profiles include verified document details such as identification and driving credentials, ensuring that connections begin from a position of legitimacy and transparency.</p>
-<p>As relationships continue, continuous performance ratings help reflect reliability, professionalism, and consistency over time. These ratings are shaped by real working experiences, encouraging fair treatment and long-term cooperation rather than short-term exploitation.</p>
-<p>In later stages, traceable payment records will further strengthen matching outcomes by creating clear histories of work and compensation. This reduces disputes, protects both drivers and car owners, and reinforces trust throughout the partnership.</p>
-<p>Matching also includes basic protection mechanisms for both parties. When a car owner plans to withdraw a vehicle, the driver is notified early to allow time for transition. Likewise, if a driver intends to leave a working arrangement, car owners receive advance notice to plan responsibly. This reduces sudden losses, promotes fairness, and supports stable working relationships.</p>
-<p>By combining verified documents, ongoing performance records, transparent payment histories, and early-notice protections, D4D’s matching system is designed to promote stability, fairness, and stronger partnerships across the entire community. 
-  </p>
+
+  <p class="icon-line"><i class="fas fa-shield-check"></i>
+  Trust-based matching using verified identities and credentials.</p>
+
+  <p class="icon-line"><i class="fas fa-id-card"></i>
+  Structured digital records support informed decisions.</p>
+
+  <p class="icon-line"><i class="fas fa-star"></i>
+  Performance ratings reward professionalism and reliability.</p>
+
+  <p class="icon-line"><i class="fas fa-receipt"></i>
+  Transparent payment histories reduce disputes.</p>
+
+  <p class="icon-line"><i class="fas fa-bell"></i>
+  Early-notice protections prevent sudden losses.</p>
 </div>
 
+<!-- WELFARE -->
 <div class="card value-card">
-  <i class="fas fa-users"></i>
+  <div class="icon-main"><i class="fas fa-users"></i></div>
   <h3>Welfare & Community</h3>
-  <p>
-    Beyond daily earnings, D4D fosters unity through welfare programs, peer support,
-    and collective initiatives that protect drivers and car owners during hard times.
-    A strong community ensures no member faces challenges alone.
-  </p>
+
+  <p class="icon-line"><i class="fas fa-hand-holding-heart"></i>
+  Support during illness, accidents, and hardship.</p>
+
+  <p class="icon-line"><i class="fas fa-people-group"></i>
+  Peer unity strengthens collective responsibility.</p>
 </div>
 
+<!-- INSURANCE -->
 <div class="card value-card">
-  <i class="fas fa-heartbeat"></i>
+  <div class="icon-main"><i class="fas fa-heartbeat"></i></div>
   <h3>Insurance Access</h3>
-  <p>
-    Through collective participation, D4D makes group health and accident insurance
-    possible at fairer terms. Unity reduces individual risk, lowers costs, and gives
-    members access to protection that is often unattainable when standing alone.
-  </p>
+
+  <p class="icon-line"><i class="fas fa-shield-heart"></i>
+  Group coverage at fairer, negotiated terms.</p>
 </div>
 
+<!-- RECORDS -->
 <div class="card value-card">
-  <i class="fas fa-id-card"></i>
+  <div class="icon-main"><i class="fas fa-id-card"></i></div>
   <h3>Digital Records</h3>
-  <p>
-    Secure digital records maintain verified identities, work history, and compliance.
-    This transparency builds trust within the community and strengthens D4D’s ability
-    to negotiate with partners, insurers, and platforms on behalf of its members.
-  </p>
+
+  <p class="icon-line"><i class="fas fa-database"></i>
+  Secure identity, compliance, and work history.</p>
 </div>
+
 </section>
 
 <section class="card community">
   <h3>Built by Drivers, for Drivers</h3>
-  <p>
-    D4D is not a ride-hailing app. It is a driver-owned ecosystem built on unity,
-    shared responsibility, and collective strength. By standing together, drivers
-    and car owners gain a stronger voice to negotiate fairer terms with existing
-    e-hailing platforms.
-    <br><br>
-    However, building a driver-led e-hailing application is also part of our
-    responsibility — ensuring drivers achieve better working conditions,
-    greater transparency, and long-term sustainability under systems they help control.
-  </p>
+  <p>D4D is not a ride-hailing app — it is a driver-owned ecosystem built on unity.</p>
 </section>
 
 <div class="copyright">© 2026 D4D – Drivers for Drivers</div>
-
 </main>
 
 <div class="app-footer">
@@ -434,27 +231,13 @@ By standing together, drivers and car owners gain access to welfare support, ver
   <i class="fas fa-user"></i>
 </div>
 
-     <div class="desktop-overlay" aria-hidden="true">
-  <div class="overlay-content">
-    <i class="fas fa-mobile-alt"></i>
-    <h2>Mobile Access Only</h2>
-    <p>
-      This page is currently optimized for mobile devices only.
-      Please open it on a smartphone for the best experience.
-    </p>
-  </div>
-     </div>
-
 <script>
-const menuToggle = document.getElementById("menuToggle");
-const navMenu = document.getElementById("navMenu");
-const icon = menuToggle.querySelector("i");
-
-menuToggle.addEventListener("click", () => {
-  const open = navMenu.classList.toggle("active");
-  icon.className = open ? "fas fa-times" : "fas fa-bars";
-});
+const t=document.getElementById("menuToggle"),
+n=document.getElementById("navMenu"),
+i=t.querySelector("i");
+t.onclick=()=>{n.classList.toggle("active");
+i.className=n.classList.contains("active")?"fas fa-times":"fas fa-bars";}
 </script>
 
 </body>
-         </html>
+</html>
