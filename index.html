@@ -334,44 +334,45 @@ a[aria-label="Join as Car Owner"] {
  }   
 
 /* ================= COMMUNITY APP OVERLAY ================= */
-
 .community-app-card {
   position: relative;
-  overflow: hidden;
-  padding: 48px 96px; /* space for phones */
+  overflow: visible;
+
+  /* reserve space for phones */
+  padding: 56px 160px;
 }
 
-/* CONTENT STAYS CENTERED & SAFE */
+/* CONTENT SAFE ZONE */
 .community-content {
-  position: relative;
-  z-index: 2;
   max-width: 520px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
   text-align: center;
 }
 
-/* SHARED PHONE STYLES */
+/* PHONE SHARED */
 .app-phone {
   position: absolute;
-  width: 240px;           /* equal size */
-  max-width: 40vw;
+  width: 240px;
   z-index: 1;
-  pointer-events: none;   /* decorative only */
+  pointer-events: none;
 }
 
-/* DRIVER APP — LEFT, TOP PROTRUSION */
+/* DRIVER — LEFT / TOP */
 .app-phone-driver {
-  left: -120px;           /* 50% outside card */
-  top: -60px;             /* protrudes upward */
-  transform: rotate(-6deg);
+  left: 0;
+  top: -60px;
+  transform: translateX(-50%) rotate(-6deg);
 }
 
-/* PASSENGER APP — RIGHT, BOTTOM PROTRUSION */
+/* PASSENGER — RIGHT / BOTTOM */
 .app-phone-passenger {
-  right: -120px;          /* 50% outside card */
-  bottom: -80px;          /* protrudes downward */
-  transform: rotate(6deg);
+  right: 0;
+  bottom: -80px;
+  transform: translateX(50%) rotate(6deg);
 }
+
 
 /* MOBILE ADJUSTMENTS */
 @media (max-width: 768px) {
