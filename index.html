@@ -333,44 +333,48 @@ a[aria-label="Join as Car Owner"] {
   margin: 12px auto 18px;
  }   
 
-/* ================= COMMUNITY APP OVERLAY ================= */
+/* ================= COMMUNITY APP (MOBILE-FIRST, SAFE) ================= */
+
 .community-app-card {
   position: relative;
-  overflow: visible;
-
-  /* reserve space for phones */
-  padding: 56px 160px;
+  padding: 28px 20px 32px;
+  overflow: hidden;
 }
 
-/* CONTENT SAFE ZONE */
-.community-content {
-  max-width: 520px;
-  margin: 0 auto;
+/* PHONE VISUAL ZONE */
+.community-phones {
   position: relative;
-  z-index: 2;
-  text-align: center;
+  height: 180px;
+  margin-bottom: 16px;
 }
 
-/* PHONE SHARED */
+/* SHARED PHONE STYLE */
 .app-phone {
   position: absolute;
-  width: 240px;
-  z-index: 1;
+  width: 160px;
   pointer-events: none;
+  z-index: 1;
 }
 
-/* DRIVER — LEFT / TOP */
+/* DRIVER — TOP LEFT */
 .app-phone-driver {
-  left: 0;
-  top: -60px;
-  transform: translateX(-50%) rotate(-6deg);
+  left: -12px;
+  top: -12px;
+  transform: rotate(-6deg);
 }
 
-/* PASSENGER — RIGHT / BOTTOM */
+/* PASSENGER — BOTTOM RIGHT */
 .app-phone-passenger {
-  right: 0;
-  bottom: -80px;
-  transform: translateX(50%) rotate(6deg);
+  right: -12px;
+  bottom: -12px;
+  transform: rotate(6deg);
+}
+
+/* CONTENT */
+.community-content {
+  position: relative;
+  z-index: 2;
+  text-align: left;
 }
 
 
