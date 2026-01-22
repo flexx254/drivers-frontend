@@ -54,6 +54,7 @@ body {
   color: var(--dark);
   padding-top: 76px;
   padding-bottom: 96px;
+  overflow-x: hidden; /* GLOBAL SAFETY */
 }
 
 /* ================= HEADER ================= */
@@ -71,9 +72,7 @@ header {
   z-index: 1000;
 }
 
-.logo img {
-  height: 38px;
-}
+.logo img { height: 38px; }
 
 .menu-icon {
   font-size: 24px;
@@ -84,10 +83,7 @@ header {
   border: none;
 }
 
-nav {
-  display: flex;
-  gap: 22px;
-}
+nav { display: flex; gap: 22px; }
 
 nav a {
   color: white;
@@ -125,9 +121,7 @@ main {
   padding: 20px;
 }
 
-section {
-  margin-bottom: 32px;
-}
+section { margin-bottom: 32px; }
 
 .card {
   background: white;
@@ -136,27 +130,22 @@ section {
   box-shadow: var(--shadow-soft);
 }
 
-/* ================= HERO (IMAGE BACKGROUND) ================= */
+/* ================= HERO ================= */
 .hero {
   position: relative;
   background:
-    linear-gradient(
-      rgba(0, 90, 42, 0.65),
-      rgba(0, 90, 42, 0.65)
-    ),
+    linear-gradient(rgba(0,90,42,.65), rgba(0,90,42,.65)),
     url("assets/logo/happydriver.png") center / cover no-repeat;
   color: white;
-  overflow: hidden;
   padding: 32px;
+  overflow: hidden;
 }
 
-/* HERO TEXT (IMAGE SAFE) */
 .hero h2 {
-  margin-top: 0;
+  margin: 0;
   font-size: 32px;
   font-weight: 800;
-  color: #ffffff;
-  text-shadow: 0 3px 10px rgba(0,0,0,0.35);
+  text-shadow: 0 3px 10px rgba(0,0,0,.35);
 }
 
 .hero p {
@@ -164,7 +153,7 @@ section {
   line-height: 1.7;
   max-width: 700px;
   color: #f1f5f2;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  text-shadow: 0 2px 6px rgba(0,0,0,.3);
 }
 
 /* ================= BUTTONS ================= */
@@ -182,7 +171,6 @@ section {
   font-weight: 700;
   border: none;
   cursor: pointer;
-  text-align: center;
   text-decoration: none;
 }
 
@@ -193,18 +181,14 @@ section {
 
 .btn.outline {
   background: transparent;
-  border: 2px solid #ffffff;
-  color: #ffffff;
-}
-
-.btn.outline:hover {
-  background: rgba(255,255,255,0.15);
+  border: 2px solid white;
+  color: white;
 }
 
 /* ================= GRID ================= */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px,1fr));
   gap: 18px;
 }
 
@@ -222,7 +206,6 @@ section {
 .value-card p {
   font-size: 15px;
   line-height: 1.8;
-        
 }
 
 /* ================= COMMUNITY ================= */
@@ -249,9 +232,7 @@ section {
   color: #888;
 }
 
-.app-footer i.active {
-  color: var(--main-green);
-}
+.app-footer i.active { color: var(--main-green); }
 
 .copyright {
   text-align: center;
@@ -259,114 +240,77 @@ section {
   color: #777;
 }
 
-/* ================= DESKTOP OVERLAY ================= */
+/* ================= OVERLAY ================= */
 .desktop-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0,0,0,.85);
   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 24px;
 }
 
-.desktop-overlay .overlay-content {
-  background: white;
-  border-radius: var(--radius);
-  padding: 32px 24px;
-  max-width: 420px;
-  box-shadow: var(--shadow);
-}
-
-.desktop-overlay i {
-  font-size: 48px;
-  color: var(--main-green);
-  margin-bottom: 16px;
-}
-
-.desktop-overlay h2 {
-  margin: 0 0 12px;
-  color: var(--main-green);
-}
-
-.desktop-overlay p {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.6;
-  color: #444;
-}
-
-/* Hide overlay on mobile */
 @media (max-width: 768px) {
-  .desktop-overlay {
-    display: none;
-  }
+  .desktop-overlay { display: none; }
 }
 
-/* ================= TEMPORARILY DISABLE CAR OWNER ================= */
-a[aria-label="Join as Car Owner"] {
-  display: none !important;
-     }
-     
+/* ================= UTIL ================= */
+.more-text { display: none; }
 
-.more-text{
-  display:none;
+.inline-toggle {
+  background: none;
+  border: none;
+  color: var(--light-green);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 4px;
 }
 
-.inline-toggle{
-  background:none;
-  border:none;
-  color:var(--light-green);
-  font-weight:600;
-  font-size:13px;
-  cursor:pointer;
-  padding:0;
-  margin-left:4px;
-}
-
- .partner-image {
+.partner-image {
   width: 100%;
   max-width: 320px;
   display: block;
   margin: 12px auto 18px;
- }   
+}
 
-/* ================= COMMUNITY APP (MOBILE-FIRST, SAFE) ================= */
+/* ================= COMMUNITY APP CARD ================= */
 
 .community-app-card {
   position: relative;
-  padding: 28px 20px 32px;
-  overflow: hidden;
+  padding: 64px 24px;
+  overflow-x: hidden;   /* IMPORTANT */
+  overflow-y: visible;
 }
 
-/* PHONE VISUAL ZONE */
 .community-phones {
   position: relative;
-  height: 180px;
-  margin-bottom: 16px;
+  height: 260px;
+  margin-bottom: -40px;
 }
 
-/* SHARED PHONE STYLE */
+/* SHARED PHONE */
 .app-phone {
   position: absolute;
-  width: 160px;
+  width: 180px;
   pointer-events: none;
   z-index: 1;
+  opacity: .9;
 }
 
-/* DRIVER — TOP LEFT */
+/* DRIVER */
 .app-phone-driver {
-  left: -12px;
-  top: -12px;
+  left: -24px;
+  top: -40px;
   transform: rotate(-6deg);
 }
 
-/* PASSENGER — BOTTOM RIGHT */
+/* PASSENGER */
 .app-phone-passenger {
-  right: -12px;
-  bottom: -12px;
+  right: -24px;
+  bottom: -40px;
   transform: rotate(6deg);
 }
 
@@ -376,35 +320,8 @@ a[aria-label="Join as Car Owner"] {
   z-index: 2;
   text-align: left;
 }
-
-
-/* MOBILE ADJUSTMENTS */
-@media (max-width: 768px) {
-  .community-app-card {
-    padding: 40px 24px;
-  }
-
-  .app-phone {
-    width: 180px;
-    opacity: 0.85;
-  }
-
-  .app-phone-driver {
-    left: -18px;
-    top: -24px;
-  }
-
-  .app-phone-passenger {
-    right: -18px;
-    bottom: -24px;
-  }
-}
-
-/* Prevent absolute children from widening layout */
-.community-phones {
-  overflow: hidden;
-}
 </style>
+
 </head>
 
 <body>
