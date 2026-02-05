@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Driver Login</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> 
+<style>
+
+    :root {
+  --main-green: #1b8f2a;
+  --white: #ffffff;
+    }
+body { font-family: Arial, sans-serif; margin:0; padding:0px; background:#f5f5f5; }
+.container {
+  max-width:400px;
+  margin:20px auto;   /* adds top & bottom spacing */
+  background:white;
+  padding:22px;
+  border-radius:10px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.12);
+}
+h2 { color:#1b8f2a; text-align:center; margin-bottom:20px; }
+label { font-weight:bold; color:#1b8f2a; display:block; margin-bottom:6px; }
+input { width:100%; padding:12px; border:2px solid #1b8f2a; border-radius:8px; font-size:16px; margin-bottom:20px; }
+button { width:100%; background:#1b8f2a; color:white; padding:14px; border:none; border-radius:8px; font-size:18px; cursor:pointer; }
+button:active { background:#166d20; }
+.msg { display:none; padding:12px; margin-top:15px; border-radius:8px; font-size:15px; }
+.success { background:#d8ffd8; color:#0f6e12; }
+.error { background:#ffd6d6; color:#a30000; }
+.toggle-pass {
+  cursor: pointer;
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-90%);
+  font-size: 18px;
+  color: var(--main-green);
+}
+.password-wrapper { position:relative; }
+
+  /* HEADER */
+header {
+  background-color: var(--main-green);
+  color: var(--white);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+header .logo {
+  display: flex;
+  align-items: center;
+}
+
+header .logo img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+    }
+
+@media (max-width: 480px) {
+  header .logo img {
+    height: 28px;
+  }
+      }
+
+    
+
+header .menu-icon {
+  font-size: 24px;
+  cursor: pointer;
+  display: none;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+nav.active {
+  display: block;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: var(--main-green);
+  padding: 15px;
+  border-radius: 5px;
+  width: 150px;
+}
+
+nav.active a {
+  display: block;
+  margin: 10px 0;
+}
+
+/* RESPONSIVE */
+@media screen and (max-width: 768px) {
+  nav {
+    display: none;
+    flex-direction: column;
+  }
+  header .menu-icon {
+    display: block;
+  }
+  }
+
+  /* FOOTER */
+footer {
+  background-color: var(--main-green);
+  color: var(--white);
+  text-align: center;
+  padding: 15px;
+  margin-top: auto;
+  }
+
+.spinner {
+  display: none;
+  margin-left: 10px;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255,255,255,0.5);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+    
+</style>
+</head>
+<body>
+
+   <header>
+
+  <div class="logo">
+  <img src="assets/logo/d4d-logo.png" alt="D4D Logo">
+  </div>
+  <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
+  <nav id="navMenu">
+    <a href="#">Home</a>
+    <a href="#">Login</a>
+    <a href="#">About</a>
+  </nav>
+   </header>
+
+<div class="container">
+<h2>Driver Login</h2>
+
+<label for="email">Email</label>
+<input type="email" id="email" placeholder="you@example.com">
+
+<label for="password">Password</label>
+<div class="password-wrapper">
+  <input type="password" id="password" placeholder="Enter your password">
+  <span id="togglePass" class="toggle-pass">&#128065;</span>
+</div>
+
+<button id="loginBtn">
+  Login
+  <span class="spinner" id="btnSpinner"></span>
+</button>
+<div id="msgBox" class="msg"></div>
+</div>
+
+  <footer>
+  &copy; 2025 Driver App. All rights reserved.
+  </footer>
+
+<script>
+
+const toggle = document.getElementById("togglePass");
+const pwd = document.getElementById("password");
+
+toggle.addEventListener("click", () => {
+  if (pwd.type === "password") {
+    // Show password
+    pwd.type = "text";
+    toggle.textContent = "👁️";  // keep the eye
+  } else {
+    // Hide password
+    pwd.type = "password";
+    toggle.textContent = "🙈";  // monkey covers eyes
+  }
+});
+// Show messages
+function showMessage(text, type){
+    const msg = document.getElementById("msgBox");
+    msg.textContent = text;
+    msg.className = `msg ${type}`;
+    msg.style.display = "block";
+}
+
+async function login(){
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
+    const btn = document.getElementById("loginBtn");
+    const spinner = document.getElementById("btnSpinner");
+
+    if(!email){ showMessage("Email is required","error"); return; }
+    if(!password){ showMessage("Password is required","error"); return; }
+
+    // Disable button + show spinner
+    btn.disabled = true;
+    spinner.style.display = "inline-block";
+
+    try{
+        const res = await fetch("https://drivers-backend-4spp.onrender.com/login", {
+            method:"POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if(data.success){
+            showMessage("Login successful! Redirecting...", "success");
+            localStorage.setItem("driverToken", data.token);
+            setTimeout(() => window.location.href="dashboard.html", 1200);
+        } else {
+            showMessage(data.error || "Invalid credentials", "error");
+        }
+    } catch(e){
+        showMessage("Network error. Try again.", "error");
+    }
+
+    // Re-enable button + hide spinner
+    btn.disabled = false;
+    spinner.style.display = "none";
+    }
+
+  document.getElementById("loginBtn").addEventListener("click", login);
+
+  // ---------------------
+// RESPONSIVE MENU
+// ---------------------
+const menuToggle = document.getElementById('menuToggle');
+const navMenu = document.getElementById('navMenu');
+
+menuToggle.addEventListener('click', () => {
+  navMenu.classList.toggle('active');
+  menuToggle.innerHTML = navMenu.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+});
+</script>
+
+</body>
+</html>
