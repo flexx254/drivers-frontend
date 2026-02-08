@@ -225,6 +225,15 @@ async function login(){
         if(data.success){
             showMessage("Login successful! Redirecting...", "success");
             localStorage.setItem("driverToken", data.token);
+
+            // 🔑 NEW
+  fetchContinueToken(email);
+
+  setTimeout(() => {
+    window.location.href =
+      "https://flexx254.github.io/drivers-frontend/owner-dashboard.html";
+  }, 1200);
+    }
             setTimeout(() => {
   window.location.href = "https://flexx254.github.io/drivers-frontend/owner-dashboard.html";
 }, 1200);
