@@ -177,92 +177,29 @@ footer {
   &copy; 2025 Driver App. All rights reserved.
   </footer>
 
-<script>
 
+     <script>
 const toggle = document.getElementById("togglePass");
 const pwd = document.getElementById("password");
 
 toggle.addEventListener("click", () => {
   if (pwd.type === "password") {
-    // Show password
     pwd.type = "text";
-    toggle.textContent = "👁️";  // keep the eye
+    toggle.textContent = "👁️";
   } else {
-    // Hide password
     pwd.type = "password";
-    toggle.textContent = "🙈";  // monkey covers eyes
+    toggle.textContent = "🙈";
   }
 });
-// Show messages
+
 function showMessage(text, type){
-    const msg = document.getElementById("msgBox");
-    msg.textContent = text;
-    msg.className = `msg ${type}`;
-    msg.style.display = "block";
+  const msg = document.getElementById("msgBox");
+  msg.textContent = text;
+  msg.className = `msg ${type}`;
+  msg.style.display = "block";
 }
 
-async function login(){
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const password = document.getElementById("password").value;
-    const btn = document.getElementById("loginBtn");
-    const spinner = document.getElementById("btnSpinner");
-
-    if(!email){ showMessage("Email is required","error"); return; }
-    if(!password){ showMessage("Password is required","error"); return; }
-
-    // Disable button + show spinner
-    btn.disabled = true;
-    spinner.style.display = "inline-block";
-
-    try{
-        const res = await fetch("https://drivers-backend-4spp.onrender.com/login", {
-            method:"POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-
-        if(data.success){
-            showMessage("Login successful! Redirecting...", "success");
-            localStorage.setItem("driverToken", data.token);
-
-            // 🔑 NEW
-  fetchContinueToken(email);
-
-  setTimeout(() => {
-    window.location.href =
-      "https://flexx254.github.io/drivers-frontend/owner-dashboard.html";
-  }, 1200);
-    }
-            setTimeout(() => {
-  window.location.href = "https://flexx254.github.io/drivers-frontend/owner-dashboard.html";
-}, 1200);
-        } else {
-            showMessage(data.error || "Invalid credentials", "error");
-        }
-    } catch(e){
-        showMessage("Network error. Try again.", "error");
-    }
-
-    // Re-enable button + hide spinner
-    btn.disabled = false;
-    spinner.style.display = "none";
-    }
-
-  document.getElementById("loginBtn").addEventListener("click", login);
-
-  // ---------------------
-// RESPONSIVE MENU
-// ---------------------
-const menuToggle = document.getElementById('menuToggle');
-const navMenu = document.getElementById('navMenu');
-
-menuToggle.addEventListener('click', () => {
-  navMenu.classList.toggle('active');
-  menuToggle.innerHTML = navMenu.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
-});
-
-    async function fetchContinueToken(email) {
+async function fetchContinueToken(email) {
   try {
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/get-continue-token",
@@ -281,8 +218,74 @@ menuToggle.addEventListener('click', () => {
   } catch (err) {
     console.error("Failed to fetch continue token", err);
   }
+}
+
+async function login(){
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const password = document.getElementById("password").value;
+  const btn = document.getElementById("loginBtn");
+  const spinner = document.getElementById("btnSpinner");
+
+  if(!email){ showMessage("Email is required","error"); return; }
+  if(!password){ showMessage("Password is required","error"); return; }
+
+  btn.disabled = true;
+  spinner.style.display = "inline-block";
+
+  try {
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/login",
+      {
+        method:"POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      showMessage("Login successful! Redirecting...", "success");
+
+      localStorage.setItem("driverToken", data.token);
+
+      // 🔑 get continue_token
+      await fetchContinueToken(email);
+
+      setTimeout(() => {
+        window.location.href =
+          "https://flexx254.github.io/drivers-frontend/owner-dashboard.html";
+      }, 1200);
+
+    } else {
+      showMessage(data.error || "Invalid credentials", "error");
     }
-</script>
+
+  } catch (e) {
+    showMessage("Network error. Try again.", "error");
+  }
+
+  btn.disabled = false;
+  spinner.style.display = "none";
+}
+
+document.getElementById("loginBtn").addEventListener("click", login);
+
+// ---------------------
+// RESPONSIVE MENU
+// ---------------------
+const menuToggle = document.getElementById('menuToggle');
+const navMenu = document.getElementById('navMenu');
+
+menuToggle.addEventListener('click', () => {
+  navMenu.classList.toggle('active');
+  menuToggle.innerHTML =
+    navMenu.classList.contains('active')
+      ? '<i class="fas fa-times"></i>'
+      : '<i class="fas fa-bars"></i>';
+});
+     </script>
+    
 
 </body>
 </html>
