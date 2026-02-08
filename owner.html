@@ -185,16 +185,16 @@ const uber_report = document.getElementById("uber_report");
 const msgBox = document.getElementById("msgBox");
 
 /* ---------------- MESSAGE HANDLER ---------------- */
-function showMessage(text, type){
+function showMessage(text, type) {
   msgBox.textContent = text;
   msgBox.className = "msg " + type;
   msgBox.style.display = "block";
 }
 
 /* ---------------- IMAGE PREVIEW ---------------- */
-function setupPreview(inputId, previewId){
-  document.getElementById(inputId).addEventListener("change", function(){
-    if(this.files[0] && this.files[0].type.startsWith("image/")){
+function setupPreview(inputId, previewId) {
+  document.getElementById(inputId).addEventListener("change", function () {
+    if (this.files[0] && this.files[0].type.startsWith("image/")) {
       const img = document.getElementById(previewId);
       img.src = URL.createObjectURL(this.files[0]);
       img.style.display = "block";
@@ -202,27 +202,38 @@ function setupPreview(inputId, previewId){
   });
 }
 
-setupPreview("car_image","car_preview");
-setupPreview("logbook","logbook_preview");
-setupPreview("inspection_report","inspection_preview");
-setupPreview("uber_report","uber_preview");
+setupPreview("car_image", "car_preview");
+setupPreview("logbook", "logbook_preview");
+setupPreview("inspection_report", "inspection_preview");
+setupPreview("uber_report", "uber_preview");
 
 /* ---------------- FORM SUBMISSION ---------------- */
-async function saveCarOwnerDetails(){
+async function saveCarOwnerDetails() {
 
-  if(
+  // 🔑 get continue_token from localStorage
+  const continueToken = localStorage.getItem("continue_token");
+
+  if (!continueToken) {
+    showMessage("Session expired. Please log in again.", "error");
+    return;
+  }
+
+  // ---------------- VALIDATION ----------------
+  if (
     !car_plate.value.trim() ||
     !car_make.value.trim() ||
     !car_model.value.trim() ||
     !car_image.files[0] ||
     !logbook.files[0] ||
     !inspection_report.files[0]
-  ){
-    showMessage("Please fill all required fields and upload documents.","error");
+  ) {
+    showMessage("Please fill all required fields and upload documents.", "error");
     return;
   }
 
+  // ---------------- BUILD FORM DATA ----------------
   const formData = new FormData();
+  formData.append("continue_token", continueToken);
   formData.append("number_plate", car_plate.value.trim());
   formData.append("car_make", car_make.value.trim());
   formData.append("car_model", car_model.value.trim());
@@ -230,12 +241,13 @@ async function saveCarOwnerDetails(){
   formData.append("logbook", logbook.files[0]);
   formData.append("inspection_report", inspection_report.files[0]);
 
-  if(uber_report.files[0]) {
+  if (uber_report.files[0]) {
     formData.append("uber_report", uber_report.files[0]);
   }
 
-  try{
-    showMessage("Submitting details...","success");
+  // ---------------- SUBMIT ----------------
+  try {
+    showMessage("Submitting details...", "success");
 
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/register-owner",
@@ -247,18 +259,17 @@ async function saveCarOwnerDetails(){
 
     const data = await res.json();
 
-    if(!res.ok){
-      showMessage(data.error || "Submission failed.","error");
+    if (!res.ok) {
+      showMessage(data.error || "Submission failed.", "error");
       return;
     }
 
-    showMessage("Car owner registered successfully.","success");
+    showMessage("Car owner details updated successfully.", "success");
 
-  }catch(err){
-    showMessage("Network error. Please try again.","error");
+  } catch (err) {
+    showMessage("Network error. Please try again.", "error");
   }
 }
 </script>
-
 </body>
   </html>
