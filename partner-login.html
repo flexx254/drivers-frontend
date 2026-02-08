@@ -252,6 +252,27 @@ menuToggle.addEventListener('click', () => {
   navMenu.classList.toggle('active');
   menuToggle.innerHTML = navMenu.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
 });
+
+    async function fetchContinueToken(email) {
+  try {
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/get-continue-token",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success && data.continue_token) {
+      localStorage.setItem("continue_token", data.continue_token);
+    }
+  } catch (err) {
+    console.error("Failed to fetch continue token", err);
+  }
+    }
 </script>
 
 </body>
