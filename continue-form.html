@@ -189,16 +189,22 @@ footer {
   &copy; 2025 Driver App. All rights reserved.
 </footer>
     
-<script>
+
+   <script>
+
+// ============================
+// TOKEN HELPER
+// ============================
+function getToken(){
+    return localStorage.getItem("access_token");
+}
 
 // ============================
 // CHECK JWT ON PAGE LOAD
 // ============================
-const jwtToken = localStorage.getItem("access_token");
-
-if (!jwtToken) {
+if (!getToken()) {
     alert("Session expired. Please login again.");
-    window.location.href = "login.html"; 
+    window.location.href = "login.html";
 }
 
 // ============================
@@ -230,7 +236,19 @@ setupPreview("psv_badge","psv_preview");
 setupPreview("good_conduct","gc_preview");
 
 // ============================
-// FILE UPLOAD FUNCTION (JWT)
+// HANDLE 401
+// ============================
+function handleUnauthorized(res){
+    if(res.status === 401){
+        localStorage.removeItem("access_token");
+        window.location.href = "login.html";
+        return true;
+    }
+    return false;
+}
+
+// ============================
+// FILE UPLOAD FUNCTION (JWT SAFE)
 // ============================
 async function uploadFile(fileInputId, expiryId, route){
     const fileInput = document.getElementById(fileInputId);
@@ -252,18 +270,16 @@ async function uploadFile(fileInputId, expiryId, route){
         const res = await fetch(`https://drivers-backend-4spp.onrender.com/${route}`, {
             method: "POST",
             headers: {
-                "Authorization": "Bearer " + jwtToken
+                "Authorization": "Bearer " + getToken()
             },
             body: form
         });
 
-        if(res.status === 401){
-            localStorage.removeItem("access_token");
-            window.location.href = "login.html";
-            return {success:false};
-        }
+        if(handleUnauthorized(res)) return {success:false};
 
-        return await res.json();
+        const data = await res.json();
+        return data;
+
     }catch(e){
         return {success:false, error:`Network error uploading ${fileInputId}`};
     }
@@ -273,19 +289,19 @@ async function uploadFile(fileInputId, expiryId, route){
 // SPINNER
 // ============================
 function showSpinner(){
-    const btn = document.querySelector("button");
+    const btn = document.getElementById("saveBtn");
     btn.disabled = true;
     document.getElementById("btnSpinner").style.display = "block";
 }
 
 function hideSpinner(){
-    const btn = document.querySelector("button");
+    const btn = document.getElementById("saveBtn");
     btn.disabled = false;
     document.getElementById("btnSpinner").style.display = "none";
 }
 
 // ============================
-// SAVE DETAILS FUNCTION (JWT)
+// SAVE DETAILS FUNCTION
 // ============================
 async function saveDetails(){
     showSpinner();
@@ -293,8 +309,17 @@ async function saveDetails(){
     const id = document.getElementById("id_number").value.trim();
     const plate = document.getElementById("number_plate").value.trim();
 
-    if(!id){ showMessage("ID number is required.","error"); hideSpinner(); return; }
-    if(!plate){ showMessage("Number plate is required.","error"); hideSpinner(); return; }
+    if(!id){
+        showMessage("ID number is required.","error");
+        hideSpinner();
+        return;
+    }
+
+    if(!plate){
+        showMessage("Number plate is required.","error");
+        hideSpinner();
+        return;
+    }
 
     // --- Update ID ---
     try{
@@ -304,18 +329,27 @@ async function saveDetails(){
         const resID = await fetch("https://drivers-backend-4spp.onrender.com/update-id", {
             method:"POST",
             headers: {
-               "Authorization": "Bearer " + localStorage.getItem("access_token")
+                "Authorization": "Bearer " + getToken()
             },
             body:formID
         });
 
+        if(handleUnauthorized(resID)) return;
+
         const dataID = await resID.json();
-        if(!dataID.success){ showMessage(dataID.error || "Error saving ID number","error"); hideSpinner(); return; }
+        if(!dataID.success){
+            showMessage(dataID.error || "Error saving ID number","error");
+            hideSpinner();
+            return;
+        }
+
     }catch(e){
-        showMessage("Network error updating ID number.","error"); hideSpinner(); return;
+        showMessage("Network error updating ID number.","error");
+        hideSpinner();
+        return;
     }
 
-    // --- Update number plate ---
+    // --- Update Number Plate ---
     try{
         const formPlate = new FormData();
         formPlate.append("number_plate", plate);
@@ -323,22 +357,35 @@ async function saveDetails(){
         const resPlate = await fetch("https://drivers-backend-4spp.onrender.com/update-number-plate", {
             method:"POST",
             headers: {
-                "Authorization": "Bearer " + jwtToken
+                "Authorization": "Bearer " + getToken()
             },
             body:formPlate
         });
 
+        if(handleUnauthorized(resPlate)) return;
+
         const dataPlate = await resPlate.json();
-        if(!dataPlate.success){ showMessage(dataPlate.error || "Error saving number plate","error"); hideSpinner(); return; }
+        if(!dataPlate.success){
+            showMessage(dataPlate.error || "Error saving number plate","error");
+            hideSpinner();
+            return;
+        }
+
     }catch(e){
-        showMessage("Network error updating number plate.","error"); hideSpinner(); return;
+        showMessage("Network error updating number plate.","error");
+        hideSpinner();
+        return;
     }
 
-    // --- Upload profile picture ---
+    // --- Upload Profile Picture ---
     const resultProfile = await uploadFile("profile_pic", null, "update-profile-picture");
-    if(!resultProfile.success){ showMessage(resultProfile.error,"error"); hideSpinner(); return; }
+    if(!resultProfile.success){
+        showMessage(resultProfile.error || "Error uploading profile picture","error");
+        hideSpinner();
+        return;
+    }
 
-    // --- Upload other documents ---
+    // --- Upload Other Documents ---
     const docs = [
         {id:"driving_license", expiry:"license_expiry", route:"update-driving-license"},
         {id:"psv_badge", expiry:"psv_badge_expiry", route:"update-psv-badge"},
@@ -347,7 +394,11 @@ async function saveDetails(){
 
     for(const doc of docs){
         const res = await uploadFile(doc.id, doc.expiry, doc.route);
-        if(!res.success){ showMessage(res.error,"error"); hideSpinner(); return; }
+        if(!res.success){
+            showMessage(res.error || "Error uploading document","error");
+            hideSpinner();
+            return;
+        }
     }
 
     hideSpinner();
@@ -367,7 +418,9 @@ menuToggle.addEventListener('click', () => {
       : '<i class="fas fa-bars"></i>';
 });
 
-</script>
+</script> 
+
+
 
 </body>
 </html>
