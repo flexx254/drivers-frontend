@@ -257,7 +257,7 @@ async function uploadFile(fileInputId, expiryId, route){
     const form = new FormData();
 
     if(fileInputId === "profile_pic") form.append("profile_picture", fileInput.files[0]);
-    if(fileInputId === "driving_license") form.append("driving_license", fileInput.files[0]);
+    if(fileInputId === "driving_license") form.append("license", fileInput.files[0]);
     if(fileInputId === "psv_badge") form.append("psv_badge", fileInput.files[0]);
     if(fileInputId === "good_conduct") form.append("good_conduct", fileInput.files[0]);
 
