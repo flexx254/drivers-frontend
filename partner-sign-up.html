@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -14,12 +15,14 @@
   font-family: sans-serif;
 }
 
+/* THEME COLORS */
 :root {
   --main-green: #006400;
   --light-green: #228B22;
   --white: #ffffff;
 }
 
+/* BODY */
 body {
   background-color: #f5f5f5;
   color: #333;
@@ -28,6 +31,7 @@ body {
   flex-direction: column;
 }
 
+/* HEADER */
 header {
   background-color: var(--main-green);
   color: var(--white);
@@ -35,11 +39,26 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
+}
+
+
+  header .logo {
+  display: flex;
+  align-items: center;
 }
 
 header .logo img {
   height: 32px;
+  width: auto;
+  object-fit: contain;
 }
+
+  @media (max-width: 480px) {
+  header .logo img {
+    height: 28px;
+  }
+  }
 
 header .menu-icon {
   font-size: 24px;
@@ -55,6 +74,7 @@ nav {
 nav a {
   color: var(--white);
   text-decoration: none;
+  font-weight: 500;
 }
 
 nav.active {
@@ -65,13 +85,20 @@ nav.active {
   background-color: var(--main-green);
   padding: 15px;
   border-radius: 5px;
+  width: 150px;
 }
 
+nav.active a {
+  display: block;
+  margin: 10px 0;
+}
+
+/* FORM STYLING */
 .container {
   flex: 1;
   max-width: 400px;
   margin: 40px auto;
-  background-color: #fff;
+  background-color: #ffffff;
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -83,7 +110,8 @@ h2 {
   margin-bottom: 20px;
 }
 
-input, button {
+input, select, button {
+  display: block;
   width: 100%;
   padding: 10px;
   margin: 10px 0;
@@ -94,12 +122,67 @@ input, button {
 
 button {
   background-color: var(--main-green);
-  color: white;
+  color: var(--white);
   border: none;
   cursor: pointer;
+  transition: background 0.3s;
 }
 
+button:hover {
+  background-color: var(--light-green);
+}
+
+#successBox {
+  color: green;
+  margin-top: 10px;
+  text-align: center;
+}
+
+#errorBox {
+  color: red;
+  margin-top: 10px;
+  white-space: pre-line;
+  text-align: center;
+}
+
+/* PASSWORD TOGGLE */
+.password-wrapper {
+  position: relative;
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  user-select: none;
+  font-size: 18px;
+}
+
+/* FOOTER */
+footer {
+  background-color: var(--main-green);
+  color: var(--white);
+  text-align: center;
+  padding: 15px;
+  margin-top: auto;
+}
+
+/* RESPONSIVE */
+@media screen and (max-width: 768px) {
+  nav {
+    display: none;
+    flex-direction: column;
+  }
+  header .menu-icon {
+    display: block;
+  }
+}
+
+/* BUTTON SPINNER */
 button.loading {
+  position: relative;
   pointer-events: none;
   opacity: 0.7;
 }
@@ -119,160 +202,240 @@ button.loading::after {
 }
 
 @keyframes spin {
+  from { transform: translateY(-50%) rotate(0deg); }
   to { transform: translateY(-50%) rotate(360deg); }
+  }
+
+.extra-links {
+  display: flex;
+  flex-direction: column;  /* makes them vertical */
+  gap: 6px;                /* space between the links */
+  margin-top: 10px;
 }
 
-.password-wrapper {
-  position: relative;
+.extra-links a {
+  font-size: 14px;
+  color: var(--main-green);
+  text-decoration: none;
 }
 
-.toggle-eye {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-}
-
-#errorBox {
-  color: red;
-  white-space: pre-line;
-  text-align: center;
-}
-
-#successBox {
-  color: green;
-  text-align: center;
-}
-
-footer {
-  background-color: var(--main-green);
-  color: white;
-  text-align: center;
-  padding: 15px;
-}
+.extra-links a:hover {
+  text-decoration: underline;
+  }
+  
 </style>
 </head>
-
 <body>
 
 <header>
   <div class="logo">
-    <img src="assets/logo/d4d-logo.png" alt="D4D Logo">
+  <img src="assets/logo/d4d-logo.png" alt="D4D Logo">
   </div>
+  <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
+  <nav id="navMenu">
+    <a href="#">Home</a>
+    <a href="#">Login</a>
+    <a href="#">About</a>
+  </nav>
 </header>
 
 <div class="container">
   <h2>Create Account</h2>
 
-  <input id="name" placeholder="Enter full name">
-  <input id="email" placeholder="Enter email">
+  <input id="name" placeholder="Enter full name" />
+  <input id="email" placeholder="Enter email" />
 
-  <input id="phone_number" type="tel" value="+254"
-         placeholder="+2547xxxxxxxx"
-         oninput="autoInsertPrefix()">
+<label for="phone_number">Phone</label>
+<input id="phone_number" name="phone" type="tel" 
+       value="+254" maxlength="13" 
+       placeholder="+2547xxxxxxxx" 
+       autocomplete="tel" required
+       aria-describedby="phoneError"
+       oninput="autoInsertPrefix()" />
+
+<div id="phoneError" class="error" aria-live="polite" style="display:none;"></div>
+  <select id="sacco">
+    <option value="">Select Sacco</option>
+    <option value="OOD">OOD</option>
+    <option value="DOD">DOD</option>
+    <option value="NONE">NONE</option>
+     <option value=OWNER">PARTNER/CAR OWNER</option>
+  </select>
 
   <div class="password-wrapper">
-    <input id="password" type="password" placeholder="Enter password">
+    <input id="password" type="password" placeholder="Enter password" />
     <span class="toggle-eye" onclick="togglePassword('password', this)">👁️</span>
   </div>
 
   <div class="password-wrapper">
-    <input id="confirm" type="password" placeholder="Confirm password">
+    <input id="confirm" type="password" placeholder="Confirm password" />
     <span class="toggle-eye" onclick="togglePassword('confirm', this)">👁️</span>
   </div>
 
   <button onclick="registerUser()">Submit</button>
-
   <div id="errorBox"></div>
   <div id="successBox"></div>
+
+    <div class="extra-links">
+  <a href="/login">Already have an account? Sign In</a>
+  <a href="/forgot-password">Forgot Password?</a>
+  </div>
 </div>
+
 
 <footer>
   &copy; 2025 Driver App. All rights reserved.
 </footer>
 
 <script>
+/* PASSWORD TOGGLE */
 function togglePassword(id, el) {
   const input = document.getElementById(id);
-  input.type = input.type === "password" ? "text" : "password";
-  el.textContent = input.type === "password" ? "👁️" : "🙈";
+  if (input.type === "password") {
+    input.type = "text";
+    el.textContent = "🙈";
+  } else {
+    input.type = "password";
+    el.textContent = "👁️";
+  }
 }
 
-function validateFrontend(name, email, phone, password, confirm) {
+/* RESPONSIVE MENU */
+const menuToggle = document.getElementById('menuToggle');
+const navMenu = document.getElementById('navMenu');
+
+menuToggle.addEventListener('click', () => {
+  navMenu.classList.toggle('active');
+  if (navMenu.classList.contains('active')) {
+    menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+  } else {
+    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+  }
+});
+
+/* FRONTEND VALIDATION & REGISTER */
+function validateFrontend(name, email, phone, sacco, password, confirm) {
   let errors = [];
 
   if (!name) errors.push("Name is required.");
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.push("Valid email required.");
-  if (!/^\+254\d{9}$/.test(phone)) errors.push("Phone must be +254XXXXXXXXX.");
+
+  if (!email) {
+    errors.push("Email is required.");
+  } else {
+    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    if (!emailRegex.test(email)) {
+      errors.push("Enter a valid email address.");
+    }
+  }
+
+  const phoneRegex = /^\+254\d{9}$/;
+  if (!phoneRegex.test(phone)) {
+    errors.push("Phone must be in +254XXXXXXXXX format.");
+  }
+
+  if (!sacco) errors.push("Please select a sacco.");
 
   if (password.length < 8) errors.push("Password must be at least 8 characters.");
-  if (!/[A-Z]/.test(password)) errors.push("One uppercase letter required.");
-  if (!/[a-z]/.test(password)) errors.push("One lowercase letter required.");
-  if (!/\d/.test(password)) errors.push("One number required.");
-  if (!/[!@#$%^&*]/.test(password)) errors.push("One special character required.");
+  if (!/[A-Z]/.test(password)) errors.push("At least one capital letter required.");
+  if (!/[a-z]/.test(password)) errors.push("At least one lowercase letter required.");
+  if (!/[0-9]/.test(password)) errors.push("At least one number required.");
+  if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) errors.push("At least one special character required.");
   if (password !== confirm) errors.push("Passwords do not match.");
 
   return errors;
 }
 
+
 async function registerUser() {
   const btn = document.querySelector("button");
   btn.classList.add("loading");
+  btn.disabled = true;
 
-  const name = nameEl.value.trim();
-  const email = emailEl.value.trim().toLowerCase();
-  const phone_number = phone_numberEl.value.trim();
-  const password = passwordEl.value;
-  const confirm = confirmEl.value;
+  document.getElementById("errorBox").textContent = "";
+  document.getElementById("successBox").textContent = "";
 
-  const errors = validateFrontend(name, email, phone_number, password, confirm);
-  if (errors.length) {
-    errorBox.textContent = errors.join("\n");
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const phone_number = document.getElementById("phone_number").value.trim();
+  const sacco = document.getElementById("sacco").value;
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm").value;
+
+  const errors = validateFrontend(name, email, phone_number, sacco, password, confirm);
+  if (errors.length > 0) {
+    document.getElementById("errorBox").textContent = errors.join("\n");
     btn.classList.remove("loading");
+    btn.disabled = false;
     return;
   }
 
   try {
-    const res = await fetch(
-      "https://drivers-backend-4spp.onrender.com/register-owner-basic",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone_number, password, confirm })
-      }
-    );
+    const res = await fetch("https://drivers-backend-4spp.onrender.com/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, phone_number, sacco, password, confirm })
+    });
 
-    const data = await res.json();
-    if (!data.success) throw data.error;
+    const regData = await res.json();
+    if (!regData.success) {
+      document.getElementById("errorBox").textContent = regData.error;
+      btn.classList.remove("loading");
+      btn.disabled = false;
+      return;
+    }
 
-    successBox.textContent = "Registration complete ✔";
-  } catch (e) {
-    errorBox.textContent = e;
+    const res2 = await fetch("https://drivers-backend-4spp.onrender.com/continue-reg", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+
+    const contData = await res2.json();
+    if (!contData.success) {
+      document.getElementById("errorBox").textContent = contData.error;
+      btn.classList.remove("loading");
+      btn.disabled = false;
+      return;
+    }
+
+    document.getElementById("successBox").textContent =
+      "Registration complete! Check your email to continue ✔";
+
+  } catch (err) {
+    document.getElementById("errorBox").textContent = "Network error: " + err;
+
   } finally {
     btn.classList.remove("loading");
-  }
-}
+    btn.disabled = false;
 
-let firstTyped = false;
+  }
+  }
+
+  let firstTyped = false;
+
 function autoInsertPrefix() {
+  const input = document.getElementById("phone_number");
+  let value = input.value;
+
+  // If this is the first input ever
   if (!firstTyped) {
     firstTyped = true;
-    phone_numberEl.value = "+254";
+    input.value = "+254";
     return;
   }
-  const digits = phone_numberEl.value.replace(/\D/g, "").slice(3, 12);
-  phone_numberEl.value = "+254" + digits;
-}
 
-const nameEl = document.getElementById("name");
-const emailEl = document.getElementById("email");
-const phone_numberEl = document.getElementById("phone_number");
-const passwordEl = document.getElementById("password");
-const confirmEl = document.getElementById("confirm");
-const errorBox = document.getElementById("errorBox");
-const successBox = document.getElementById("successBox");
+  // Always force +254 at the start
+  if (!value.startsWith("+254")) {
+    value = "+254" + value.replace(/[^\d]/g, "");
+  }
+
+  // Digits allowed only after +254
+  const digits = value.slice(4).replace(/[^\d]/g, "").slice(0, 9);
+
+  input.value = "+254" + digits;
+  }
+  
 </script>
 
 </body>
-</html>
+    </html>
