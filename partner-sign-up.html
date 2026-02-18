@@ -254,13 +254,7 @@ button.loading::after {
        oninput="autoInsertPrefix()" />
 
 <div id="phoneError" class="error" aria-live="polite" style="display:none;"></div>
-  <select id="sacco">
-    <option value="">Select Sacco</option>
-    <option value="OOD">OOD</option>
-    <option value="DOD">DOD</option>
-    <option value="NONE">NONE</option>
-     <option value=OWNER">PARTNER/CAR OWNER</option>
-  </select>
+
 
   <div class="password-wrapper">
     <input id="password" type="password" placeholder="Enter password" />
@@ -357,7 +351,7 @@ async function registerUser() {
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim().toLowerCase();
   const phone_number = document.getElementById("phone_number").value.trim();
-  const sacco = document.getElementById("sacco").value;
+  const sacco = OWNER";
   const password = document.getElementById("password").value;
   const confirm = document.getElementById("confirm").value;
 
