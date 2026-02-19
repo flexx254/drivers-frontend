@@ -417,8 +417,8 @@ async function registerUser() {
       return;
     }
 
-    successBox.textContent =
-      "Registration complete! Check your email to continue ✔";
+    // Redirect to continue form
+window.location.href = "continue-form.html";
 
   } catch (err) {
     errorBox.textContent = "Network error: " + err;
