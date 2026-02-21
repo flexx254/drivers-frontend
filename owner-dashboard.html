@@ -105,6 +105,33 @@ footer {
   padding:15px;
   margin-top:40px;
 }
+
+  /* REGISTRATION STATUS */
+.status-box{
+  text-align:center;
+  padding:12px;
+  border-radius:8px;
+  font-weight:bold;
+  margin-top:10px;
+}
+
+.status-complete{
+  background:#e6f7ea;
+  color:var(--main-green);
+  border:1px solid var(--main-green);
+}
+
+.status-incomplete{
+  background:#ffe6e6;
+  color:red;
+  border:1px solid red;
+}
+
+.status-incomplete a{
+  color:red;
+  text-decoration:none;
+  font-weight:bold;
+  }
 </style>
 </head>
 
@@ -121,7 +148,18 @@ footer {
 </header>
 
 <div class="container">
-  <h2>Available Owners</h2>
+  
+  <h2>Partner Dashboard</h2>
+
+  <!-- REGISTRATION STATUS -->
+  <div id="registrationStatus" class="status-box"></div>
+
+  <hr style="margin:20px 0;">
+
+  <h3 style="color:var(--main-green);">Available Owners</h3>
+  <div id="owners"></div>
+  </div>
+  <h2>Available Drivers</h2>
   <div id="owners"></div>
 </div>
 
@@ -205,6 +243,49 @@ fetch("https://drivers-backend-4spp.onrender.com/owners-with-location")
 })
 .catch(()=>{
   ownersDiv.innerHTML="<p>Error loading owners.</p>";
+});
+
+  /* CHECK REGISTRATION STATUS */
+const statusBox = document.getElementById("registrationStatus");
+
+const token = localStorage.getItem("token");
+
+// If no token → redirect to login
+if (!token) {
+  window.location.href = "owner-login.html";
+}
+
+fetch("https://drivers-backend-4spp.onrender.com/check-partner-status", {
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer " + token,
+    "Content-Type": "application/json"
+  }
+})
+.then(res => {
+  if (res.status === 401) {
+    window.location.href = "owner-login.html";
+  }
+  return res.json();
+})
+.then(data => {
+
+  if (data.fully_registered) {
+    statusBox.className = "status-box status-complete";
+    statusBox.innerHTML = "✔ Fully Registered";
+  } else {
+    statusBox.className = "status-box status-incomplete";
+    statusBox.innerHTML =
+      '⚠ Not Fully Registered - ' +
+      '<a href="continue-partner-form.html">Click here to complete registration</a>';
+  }
+
+})
+.catch(() => {
+  statusBox.className = "status-box status-incomplete";
+  statusBox.innerHTML =
+    '⚠ Unable to verify registration - ' +
+    '<a href="continue-partner-form.html">Click to complete registration</a>';
 });
 </script>
 
