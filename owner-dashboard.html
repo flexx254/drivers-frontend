@@ -8,15 +8,19 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-:root {
+:root{
   --main-green:#1b8f2a;
   --white:#fff;
 }
 
-body { margin:0; font-family:Arial,sans-serif; background:#f5f5f5; }
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f5f5f5;
+}
 
 /* HEADER */
-header {
+header{
   background:var(--main-green);
   color:var(--white);
   padding:15px 20px;
@@ -25,14 +29,25 @@ header {
   align-items:center;
 }
 
-header img { height:32px; }
+header img{ height:32px; }
 
-.menu-icon { display:none; font-size:24px; cursor:pointer; }
+.menu-icon{
+  display:none;
+  font-size:24px;
+  cursor:pointer;
+}
 
-nav { display:flex; gap:20px; }
-nav a { color:white; text-decoration:none; }
+nav{
+  display:flex;
+  gap:20px;
+}
 
-nav.active {
+nav a{
+  color:white;
+  text-decoration:none;
+}
+
+nav.active{
   display:block;
   position:absolute;
   top:60px;
@@ -43,12 +58,18 @@ nav.active {
 }
 
 @media(max-width:768px){
-  nav{display:none; flex-direction:column;}
-  .menu-icon{display:block;}
+  nav{
+    display:none;
+    flex-direction:column;
+  }
+
+  .menu-icon{
+    display:block;
+  }
 }
 
 /* MAIN */
-.container {
+.container{
   max-width:600px;
   margin:20px auto;
   background:white;
@@ -57,10 +78,13 @@ nav.active {
   box-shadow:0 3px 10px rgba(0,0,0,.12);
 }
 
-h2 { color:var(--main-green); text-align:center; }
+h2{
+  color:var(--main-green);
+  text-align:center;
+}
 
 /* OWNER CARD */
-.owner-card {
+.owner-card{
   display:flex;
   gap:15px;
   align-items:center;
@@ -71,7 +95,7 @@ h2 { color:var(--main-green); text-align:center; }
   margin-top:15px;
 }
 
-.owner-card img {
+.owner-card img{
   width:60px;
   height:60px;
   border-radius:50%;
@@ -79,10 +103,14 @@ h2 { color:var(--main-green); text-align:center; }
   border:2px solid var(--main-green);
 }
 
-.owner-info { flex:1; }
-.location { color:var(--main-green); font-weight:bold; }
+.owner-info{ flex:1; }
 
-.connect-btn {
+.location{
+  color:var(--main-green);
+  font-weight:bold;
+}
+
+.connect-btn{
   background:var(--main-green);
   color:white;
   border:none;
@@ -91,14 +119,14 @@ h2 { color:var(--main-green); text-align:center; }
   cursor:pointer;
 }
 
-.phone {
+.phone{
   margin-top:6px;
   font-weight:bold;
   display:none;
 }
 
 /* FOOTER */
-footer {
+footer{
   background:var(--main-green);
   color:white;
   text-align:center;
@@ -140,6 +168,7 @@ footer {
 <header>
   <img src="assets/logo/d4d-logo.png" alt="D4D">
   <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>
+
   <nav id="navMenu">
     <a href="#">Home</a>
     <a href="#">Dashboard</a>
@@ -162,7 +191,7 @@ footer {
 
 <script>
 
-/* MENU */
+/* MENU TOGGLE */
 const menuToggle=document.getElementById("menuToggle");
 const navMenu=document.getElementById("navMenu");
 
@@ -173,121 +202,137 @@ menuToggle.onclick=()=>{
     :'<i class="fas fa-bars"></i>';
 };
 
-/* AUTH TOKEN */
+/* AUTH CHECK */
 const token = localStorage.getItem("token");
 
-if (!token) {
-  window.location.href = "owner-dashboard.html";
+if(!token){
+  window.location.href="partner-login.html";
 }
 
-/* CHECK REGISTRATION STATUS FIRST */
-const statusBox = document.getElementById("registrationStatus");
-
-fetch("https://drivers-backend-4spp.onrender.com/check-partner-status", {
-  headers: {
-    "Authorization": "Bearer " + token
-  }
-})
-.then(res=>{
-  if(res.status===401){
-    window.location.href="partner-login.html";
-  }
-  return res.json();
-})
-.then(data=>{
-  if(data.fully_registered){
-    statusBox.className="status-box status-complete";
-    statusBox.innerHTML="✔ Fully Registered";
-  }else{
-    statusBox.className="status-box status-incomplete";
-    statusBox.innerHTML=
-      '⚠ Not Fully Registered - '+
-      '<a href="continue-partner-form.html">Click here to complete registration</a>';
-  }
-})
-.catch(()=>{
-  statusBox.className="status-box status-incomplete";
-  statusBox.innerHTML=
-    '⚠ Unable to verify registration - '+
-    '<a href="continue-partner-form.html">Click to complete registration</a>';
-});
-
-/* LOAD OWNERS */
+const statusBox=document.getElementById("registrationStatus");
 const ownersDiv=document.getElementById("owners");
 
-fetch("https://drivers-backend-4spp.onrender.com/owners-with-location",{
-  headers:{
-    "Authorization":"Bearer "+token
-  }
-})
-.then(r=>r.json())
-.then(data=>{
-  if(!Array.isArray(data)||!data.length){
-    ownersDiv.innerHTML="<p>No owners available.</p>";
-    return;
-  }
+/* REGISTRATION CHECK + LOAD OWNERS */
+(async()=>{
 
-  data.forEach(owner=>{
-    const card=document.createElement("div");
-    card.className="owner-card";
-    card.innerHTML=`
-      <img src="${owner.profile_pic_url}" alt="Profile">
-      <div class="owner-info">
-        <strong>${owner.full_name}</strong><br>
-        <span class="location">${owner.location}</span>
-        <div class="phone"></div>
-      </div>
-      <button class="connect-btn">Connect</button>
-    `;
+  try{
 
-    const btn=card.querySelector(".connect-btn");
-    const phoneEl=card.querySelector(".phone");
+    const res=await fetch(
+      "https://drivers-backend-4spp.onrender.com/check-partner-status",
+      {
+        headers:{
+          "Authorization":"Bearer "+token
+        }
+      }
+    );
 
-    btn.onclick=async()=>{
-      if(!confirm("Are you sure you want to connect?")) return;
+    if(res.status===401){
+      window.location.href="partner-login.html";
+      return;
+    }
 
-      btn.disabled=true;
-      btn.textContent="Connecting...";
+    const data=await res.json();
 
-      try{
-        const res=await fetch(
-          "https://drivers-backend-4spp.onrender.com/connect-owner-secure",
-          {
-            method:"POST",
-            headers:{
-              "Content-Type":"application/json",
-              "Authorization":"Bearer "+token
-            },
-            body:JSON.stringify({owner_id:owner.id})
+    if(!data.fully_registered){
+      statusBox.className="status-box status-incomplete";
+      statusBox.innerHTML=
+        '⚠ Not Fully Registered - '+
+        '<a href="continue-partner-form.html">Click here to complete registration</a>';
+
+      ownersDiv.innerHTML="<p style='color:red;text-align:center'>Complete registration to view owners.</p>";
+      return;
+    }
+
+    statusBox.className="status-box status-complete";
+    statusBox.innerHTML="✔ Fully Registered";
+
+    /* LOAD OWNERS */
+
+    const ownersRes=await fetch(
+      "https://drivers-backend-4spp.onrender.com/owners-with-location",
+      {
+        headers:{
+          "Authorization":"Bearer "+token
+        }
+      }
+    );
+
+    const owners=await ownersRes.json();
+
+    if(!Array.isArray(owners)||!owners.length){
+      ownersDiv.innerHTML="<p>No owners available.</p>";
+      return;
+    }
+
+    owners.forEach(owner=>{
+      const card=document.createElement("div");
+      card.className="owner-card";
+
+      card.innerHTML=`
+        <img src="${owner.profile_pic_url}" alt="Profile">
+
+        <div class="owner-info">
+          <strong>${owner.full_name}</strong><br>
+          <span class="location">${owner.location}</span>
+          <div class="phone"></div>
+        </div>
+
+        <button class="connect-btn">Connect</button>
+      `;
+
+      const btn=card.querySelector(".connect-btn");
+      const phoneEl=card.querySelector(".phone");
+
+      btn.onclick=async()=>{
+
+        if(!confirm("Are you sure you want to connect?")) return;
+
+        btn.disabled=true;
+        btn.textContent="Connecting...";
+
+        try{
+
+          const connectRes=await fetch(
+            "https://drivers-backend-4spp.onrender.com/connect-owner-secure",
+            {
+              method:"POST",
+              headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer "+token
+              },
+              body:JSON.stringify({owner_id:owner.id})
+            }
+          );
+
+          const result=await connectRes.json();
+
+          if(connectRes.ok){
+            alert("Connected successfully");
+            phoneEl.textContent=result.phone_number;
+            phoneEl.style.display="block";
+            btn.textContent="Connected";
+          }else{
+            alert(result.message||"Failed");
+            btn.disabled=false;
+            btn.textContent="Connect";
           }
-        );
 
-        const result=await res.json();
-
-        if(res.ok){
-          alert("Connected successfully");
-          phoneEl.textContent=result.phone_number;
-          phoneEl.style.display="block";
-          btn.textContent="Connected";
-        }else{
-          alert(result.message||"Failed");
+        }catch{
+          alert("Network error");
           btn.disabled=false;
           btn.textContent="Connect";
         }
+      };
 
-      }catch{
-        alert("Network error");
-        btn.disabled=false;
-        btn.textContent="Connect";
-      }
-    };
+      ownersDiv.appendChild(card);
+    });
 
-    ownersDiv.appendChild(card);
-  });
-})
-.catch(()=>{
-  ownersDiv.innerHTML="<p>Error loading owners.</p>";
-});
+  }catch{
+    statusBox.className="status-box status-incomplete";
+    statusBox.innerHTML="⚠ System error";
+  }
+
+})();
 
 </script>
 
