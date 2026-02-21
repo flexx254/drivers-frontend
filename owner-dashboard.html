@@ -100,6 +100,32 @@ footer {
   padding:15px;  
   margin-top:40px;  
 }  
+
+  .status-box{
+  text-align:center;
+  padding:12px;
+  border-radius:8px;
+  font-weight:bold;
+  margin-bottom:15px;
+}
+
+.status-complete{
+  background:#e6f7ea;
+  color:var(--main-green);
+  border:1px solid var(--main-green);
+}
+
+.status-incomplete{
+  background:#ffe6e6;
+  color:red;
+  border:1px solid red;
+}
+
+.status-incomplete a{
+  color:red;
+  text-decoration:none;
+  font-weight:bold;
+}
 </style>  </head>  <body>  <header>  
   <img src="assets/logo/d4d-logo.png" alt="D4D">  
   <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>  
@@ -108,7 +134,10 @@ footer {
     <a href="#">Dashboard</a>  
     <a href="#">Logout</a>  
   </nav>  
-</header>  <div class="container">  
+</header>  <div class="container">
+  <div id="registrationStatus" class="status-box"></div>
+
+<hr style="margin:20px 0;">
   <h2>Available Owners</h2>  
   <div id="owners"></div>  
 </div>  <footer>&copy; 2025 D4D Platform</footer>  <script>  
@@ -190,5 +219,72 @@ fetch("https://drivers-backend-4spp.onrender.com/owners-with-location")
 .catch(()=>{  
   ownersDiv.innerHTML="<p>Error loading owners.</p>";  
 });  
+
+  /* REGISTRATION STATUS CHECK */
+
+const token = localStorage.getItem("token");
+
+if(!token){
+  window.location.href="partner-login.html";
+}
+
+const statusBox = document.getElementById("registrationStatus");
+
+async function checkRegistration(){
+
+  try{
+
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/check-partner-status",
+      {
+        headers:{
+          "Authorization":"Bearer "+token
+        }
+      }
+    );
+
+    if(res.status === 401){
+      window.location.href="partner-login.html";
+      return false;
+    }
+
+    const data = await res.json();
+
+    if(data.fully_registered){
+      statusBox.className="status-box status-complete";
+      statusBox.innerHTML="✔ Fully Registered";
+      return true;
+    }
+
+    else{
+      statusBox.className="status-box status-incomplete";
+      statusBox.innerHTML=
+        '⚠ Not Fully Registered - '+
+        '<a href="continue-partner-form.html">Click here to complete registration</a>';
+
+      return false;
+    }
+
+  }catch{
+
+    statusBox.className="status-box status-incomplete";
+    statusBox.innerHTML=
+      '⚠ Unable to verify registration - '+
+      '<a href="continue-partner-form.html">Click to complete registration</a>';
+
+    return false;
+  }
+}
+
+/* EXECUTE BEFORE LOADING OWNERS */
+
+(async()=>{
+  const ok = await checkRegistration();
+
+  if(!ok){
+    document.getElementById("owners").innerHTML=
+      "<p style='color:red;text-align:center'>Complete registration to continue.</p>";
+  }
+})();
 </script>  </body>  
   </html>
