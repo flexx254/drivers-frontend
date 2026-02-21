@@ -177,7 +177,7 @@ menuToggle.onclick=()=>{
 const token = localStorage.getItem("token");
 
 if (!token) {
-  window.location.href = "partner-dashboard.html";
+  window.location.href = "owner-dashboard.html";
 }
 
 /* CHECK REGISTRATION STATUS FIRST */
@@ -190,7 +190,7 @@ fetch("https://drivers-backend-4spp.onrender.com/check-partner-status", {
 })
 .then(res=>{
   if(res.status===401){
-    window.location.href="owner-login.html";
+    window.location.href="partner-login.html";
   }
   return res.json();
 })
