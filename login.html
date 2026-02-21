@@ -228,7 +228,7 @@ async function login(){
             localStorage.setItem("access_token", data.access_token);
 
             // Redirect immediately
-            window.location.href = "continue-form.html";
+            window.location.href = "driver-search.html";
         } 
         else {
             showMessage(data.error || "Invalid credentials", "error");
