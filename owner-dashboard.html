@@ -141,148 +141,187 @@ footer {
   <h2>Available Owners</h2>  
   <div id="owners"></div>  
 </div>  <footer>&copy; 2025 D4D Platform</footer>  <script>  
-/* MENU */  
-const menuToggle=document.getElementById("menuToggle");  
-const navMenu=document.getElementById("navMenu");  
-menuToggle.onclick=()=>{  
-  navMenu.classList.toggle("active");  
-  menuToggle.innerHTML=navMenu.classList.contains("active")  
-    ?'<i class="fas fa-times"></i>'  
-    :'<i class="fas fa-bars"></i>';  
-};  
-  
-/* LOAD OWNERS */  
-const ownersDiv=document.getElementById("owners");  
-  
-fetch("https://drivers-backend-4spp.onrender.com/owners-with-location")  
-.then(r=>r.json())  
-.then(data=>{  
-  if(!Array.isArray(data)||!data.length){  
-    ownersDiv.innerHTML="<p>No owners available.</p>";  
-    return;  
-  }  
-  
-  data.forEach(owner=>{  
-    const card=document.createElement("div");  
-    card.className="owner-card";  
-    card.innerHTML=`  
-      <img src="${owner.profile_pic_url}" alt="Profile">  
-      <div class="owner-info">  
-        <strong>${owner.full_name}</strong><br>  
-        <span class="location">${owner.location}</span>  
-        <div class="phone"></div>  
-      </div>  
-      <button class="connect-btn">Connect</button>  
-    `;  
-  
-    const btn=card.querySelector(".connect-btn");  
-    const phoneEl=card.querySelector(".phone");  
-  
-    btn.onclick=async()=>{  
-      if(!confirm("Are you sure you want to connect?")) return;  
-  
-      btn.disabled=true;  
-      btn.textContent="Connecting...";  
-  
-      try{  
-        const res=await fetch(  
-          "https://drivers-backend-4spp.onrender.com/connect-owner-secure",  
-          {  
-            method:"POST",  
-            headers:{"Content-Type":"application/json"},  
-            body:JSON.stringify({owner_id:owner.id})  
-          }  
-        );  
-  
-        const result=await res.json();  
-  
-        if(res.ok){  
-          alert("Connected successfully");  
-          phoneEl.textContent=result.phone_number;  
-          phoneEl.style.display="block";  
-          btn.textContent="Connected";  
-        }else{  
-          alert(result.message||"Failed");  
-          btn.disabled=false;  
-          btn.textContent="Connect";  
-        }  
-      }catch{  
-        alert("Network error");  
-        btn.disabled=false;  
-        btn.textContent="Connect";  
-      }  
-    };  
-  
-    ownersDiv.appendChild(card);  
-  });  
-})  
-.catch(()=>{  
-  ownersDiv.innerHTML="<p>Error loading owners.</p>";  
-});  
 
-  /* REGISTRATION STATUS CHECK */
+      /* ================= MENU ================= */
+const menuToggle = document.getElementById("menuToggle");
+const navMenu = document.getElementById("navMenu");
 
+menuToggle.onclick = () => {
+  navMenu.classList.toggle("active");
+  menuToggle.innerHTML = navMenu.classList.contains("active")
+    ? '<i class="fas fa-times"></i>'
+    : '<i class="fas fa-bars"></i>';
+};
+
+
+/* ================= AUTH CHECK ================= */
+
+// Get token
 const token = localStorage.getItem("token");
 
-if(!token){
-  window.location.href="partner-login.html";
+// If no token → go to login immediately
+if (!token) {
+  window.location.href = "partner-login.html";
 }
 
+
+/* ================= REGISTRATION CHECK ================= */
+
 const statusBox = document.getElementById("registrationStatus");
+const ownersDiv = document.getElementById("owners");
 
-async function checkRegistration(){
-
-  try{
-
+async function checkRegistration() {
+  try {
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/check-partner-status",
       {
-        headers:{
-          "Authorization":"Bearer "+token
+        headers: {
+          "Authorization": "Bearer " + token
         }
       }
     );
 
-    if(res.status === 401){
-      window.location.href="partner-login.html";
+    // If token invalid or expired
+    if (res.status === 401) {
+      localStorage.removeItem("token"); // clear bad token
+      window.location.href = "partner-login.html";
       return false;
     }
 
     const data = await res.json();
 
-    if(data.fully_registered){
-      statusBox.className="status-box status-complete";
-      statusBox.innerHTML="✔ Fully Registered";
+    if (data.fully_registered) {
+      statusBox.className = "status-box status-complete";
+      statusBox.innerHTML = "✔ Fully Registered";
       return true;
-    }
-
-    else{
-      statusBox.className="status-box status-incomplete";
-      statusBox.innerHTML=
-        '⚠ Not Fully Registered - '+
+    } else {
+      statusBox.className = "status-box status-incomplete";
+      statusBox.innerHTML =
+        '⚠ Not Fully Registered - ' +
         '<a href="continue-partner-form.html">Click here to complete registration</a>';
-
       return false;
     }
 
-  }catch{
-
-    statusBox.className="status-box status-incomplete";
-    statusBox.innerHTML=
-      '⚠ Unable to verify registration - '+
+  } catch (error) {
+    statusBox.className = "status-box status-incomplete";
+    statusBox.innerHTML =
+      '⚠ Unable to verify registration - ' +
       '<a href="continue-partner-form.html">Click to complete registration</a>';
-
     return false;
   }
 }
 
-/* EXECUTE BEFORE LOADING OWNERS */
 
-(async()=>{
-  const ok = await checkRegistration();
+/* ================= LOAD OWNERS ================= */
 
-  if(!ok){
-    document.getElementById("owners").innerHTML=
+async function loadOwners() {
+
+  try {
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/owners-with-location",
+      {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      }
+    );
+
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "partner-login.html";
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!Array.isArray(data) || !data.length) {
+      ownersDiv.innerHTML = "<p>No owners available.</p>";
+      return;
+    }
+
+    data.forEach(owner => {
+
+      const card = document.createElement("div");
+      card.className = "owner-card";
+
+      card.innerHTML = `
+        <img src="${owner.profile_pic_url}" alt="Profile">
+        <div class="owner-info">
+          <strong>${owner.full_name}</strong><br>
+          <span class="location">${owner.location}</span>
+          <div class="phone"></div>
+        </div>
+        <button class="connect-btn">Connect</button>
+      `;
+
+      const btn = card.querySelector(".connect-btn");
+      const phoneEl = card.querySelector(".phone");
+
+      btn.onclick = async () => {
+
+        if (!confirm("Are you sure you want to connect?")) return;
+
+        btn.disabled = true;
+        btn.textContent = "Connecting...";
+
+        try {
+
+          const connectRes = await fetch(
+            "https://drivers-backend-4spp.onrender.com/connect-owner-secure",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+              },
+              body: JSON.stringify({ owner_id: owner.id })
+            }
+          );
+
+          if (connectRes.status === 401) {
+            localStorage.removeItem("token");
+            window.location.href = "partner-login.html";
+            return;
+          }
+
+          const result = await connectRes.json();
+
+          if (connectRes.ok) {
+            alert("Connected successfully");
+            phoneEl.textContent = result.phone_number;
+            phoneEl.style.display = "block";
+            btn.textContent = "Connected";
+          } else {
+            alert(result.message || "Failed");
+            btn.disabled = false;
+            btn.textContent = "Connect";
+          }
+
+        } catch {
+          alert("Network error");
+          btn.disabled = false;
+          btn.textContent = "Connect";
+        }
+      };
+
+      ownersDiv.appendChild(card);
+    });
+
+  } catch {
+    ownersDiv.innerHTML = "<p>Error loading owners.</p>";
+  }
+}
+
+
+/* ================= APP START ================= */
+
+(async () => {
+  const registered = await checkRegistration();
+
+  if (registered) {
+    loadOwners();
+  } else {
+    ownersDiv.innerHTML =
       "<p style='color:red;text-align:center'>Complete registration to continue.</p>";
   }
 })();
