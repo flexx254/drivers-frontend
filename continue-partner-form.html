@@ -170,12 +170,37 @@ footer {
 </footer>
 
 <script>
+/* ============================= */
+/* 🔐 JWT PROTECTION */
+/* ============================= */
+
+const TOKEN_KEY = "token";
+const token = localStorage.getItem(TOKEN_KEY);
+
+// If no token → redirect to login
+if (!token) {
+  window.location.href = "partner-login.html";
+}
+
+/* ============================= */
+/* MESSAGE SYSTEM */
+/* ============================= */
+
 const msgBox = document.getElementById("msgBox");
 
+function showMessage(text, type) {
+  msgBox.textContent = text;
+  msgBox.className = "msg " + type;
+  msgBox.style.display = "block";
+}
+
+/* ============================= */
 /* IMAGE PREVIEW */
-function setupPreview(inputId, previewId){
-  document.getElementById(inputId).addEventListener("change", function(){
-    if(this.files[0] && this.files[0].type.startsWith("image/")){
+/* ============================= */
+
+function setupPreview(inputId, previewId) {
+  document.getElementById(inputId).addEventListener("change", function () {
+    if (this.files[0] && this.files[0].type.startsWith("image/")) {
       const img = document.getElementById(previewId);
       img.src = URL.createObjectURL(this.files[0]);
       img.style.display = "block";
@@ -183,19 +208,16 @@ function setupPreview(inputId, previewId){
   });
 }
 
-setupPreview("car_image","car_preview");
-setupPreview("logbook","logbook_preview");
-setupPreview("inspection_report","inspection_preview");
-setupPreview("uber_report","uber_preview");
+setupPreview("car_image", "car_preview");
+setupPreview("logbook", "logbook_preview");
+setupPreview("inspection_report", "inspection_preview");
+setupPreview("uber_report", "uber_preview");
 
-function showMessage(text, type){
-  msgBox.textContent = text;
-  msgBox.className = "msg " + type;
-  msgBox.style.display = "block";
-}
+/* ============================= */
+/* SUBMIT CONTINUE REGISTRATION */
+/* ============================= */
 
-/* SUBMIT CONTINUE REG */
-async function submitPartnerDetails(){
+async function submitPartnerDetails() {
 
   const number_plate = document.getElementById("number_plate").value.trim();
   const car_make = document.getElementById("car_make").value.trim();
@@ -206,8 +228,8 @@ async function submitPartnerDetails(){
   const inspection = document.getElementById("inspection_report").files[0];
   const uber = document.getElementById("uber_report").files[0];
 
-  if(!number_plate || !car_make || !car_model || !car_image || !logbook || !inspection){
-    showMessage("Please complete all required fields.","error");
+  if (!number_plate || !car_make || !car_model || !car_image || !logbook || !inspection) {
+    showMessage("Please complete all required fields.", "error");
     return;
   }
 
@@ -218,30 +240,51 @@ async function submitPartnerDetails(){
   formData.append("car_image", car_image);
   formData.append("logbook", logbook);
   formData.append("inspection_report", inspection);
-  if(uber) formData.append("uber_report", uber);
+  if (uber) formData.append("uber_report", uber);
 
-  try{
-    showMessage("Submitting details...","success");
+  try {
+    showMessage("Submitting details...", "success");
 
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/continue-partner-reg",
-      { method: "POST", body: formData }
+      {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + token
+        },
+        body: formData
+      }
     );
 
-    const data = await res.json();
-
-    if(!res.ok){
-      showMessage(data.error || "Submission failed.","error");
+    // 🔒 If token expired or invalid
+    if (res.status === 401) {
+      localStorage.removeItem(TOKEN_KEY);
+      window.location.href = "partner-login.html";
       return;
     }
 
-    showMessage("Partner registration completed successfully.","success");
+    const data = await res.json();
 
-  }catch(err){
-    showMessage("Network error. Please try again.","error");
+    if (!res.ok) {
+      showMessage(data.error || "Submission failed.", "error");
+      return;
+    }
+
+    showMessage("Partner registration completed successfully.", "success");
+
+    // ✅ Redirect to dashboard after success
+    setTimeout(() => {
+      window.location.href = "owner-dashboard.html";
+    }, 1500);
+
+  } catch (err) {
+    showMessage("Network error. Please try again.", "error");
   }
 }
 </script>
+
+
+    
 
 </body>
 </html>
