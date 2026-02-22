@@ -247,7 +247,7 @@ async function login(){
     if (data.success) {
       showMessage("Login successful! Redirecting...", "success");
 
-      localStorage.setItem("driverToken", data.token);
+      localStorage.setItem("token", data.token);
 
       // 🔑 get continue_token
       await fetchContinueToken(email);
