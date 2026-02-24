@@ -225,7 +225,7 @@ async function login(){
             showMessage("Login successful! Redirecting...", "success");
 
             // Save real JWT
-            localStorage.setItem("access_token", data.access_token);
+            localStorage.setItem("token", data.access_token);
 
             // Redirect immediately
             window.location.href = "driver-search.html";
