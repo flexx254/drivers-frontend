@@ -196,7 +196,7 @@ footer {
 // TOKEN HELPER
 // ============================
 function getToken(){
-    return localStorage.getItem("access_token");
+    return localStorage.getItem("token");
 }
 
 // ============================
@@ -240,7 +240,7 @@ setupPreview("good_conduct","gc_preview");
 // ============================
 function handleUnauthorized(res){
     if(res.status === 401){
-        localStorage.removeItem("access_token");
+        localStorage.removeItem("token");
         window.location.href = "login.html";
         return true;
     }
