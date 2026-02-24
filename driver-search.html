@@ -234,7 +234,7 @@ footer {
 const token = localStorage.getItem("token");
 
 if (!token) {
-  window.location.href = "driver-login.html";
+  window.location.href = "login.html";
 }
 
 /* ================= REGISTRATION CHECK ================= */
@@ -254,7 +254,7 @@ async function checkRegistration() {
 
     if (res.status === 401) {
       localStorage.removeItem("token");
-      window.location.href = "driver-login.html";
+      window.location.href = "login.html";
       return false;
     }
 
