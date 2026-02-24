@@ -267,14 +267,14 @@ async function checkRegistration() {
     } else {
       statusBox.className = "status-box status-incomplete";
       statusBox.innerHTML =
-        '⚠ Not Fully Registered - <a href="continue-driver-form.html">Click here to complete registration</a>';
+  '⚠ Not Fully Registered - <a href="continue-form.html">Click here to complete registration</a>';
       return false;
     }
 
   } catch {
     statusBox.className = "status-box status-incomplete";
     statusBox.innerHTML =
-      '⚠ Unable to verify registration - <a href="continue-driver-form.html">Click to complete registration</a>';
+  '⚠ Unable to verify registration - <a href="continue-form.html">Click to complete registration</a>';
     return false;
   }
 }
