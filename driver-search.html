@@ -266,15 +266,28 @@ async function checkRegistration() {
       return true;
     } else {
       statusBox.className = "status-box status-incomplete";
-      statusBox.innerHTML =
-  '⚠ Not Fully Registered - <a href="continue-form.html">This Dashboard is for DRIVERS only. Click here to complete registration.</a>';
+      statusBox.innerHTML = `
+  ⚠ Not Fully Registered<br>
+  <a href="continue-form.html">
+    This Dashboard is for DRIVERS only. Click here to complete registration.
+  </a>
+  <a href="partner-login.html" class="partner-login-link">
+    Login as Partner
+  </a>
+`;
       return false;
     }
 
   } catch {
     statusBox.className = "status-box status-incomplete";
-    statusBox.innerHTML =
-  '⚠ Unable to verify registration - <a href="continue-form.html">Click to complete registration</a>';
+
+    statusBox.innerHTML = `
+  ⚠ Unable to verify registration<br>
+  <a href="continue-form.html">Click to complete registration</a>
+  <a href="partner-login.html" class="partner-login-link">
+    Login as Partner
+  </a>
+`;
     return false;
   }
 }
