@@ -126,6 +126,15 @@ footer {
   text-decoration:none;
   font-weight:bold;
 }
+
+ /* Driver login link (green) */
+.driver-login-link{
+  display:block;
+  margin-top:8px;
+  color:var(--main-green) !important;
+  text-decoration:none;
+  font-weight:bold;
+} 
 </style>  </head>  <body>  <header>  
   <img src="assets/logo/d4d-logo.png" alt="D4D">  
   <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>  
@@ -196,17 +205,29 @@ async function checkRegistration() {
       return true;
     } else {
       statusBox.className = "status-box status-incomplete";
-      statusBox.innerHTML =
-        '⚠ Not Fully Registered - ' +
-        '<a href="continue-partner-form.html">Click here to complete registration</a>';
+      statusBox.innerHTML = `
+  ⚠ Not fully registered. This dashboard is for partners/car owners only.<br>
+  <a href="continue-partner-form.html">
+    Click here to complete registration
+  </a>
+  <a href="login.html" class="driver-login-link">
+    Login as Driver
+  </a>
+`;
       return false;
     }
 
   } catch (error) {
     statusBox.className = "status-box status-incomplete";
-    statusBox.innerHTML =
-      '⚠ Unable to verify registration - ' +
-      '<a href="continue-partner-form.html">Click to complete registration</a>';
+    statusBox.innerHTML = `
+  ⚠ Unable to verify registration.<br>
+  <a href="continue-partner-form.html">
+    Click here to complete registration
+  </a>
+  <a href="login.html" class="driver-login-link">
+    Login as Driver
+  </a>
+`;
     return false;
   }
 }
