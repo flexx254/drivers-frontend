@@ -242,9 +242,12 @@ footer {
 
 <script>
 
-/* ================= AUTH CHECK ================= */
+/* ================= CONFIG ================= */
 
+const BASE_URL = "https://drivers-backend-4spp.onrender.com";
 const token = localStorage.getItem("token");
+
+/* ================= AUTH CHECK ================= */
 
 if (!token) {
   window.location.href = "login.html";
@@ -256,14 +259,11 @@ const statusBox = document.getElementById("registrationStatus");
 
 async function checkRegistration() {
   try {
-    const res = await fetch(
-      "https://drivers-backend-4spp.onrender.com/check-driver-status",
-      {
-        headers: {
-          "Authorization": "Bearer " + token
-        }
+    const res = await fetch(`${BASE_URL}/check-driver-status`, {
+      headers: {
+        "Authorization": "Bearer " + token
       }
-    );
+    });
 
     if (res.status === 401) {
       localStorage.removeItem("token");
@@ -280,27 +280,26 @@ async function checkRegistration() {
     } else {
       statusBox.className = "status-box status-incomplete";
       statusBox.innerHTML = `
-  ⚠ Not Fully Registered<br>
-  <a href="continue-form.html">
-    This Dashboard is for DRIVERS only. Click here to complete registration.
-  </a>
-  <a href="partner-login.html" class="partner-login-link">
-    Login as Partner
-  </a>
-`;
+        ⚠ Not Fully Registered<br>
+        <a href="continue-form.html">
+          This Dashboard is for DRIVERS only. Click here to complete registration.
+        </a>
+        <a href="partner-login.html" class="partner-login-link">
+          Login as Partner
+        </a>
+      `;
       return false;
     }
 
-  } catch {
+  } catch (error) {
     statusBox.className = "status-box status-incomplete";
-
     statusBox.innerHTML = `
-  ⚠ Unable to verify registration<br>
-  <a href="continue-form.html">Click to complete registration</a>
-  <a href="partner-login.html" class="partner-login-link">
-    Login as Partner
-  </a>
-`;
+      ⚠ Unable to verify registration<br>
+      <a href="continue-form.html">Click to complete registration</a>
+      <a href="partner-login.html" class="partner-login-link">
+        Login as Partner
+      </a>
+    `;
     return false;
   }
 }
@@ -311,6 +310,7 @@ async function searchDriver(){
   const plate = document.getElementById("search_plate").value.trim();
   const msg = document.getElementById("msg");
   const result = document.getElementById("result");
+
   result.innerHTML = "";
   msg.textContent = "";
 
@@ -320,7 +320,10 @@ async function searchDriver(){
   }
 
   try{
-    const res = await fetch(`https://drivers-backend-4spp.onrender.com/search-driver?number_plate=${encodeURIComponent(plate)}`);
+    const res = await fetch(
+      `${BASE_URL}/search-driver?number_plate=${encodeURIComponent(plate)}`
+    );
+
     const data = await res.json();
 
     if(!data.success){
@@ -329,6 +332,7 @@ async function searchDriver(){
     }
 
     const driver = data.driver;
+
     result.innerHTML = `
       <div class="driver-card">
         <img src="${driver.profile_pic_url || 'https://via.placeholder.com/60'}" alt="Profile">
@@ -339,7 +343,7 @@ async function searchDriver(){
       </div>
     `;
 
-  }catch{
+  } catch (error){
     msg.textContent = "Network error. Try again.";
   }
 }
@@ -356,14 +360,14 @@ menuToggle.addEventListener('click', () => {
     : '<i class="fas fa-bars"></i>';
 });
 
-/* ================= LOAD CARS ================= */
+/* ================= LOAD AVAILABLE CARS ================= */
 
 async function loadAvailableCars() {
   const container = document.getElementById("availableCars");
   container.innerHTML = "";
 
   try {
-    const res = await fetch("https://drivers-backend-4spp.onrender.com/available-cars");
+    const res = await fetch(`${BASE_URL}/available-cars`);
     const data = await res.json();
 
     if(!data.success || !data.cars.length){
@@ -374,39 +378,87 @@ async function loadAvailableCars() {
     data.cars.forEach(car => {
       const card = document.createElement("div");
       card.className = "car-card";
+
       card.innerHTML = `
         <img src="${car.car_image_url || 'https://via.placeholder.com/60'}">
         <div style="flex:1">
           <strong>${car.car_make} ${car.car_model}</strong><br>
           ${car.number_plate}
         </div>
-        <button class="connect-btn"
-          onclick="connectOwner('${car.number_plate}')">
+        <button class="connect-btn">
           Connect
         </button>
       `;
+
+      const button = card.querySelector(".connect-btn");
+      button.addEventListener("click", () => connectOwner(car.number_plate));
+
       container.appendChild(card);
     });
 
-  } catch {
+  } catch (error) {
     container.innerHTML = "<p>Failed to load available cars.</p>";
+  }
+}
+
+/* ================= UPDATE LOCATION ================= */
+
+async function updateLocation(location) {
+  try {
+    const res = await fetch(`${BASE_URL}/update-location`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ location })
+    });
+
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+      return false;
+    }
+
+    const data = await res.json();
+
+    if (!data.success) {
+      alert(data.error || "Failed to update location.");
+      return false;
+    }
+
+    return true;
+
+  } catch (error) {
+    alert("Network error while saving location.");
+    return false;
   }
 }
 
 /* ================= CONNECT OWNER ================= */
 
-function connectOwner(numberPlate) {
-  const confirmConnect = confirm(`Do you want to connect with the owner of ${numberPlate}?`);
+async function connectOwner(numberPlate) {
+
+  const confirmConnect = confirm(
+    `Do you want to connect with the owner of ${numberPlate}?`
+  );
+
   if (!confirmConnect) return;
 
-  const location = prompt("Enter your residential area (e.g. Donholm, Umoja):");
+  const location = prompt(
+    "Enter your residential area (e.g. Donholm, Umoja):"
+  );
 
   if (!location || !location.trim()) {
     alert("Location is required.");
     return;
   }
 
-  alert(`Request sent for ${numberPlate}\nLocation: ${location.trim()}`);
+  const saved = await updateLocation(location.trim());
+
+  if (!saved) return;
+
+  alert(`Request sent for ${numberPlate}\nLocation saved successfully.`);
 }
 
 /* ================= APP START ================= */
@@ -423,6 +475,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 </script>
+
 
 </body>
    </html>
