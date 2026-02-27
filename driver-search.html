@@ -435,31 +435,45 @@ async function updateLocation(location) {
   }
 }
 
-/* ================= CONNECT OWNER ================= */
-
 async function connectOwner(numberPlate) {
-
-  const confirmConnect = confirm(
-    `Do you want to connect with the owner of ${numberPlate}?`
-  );
-
+  const confirmConnect = confirm(`Do you want to connect with the owner of ${numberPlate}?`);
   if (!confirmConnect) return;
 
-  const location = prompt(
-    "Enter your residential area (e.g. Donholm, Umoja):"
-  );
+  const location = prompt("Enter your residential area (e.g. Donholm, Umoja):");
 
   if (!location || !location.trim()) {
     alert("Location is required.");
     return;
   }
 
-  const saved = await updateLocation(location.trim());
+  try {
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/update-location",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          location: location.trim()
+        })
+      }
+    );
 
-  if (!saved) return;
+    const data = await res.json();
 
-  alert(`Request sent for ${numberPlate}\nLocation saved successfully.`);
-}
+    if (!res.ok) {
+      alert(data.error || "Failed to update location.");
+      return;
+    }
+
+    alert("Location updated successfully!");
+
+  } catch (err) {
+    alert("Network error.");
+  }
+  }
 
 /* ================= APP START ================= */
 
