@@ -147,13 +147,29 @@ const purposeSelect = document.getElementById("purpose");
 const paymentOverlay = document.getElementById("paymentOverlay");
 const statusText = document.getElementById("statusText");
 
-/* CREATE PAYMENT INTENT ONLY */
+let pollingInterval = null;
+let pollingTimeout = null;
+
+/* =========================
+   CHECK LOGIN FIRST
+========================= */
+const token = localStorage.getItem("token");
+
+if (!token) {
+  alert("Session expired. Please login again.");
+  window.location.href = "login.html";
+}
+
+/* =========================
+   START PAYMENT
+========================= */
 async function startPayment() {
+
   const phone = mpesaInput.value.trim();
   const purpose = purposeSelect.value;
 
   if (!/^\+254\d{9}$/.test(phone)) {
-    alert("Invalid MPESA number");
+    alert("Invalid MPESA number. Use +2547XXXXXXXX format.");
     return;
   }
 
@@ -167,31 +183,127 @@ async function startPayment() {
   statusText.className = "status";
 
   try {
+
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/create-payment-intent",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
         body: JSON.stringify({ phone, purpose })
       }
     );
 
-    const data = await res.json();
-
-    if (data.status === "ok") {
-      statusText.textContent = "Payment intent created ✔";
-      statusText.className = "status success";
-    } else {
-      statusText.textContent = "Failed to create payment intent";
-      statusText.className = "status error";
+    if (res.status === 401) {
+      alert("Unauthorized. Please login again.");
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+      return;
     }
 
-  } catch (e) {
-    statusText.textContent = "Network error";
-    statusText.className = "status error";
+    const data = await res.json();
+
+    if (data.status === "ok" && data.reference) {
+
+      statusText.textContent = "Waiting for MPESA confirmation...";
+      statusText.className = "status";
+
+      startPolling(data.reference);
+
+    } else {
+      showError("Failed to create payment intent");
+    }
+
+  } catch (err) {
+    showError("Network error. Try again.");
   }
 }
-</script>
 
+/* =========================
+   POLLING FUNCTION
+========================= */
+function startPolling(reference) {
+
+  pollingTimeout = setTimeout(() => {
+    stopPolling();
+    showError("Payment timeout. Please try again.");
+  }, 120000);
+
+  pollingInterval = setInterval(async () => {
+
+    try {
+
+      const res = await fetch(
+        "https://drivers-backend-4spp.onrender.com/check-payment-status",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({ reference })
+        }
+      );
+
+      if (res.status === 401) {
+        alert("Session expired. Please login again.");
+        stopPolling();
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data.status === "paid") {
+
+        stopPolling();
+
+        statusText.textContent = "Payment Successful ✔";
+        statusText.className = "status success";
+
+        setTimeout(() => {
+          paymentOverlay.style.display = "none";
+          window.location.href = "dashboard.html";
+        }, 3000);
+      }
+
+    } catch (err) {
+      stopPolling();
+      showError("Error checking payment status.");
+    }
+
+  }, 5000);
+}
+
+/* =========================
+   STOP POLLING
+========================= */
+function stopPolling() {
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+    pollingInterval = null;
+  }
+  if (pollingTimeout) {
+    clearTimeout(pollingTimeout);
+    pollingTimeout = null;
+  }
+}
+
+/* =========================
+   ERROR HANDLER
+========================= */
+function showError(message) {
+  stopPolling();
+  statusText.textContent = message;
+  statusText.className = "status error";
+
+  setTimeout(() => {
+    paymentOverlay.style.display = "none";
+  }, 3000);
+}
+  </script>
 </body>
 </html>
