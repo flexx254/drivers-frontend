@@ -374,6 +374,65 @@ section { margin-bottom: 32px; }
   to {
     transform: rotate(360deg);
   }
+
+
+     /* HEADER ACTIONS */
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+/* LOGIN BUTTON */
+.login-btn{
+  background:white;
+  color:var(--main-green);
+  border:none;
+  padding:8px 14px;
+  border-radius:20px;
+  font-weight:600;
+  font-size:13px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+/* DROPDOWN */
+.login-dropdown{
+  position:relative;
+}
+
+.login-menu{
+  position:absolute;
+  top:40px;
+  right:0;
+  background:white;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  width:170px;
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.login-menu a{
+  padding:12px 14px;
+  text-decoration:none;
+  color:var(--main-green);
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.login-menu a:hover{
+  background:var(--grey);
+}
+
+.login-menu.show{
+  display:flex;
+     }
                     }
 </style>
 
@@ -390,9 +449,31 @@ section { margin-bottom: 32px; }
     <img src="assets/logo/d4d-logo.webp" alt="D4D Logo">
   </div>
 
+<div class="header-actions">
+
+  <!-- LOGIN DROPDOWN -->
+  <div class="login-dropdown">
+    <button class="login-btn" id="loginToggle">
+      Login <i class="fas fa-chevron-down"></i>
+    </button>
+
+    <div class="login-menu" id="loginMenu">
+      <a href="https://flexx254.github.io/drivers-frontend/login.html">
+        <i class="fas fa-car"></i> Driver Login
+      </a>
+
+      <a href="https://flexx254.github.io/drivers-frontend/owner-login.html">
+        <i class="fas fa-key"></i> Owner Login
+      </a>
+    </div>
+  </div>
+
+  <!-- HAMBURGER -->
   <button class="menu-icon" id="menuToggle" aria-label="Toggle navigation" type="button">
     <i class="fas fa-bars"></i>
   </button>
+
+</div>
 
   <nav id="navMenu" aria-label="Primary navigation">
     <a href="#">Home</a>
@@ -725,6 +806,23 @@ window.addEventListener("load", () => {
     setTimeout(() => {
       loader.remove();
     }, 300);
+  }
+});
+
+
+
+/* LOGIN DROPDOWN */
+const loginToggle = document.getElementById("loginToggle");
+const loginMenu = document.getElementById("loginMenu");
+
+loginToggle.addEventListener("click", () => {
+  loginMenu.classList.toggle("show");
+});
+
+/* CLOSE WHEN CLICKING OUTSIDE */
+document.addEventListener("click", (e) => {
+  if (!loginToggle.contains(e.target) && !loginMenu.contains(e.target)) {
+    loginMenu.classList.remove("show");
   }
 });
 </script>
