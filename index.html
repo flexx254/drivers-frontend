@@ -830,21 +830,6 @@ document.addEventListener("click", (e) => {
 
 
 
-/* LOGIN DROPDOWN TOGGLE */
-const loginToggle = document.getElementById("loginToggle");
-const loginMenu = document.getElementById("loginMenu");
-
-loginToggle.addEventListener("click", () => {
-  loginMenu.classList.toggle("show");
-});
-
-/* CLOSE IF USER CLICKS OUTSIDE */
-document.addEventListener("click", (e) => {
-  if (!loginToggle.contains(e.target) && !loginMenu.contains(e.target)) {
-    loginMenu.classList.remove("show");
-  }
-});
-
 
 </script>
 
