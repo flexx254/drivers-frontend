@@ -374,7 +374,7 @@ section { margin-bottom: 32px; }
   to {
     transform: rotate(360deg);
   }
-
+}
 
      /* HEADER ACTIONS */
 .header-actions{
@@ -406,7 +406,7 @@ section { margin-bottom: 32px; }
 .login-menu{
   position:absolute;
   top:40px;
-  right:0;
+  left:0;              /* align dropdown to the left */
   background:white;
   border-radius:var(--radius);
   box-shadow:var(--shadow);
@@ -434,6 +434,13 @@ section { margin-bottom: 32px; }
   display:flex;
      }
                     }
+
+@media (max-width:768px){
+  .login-menu{
+    right:auto;
+    left:0;
+  }
+     }
 </style>
 
 </head>
