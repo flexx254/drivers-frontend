@@ -284,6 +284,15 @@ menuToggle.addEventListener('click', () => {
       ? '<i class="fas fa-times"></i>'
       : '<i class="fas fa-bars"></i>';
 });
+
+
+window.addEventListener("load", function () {
+
+fetch("https://myflaskapp.onrender.com/wake-render")
+.catch(error => console.log("Wake request sent"));
+
+});
+
      </script>
     
 
