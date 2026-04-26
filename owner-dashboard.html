@@ -597,6 +597,18 @@ async function loadContracts() {
   }
    }
 
+   (async () => {
+  const registered = await checkRegistration();
+
+  if (registered) {
+    loadOwners();
+    loadContracts(); // ✅ ADD THIS LINE
+  } else {
+    ownersDiv.innerHTML =
+      "<p style='color:red;text-align:center'>Complete registration to continue.</p>";
+  }
+})();
+
  </script>                 
 
 
