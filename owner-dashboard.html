@@ -149,9 +149,10 @@ footer {
 <hr style="margin:20px 0;">
   <h2>Available Drivers</h2>  
   <div id="owners"></div>  
-</div>  <footer>&copy; 2025 D4D Platform</footer>  <script>  
+</div>  <footer>&copy; 2025 D4D Platform</footer>      
+ <script>
 
-      /* ================= MENU ================= */
+/* ================= MENU ================= */
 const menuToggle = document.getElementById("menuToggle");
 const navMenu = document.getElementById("navMenu");
 
@@ -165,34 +166,36 @@ menuToggle.onclick = () => {
 
 /* ================= AUTH CHECK ================= */
 
-// Get token
 const token = localStorage.getItem("token");
 
-// If no token → go to login immediately
 if (!token) {
   window.location.href = "partner-login.html";
 }
 
 
-/* ================= REGISTRATION CHECK ================= */
+/* ================= GLOBALS ================= */
 
 const statusBox = document.getElementById("registrationStatus");
 const ownersDiv = document.getElementById("owners");
+
+let allDrivers = [];
+let currentPage = 0;
+const perPage = 4;
+
+
+/* ================= REGISTRATION CHECK ================= */
 
 async function checkRegistration() {
   try {
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/check-partner-status",
       {
-        headers: {
-          "Authorization": "Bearer " + token
-        }
+        headers: { "Authorization": "Bearer " + token }
       }
     );
 
-    // If token invalid or expired
     if (res.status === 401) {
-      localStorage.removeItem("token"); // clear bad token
+      localStorage.removeItem("token");
       window.location.href = "partner-login.html";
       return false;
     }
@@ -206,44 +209,33 @@ async function checkRegistration() {
     } else {
       statusBox.className = "status-box status-incomplete";
       statusBox.innerHTML = `
-  ⚠ Not fully registered. This dashboard is for partners/car owners only.<br>
-  <a href="continue-partner-form.html">
-    Click here to complete registration
-  </a>
-  <a href="login.html" class="driver-login-link">
-    Login as Driver
-  </a>
-`;
+        ⚠ Not fully registered.<br>
+        <a href="continue-partner-form.html">Complete registration</a>
+        <a href="login.html" class="driver-login-link">Login as Driver</a>
+      `;
       return false;
     }
 
-  } catch (error) {
+  } catch {
     statusBox.className = "status-box status-incomplete";
     statusBox.innerHTML = `
-  ⚠ Unable to verify registration.<br>
-  <a href="continue-partner-form.html">
-    Click here to complete registration
-  </a>
-  <a href="login.html" class="driver-login-link">
-    Login as Driver
-  </a>
-`;
+      ⚠ Unable to verify registration.<br>
+      <a href="continue-partner-form.html">Complete registration</a>
+      <a href="login.html" class="driver-login-link">Login as Driver</a>
+    `;
     return false;
   }
 }
 
 
-/* ================= LOAD OWNERS ================= */
+/* ================= LOAD DRIVERS ================= */
 
 async function loadOwners() {
-
   try {
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/owners-with-location",
       {
-        headers: {
-          "Authorization": "Bearer " + token
-        }
+        headers: { "Authorization": "Bearer " + token }
       }
     );
 
@@ -256,85 +248,209 @@ async function loadOwners() {
     const data = await res.json();
 
     if (!Array.isArray(data) || !data.length) {
-      ownersDiv.innerHTML = "<p>No owners available.</p>";
+      ownersDiv.innerHTML = "<p>No drivers available.</p>";
       return;
     }
 
-    data.forEach(owner => {
-
-      const card = document.createElement("div");
-      card.className = "owner-card";
-
-      card.innerHTML = `
-        <img src="${owner.profile_pic_url}" alt="Profile">
-        <div class="owner-info">
-          <strong>${owner.full_name}</strong><br>
-          <span class="location">${owner.location}</span>
-          <div class="phone"></div>
-        </div>
-        <button class="connect-btn">Connect</button>
-      `;
-
-      const btn = card.querySelector(".connect-btn");
-      const phoneEl = card.querySelector(".phone");
-
-      btn.onclick = async () => {
-
-        if (!confirm("Are you sure you want to connect?")) return;
-
-        btn.disabled = true;
-        btn.textContent = "Connecting...";
-
-        try {
-
-          const connectRes = await fetch(
-            "https://drivers-backend-4spp.onrender.com/connect-owner-secure",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-              },
-              body: JSON.stringify({ owner_id: owner.id })
-            }
-          );
-
-          if (connectRes.status === 401) {
-            localStorage.removeItem("token");
-            window.location.href = "partner-login.html";
-            return;
-          }
-
-          const result = await connectRes.json();
-
-          if (connectRes.ok) {
-            alert("Connected successfully");
-            phoneEl.textContent = result.phone_number;
-            phoneEl.style.display = "block";
-            btn.textContent = "Connected";
-          } else {
-            alert(result.message || "Failed");
-            btn.disabled = false;
-            btn.textContent = "Connect";
-          }
-
-        } catch {
-          alert("Network error");
-          btn.disabled = false;
-          btn.textContent = "Connect";
-        }
-      };
-
-      ownersDiv.appendChild(card);
-    });
+    allDrivers = data;
+    renderPage();
 
   } catch {
-    ownersDiv.innerHTML = "<p>Error loading owners.</p>";
+    ownersDiv.innerHTML = "<p>Error loading drivers.</p>";
   }
 }
 
 
-/* ================= APP START ================= */
+/* ================= RENDER PAGE ================= */
+
+function renderPage() {
+  ownersDiv.innerHTML = "";
+
+  const start = currentPage * perPage;
+  const end = start + perPage;
+
+  const pageItems = allDrivers.slice(start, end);
+
+  pageItems.forEach(driver => {
+    const card = createDriverCard(driver);
+    ownersDiv.appendChild(card);
+  });
+
+  renderPagination();
+}
+
+
+/* ================= DRIVER CARD ================= */
+
+function createDriverCard(driver) {
+
+  const card = document.createElement("div");
+  card.className = "owner-card";
+
+  card.innerHTML = `
+    <img src="${driver.profile_pic_url}" alt="Profile">
+    <div class="owner-info">
+      <strong>${driver.full_name}</strong><br>
+      <span class="location">${driver.location}</span>
+      <div class="phone"></div>
+    </div>
+    <button class="connect-btn">Connect</button>
+  `;
+
+  const btn = card.querySelector(".connect-btn");
+  const phoneEl = card.querySelector(".phone");
+
+  btn.onclick = async () => {
+
+    if (!confirm("Connect to this driver?")) return;
+
+    btn.disabled = true;
+    btn.textContent = "Connecting...";
+
+    try {
+      const connectRes = await fetch(
+        "https://drivers-backend-4spp.onrender.com/connect-owner-secure",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({ driver_id: driver.id }) // ✅ FIXED
+        }
+      );
+
+      const result = await connectRes.json();
+
+      if (connectRes.ok) {
+        phoneEl.textContent = result.phone_number;
+        phoneEl.style.display = "block";
+        btn.textContent = "Connected";
+
+        showContractForm(card, driver); // ✅ NEW
+
+      } else {
+        alert(result.message || "Failed");
+        btn.disabled = false;
+        btn.textContent = "Connect";
+      }
+
+    } catch {
+      alert("Network error");
+      btn.disabled = false;
+      btn.textContent = "Connect";
+    }
+  };
+
+  return card;
+}
+
+
+/* ================= PAGINATION ================= */
+
+function renderPagination() {
+  const totalPages = Math.ceil(allDrivers.length / perPage);
+
+  const nav = document.createElement("div");
+  nav.style.textAlign = "center";
+  nav.style.marginTop = "15px";
+
+  nav.innerHTML = `
+    <button ${currentPage === 0 ? "disabled" : ""}>⬅ Prev</button>
+    <span style="margin:0 10px;">
+      Page ${currentPage + 1} of ${totalPages}
+    </span>
+    <button ${currentPage >= totalPages - 1 ? "disabled" : ""}>Next ➡</button>
+  `;
+
+  const buttons = nav.querySelectorAll("button");
+
+  buttons[0].onclick = () => {
+    currentPage--;
+    renderPage();
+  };
+
+  buttons[1].onclick = () => {
+    currentPage++;
+    renderPage();
+  };
+
+  ownersDiv.appendChild(nav);
+}
+
+
+/* ================= CONTRACT FORM ================= */
+
+function showContractForm(card, driver) {
+
+  const form = document.createElement("div");
+  form.style.marginTop = "10px";
+
+  form.innerHTML = `
+    <hr>
+    <h4 style="color:var(--main-green)">Create Contract</h4>
+
+    <input type="number" placeholder="Daily amount (KES)" id="amount-${driver.id}" />
+
+    <select id="days-${driver.id}">
+      <option value="6">Mon–Sat</option>
+      <option value="7">Mon–Sun</option>
+    </select>
+
+    <button class="connect-btn">Start Contract</button>
+  `;
+
+  const startBtn = form.querySelector("button");
+
+  startBtn.onclick = async () => {
+
+    const amount = document.getElementById(`amount-${driver.id}`).value;
+    const days = document.getElementById(`days-${driver.id}`).value;
+
+    if (!amount) {
+      alert("Enter amount");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        "https://drivers-backend-4spp.onrender.com/set-contract",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({
+            driver_id: driver.id,
+            daily_amount: Number(amount),
+            work_days: Number(days)
+          })
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        form.innerHTML = `
+          <p style="color:green;font-weight:bold;">
+            Contract sent. Waiting for driver acceptance...
+          </p>
+        `;
+      } else {
+        alert(data.error || "Failed");
+      }
+
+    } catch {
+      alert("Network error");
+    }
+  };
+
+  card.appendChild(form);
+}
+
+
+/* ================= START APP ================= */
 
 (async () => {
   const registered = await checkRegistration();
@@ -346,5 +462,9 @@ async function loadOwners() {
       "<p style='color:red;text-align:center'>Complete registration to continue.</p>";
   }
 })();
-</script>  </body>  
+
+ </script>                 
+
+
+</body>  
   </html>
