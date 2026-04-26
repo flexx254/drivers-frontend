@@ -253,9 +253,16 @@ if (!token) {
   window.location.href = "login.html";
 }
 
-/* ================= REGISTRATION CHECK ================= */
+/* ================= GLOBALS ================= */
 
 const statusBox = document.getElementById("registrationStatus");
+const carsContainer = document.getElementById("availableCars");
+
+let allCars = [];
+let currentPage = 0;
+const perPage = 4;
+
+/* ================= REGISTRATION CHECK ================= */
 
 async function checkRegistration() {
   try {
@@ -281,9 +288,7 @@ async function checkRegistration() {
       statusBox.className = "status-box status-incomplete";
       statusBox.innerHTML = `
         ⚠ Not Fully Registered<br>
-        <a href="continue-form.html">
-          This Dashboard is for DRIVERS only. Click here to complete registration.
-        </a>
+        <a href="continue-form.html">Complete registration</a>
         <a href="partner-login.html" class="partner-login-link">
           Login as Partner
         </a>
@@ -291,14 +296,11 @@ async function checkRegistration() {
       return false;
     }
 
-  } catch (error) {
+  } catch {
     statusBox.className = "status-box status-incomplete";
     statusBox.innerHTML = `
       ⚠ Unable to verify registration<br>
       <a href="continue-form.html">Click to complete registration</a>
-      <a href="partner-login.html" class="partner-login-link">
-        Login as Partner
-      </a>
     `;
     return false;
   }
@@ -335,7 +337,7 @@ async function searchDriver(){
 
     result.innerHTML = `
       <div class="driver-card">
-        <img src="${driver.profile_pic_url || 'https://via.placeholder.com/60'}" alt="Profile">
+        <img src="${driver.profile_pic_url || 'https://via.placeholder.com/60'}">
         <div>
           <strong>${driver.full_name}</strong><br>
           ${driver.number_plate}
@@ -343,8 +345,8 @@ async function searchDriver(){
       </div>
     `;
 
-  } catch (error){
-    msg.textContent = "Network error. Try again.";
+  } catch {
+    msg.textContent = "Network error.";
   }
 }
 
@@ -360,120 +362,143 @@ menuToggle.addEventListener('click', () => {
     : '<i class="fas fa-bars"></i>';
 });
 
-/* ================= LOAD AVAILABLE CARS ================= */
+/* ================= LOAD CARS ================= */
 
 async function loadAvailableCars() {
-  const container = document.getElementById("availableCars");
-  container.innerHTML = "";
+  carsContainer.innerHTML = "<p>Loading...</p>";
 
   try {
     const res = await fetch(`${BASE_URL}/available-cars`);
     const data = await res.json();
 
-    if(!data.success || !data.cars.length){
-      container.innerHTML = "<p>No available cars found.</p>";
+    if (!data.success || !data.cars.length) {
+      carsContainer.innerHTML = "<p>No available cars.</p>";
       return;
     }
 
-    data.cars.forEach(car => {
-      const card = document.createElement("div");
-      card.className = "car-card";
+    allCars = data.cars;
+    renderPage();
 
-      card.innerHTML = `
-        <img src="${car.car_image_url || 'https://via.placeholder.com/60'}">
-        <div style="flex:1">
-          <strong>${car.car_make} ${car.car_model}</strong><br>
-          ${car.number_plate}
-        </div>
-        <button class="connect-btn">
-          Connect
-        </button>
-      `;
-
-      const button = card.querySelector(".connect-btn");
-      button.addEventListener("click", () => connectOwner(car.number_plate));
-
-      container.appendChild(card);
-    });
-
-  } catch (error) {
-    container.innerHTML = "<p>Failed to load available cars.</p>";
+  } catch {
+    carsContainer.innerHTML = "<p>Failed to load cars.</p>";
   }
 }
 
-/* ================= UPDATE LOCATION ================= */
+/* ================= RENDER PAGE ================= */
 
-async function updateLocation(location) {
-  try {
-    const res = await fetch(`${BASE_URL}/update-location`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      },
-      body: JSON.stringify({ location })
-    });
+function renderPage() {
+  carsContainer.innerHTML = "";
 
-    if (res.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "login.html";
-      return false;
-    }
+  const start = currentPage * perPage;
+  const end = start + perPage;
 
-    const data = await res.json();
+  const pageItems = allCars.slice(start, end);
 
-    if (!data.success) {
-      alert(data.error || "Failed to update location.");
-      return false;
-    }
+  pageItems.forEach(car => {
+    const card = createCarCard(car);
+    carsContainer.appendChild(card);
+  });
 
-    return true;
-
-  } catch (error) {
-    alert("Network error while saving location.");
-    return false;
-  }
+  renderPagination();
 }
 
-async function connectOwner(numberPlate) {
-  const confirmConnect = confirm(`Do you want to connect with the owner of ${numberPlate}?`);
-  if (!confirmConnect) return;
+/* ================= CAR CARD ================= */
 
-  const location = prompt("Enter your residential area (e.g. Donholm, Umoja):");
+function createCarCard(car) {
 
-  if (!location || !location.trim()) {
-    alert("Location is required.");
-    return;
-  }
+  const card = document.createElement("div");
+  card.className = "car-card";
 
-  try {
-    const res = await fetch(
-      "https://drivers-backend-4spp.onrender.com/update-location",
-      {
+  card.innerHTML = `
+    <img src="${car.car_image_url || 'https://via.placeholder.com/60'}">
+    <div style="flex:1">
+      <strong>${car.car_make} ${car.car_model}</strong><br>
+      ${car.number_plate}
+    </div>
+    <button class="connect-btn">Connect</button>
+  `;
+
+  const btn = card.querySelector(".connect-btn");
+
+  btn.onclick = async () => {
+
+    if (!confirm(`Connect to ${car.number_plate}?`)) return;
+
+    const location = prompt("Enter your residential area:");
+
+    if (!location || !location.trim()) {
+      alert("Location required");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Connecting...";
+
+    try {
+      const res = await fetch(`${BASE_URL}/connect-owner`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer " + token
         },
         body: JSON.stringify({
+          number_plate: car.number_plate,
           location: location.trim()
         })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        btn.textContent = "Connected";
+      } else {
+        alert(data.error || "Failed");
+        btn.disabled = false;
+        btn.textContent = "Connect";
       }
-    );
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.error || "Failed to update location.");
-      return;
+    } catch {
+      alert("Network error");
+      btn.disabled = false;
+      btn.textContent = "Connect";
     }
+  };
 
-    alert("Location updated successfully!");
+  return card;
+}
 
-  } catch (err) {
-    alert("Network error.");
-  }
-  }
+/* ================= PAGINATION ================= */
+
+function renderPagination() {
+
+  const totalPages = Math.ceil(allCars.length / perPage);
+
+  const nav = document.createElement("div");
+  nav.style.textAlign = "center";
+  nav.style.marginTop = "15px";
+
+  nav.innerHTML = `
+    <button ${currentPage === 0 ? "disabled" : ""}>⬅ Prev</button>
+    <span style="margin:0 10px;">
+      Page ${currentPage + 1} of ${totalPages}
+    </span>
+    <button ${currentPage >= totalPages - 1 ? "disabled" : ""}>Next ➡</button>
+  `;
+
+  const buttons = nav.querySelectorAll("button");
+
+  buttons[0].onclick = () => {
+    currentPage--;
+    renderPage();
+  };
+
+  buttons[1].onclick = () => {
+    currentPage++;
+    renderPage();
+  };
+
+  carsContainer.appendChild(nav);
+}
 
 /* ================= APP START ================= */
 
@@ -483,12 +508,14 @@ window.addEventListener("DOMContentLoaded", async () => {
   if (registered) {
     loadAvailableCars();
   } else {
-    document.getElementById("availableCars").innerHTML =
-      "<p style='color:red;text-align:center'>Complete registration to continue.</p>";
+    carsContainer.innerHTML =
+      "<p style='color:red;text-align:center'>Complete registration first.</p>";
   }
 });
 
 </script>
+
+
 
 
 </body>
