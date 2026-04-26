@@ -135,6 +135,38 @@ footer {
   text-decoration:none;
   font-weight:bold;
 } 
+
+  /* CONTRACT CARD */
+.contract-card{
+  border:1px solid var(--main-green);
+  border-radius:8px;
+  padding:12px;
+  margin-top:12px;
+  background:#f0fff4;
+}
+
+.contract-status{
+  font-weight:bold;
+  margin-top:6px;
+}
+
+.status-green{
+  color:green;
+}
+
+.status-red{
+  color:red;
+}
+
+.terminate-btn{
+  margin-top:8px;
+  background:red;
+  color:white;
+  border:none;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  }
 </style>  </head>  <body>  <header>  
   <img src="assets/logo/d4d-logo.png" alt="D4D">  
   <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>  
@@ -147,7 +179,10 @@ footer {
   <div id="registrationStatus" class="status-box"></div>
 
 <hr style="margin:20px 0;">
-  <h2>Available Drivers</h2>  
+  <h2>Available Drivers</h2>
+  <hr style="margin:25px 0;">
+  <h2>Active Contracts</h2>
+  <div id="contracts"></div>
   <div id="owners"></div>  
 </div>  <footer>&copy; 2025 D4D Platform</footer>      
  <script>
@@ -462,6 +497,97 @@ function showContractForm(card, driver) {
       "<p style='color:red;text-align:center'>Complete registration to continue.</p>";
   }
 })();
+
+   const contractsDiv = document.getElementById("contracts");
+
+async function loadContracts() {
+
+  try {
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/owner-contracts",
+      {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      }
+    );
+
+    const data = await res.json();
+
+    if (!Array.isArray(data) || !data.length) {
+      contractsDiv.innerHTML = "<p>No active contracts.</p>";
+      return;
+    }
+
+    contractsDiv.innerHTML = "";
+
+    data.forEach(contract => {
+
+      const card = document.createElement("div");
+      card.className = "contract-card";
+
+      card.innerHTML = `
+        <strong>Driver ID:</strong> ${contract.driver_id}<br>
+        <strong>Daily:</strong> KES ${contract.daily_amount}<br>
+        <strong>Status:</strong> ${contract.status}
+        <div class="contract-status" id="status-${contract.id}">Checking...</div>
+        <button class="terminate-btn">Terminate</button>
+      `;
+
+      checkPaymentStatus(contract.id);
+
+      const btn = card.querySelector(".terminate-btn");
+
+      btn.onclick = async () => {
+        if (!confirm("Terminate contract?")) return;
+
+        await fetch(
+          "https://drivers-backend-4spp.onrender.com/terminate-contract",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ contract_id: contract.id })
+          }
+        );
+
+        loadContracts();
+      };
+
+      contractsDiv.appendChild(card);
+    });
+
+  } catch {
+    contractsDiv.innerHTML = "<p>Error loading contracts</p>";
+  }
+   }
+
+
+   async function checkPaymentStatus(contractId) {
+
+  try {
+    const res = await fetch(
+      `https://drivers-backend-4spp.onrender.com/payment-status/${contractId}`
+    );
+
+    const data = await res.json();
+
+    const el = document.getElementById(`status-${contractId}`);
+
+    if (data.paid_today) {
+      el.textContent = "✔ Paid Today";
+      el.className = "contract-status status-green";
+    } else {
+      el.textContent = "❌ Not Paid Today";
+      el.className = "contract-status status-red";
+    }
+
+  } catch {
+    console.log("status error");
+  }
+   }
 
  </script>                 
 
