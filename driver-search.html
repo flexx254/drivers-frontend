@@ -240,6 +240,7 @@ footer {
   &copy; 2025 Driver App. All rights reserved.
 </footer>
 
+  
 <script>
 
 /* ================= CONFIG ================= */
@@ -261,6 +262,7 @@ const carsContainer = document.getElementById("availableCars");
 let currentPage = 1;
 const perPage = 4;
 let totalPages = 1;
+
 /* ================= REGISTRATION CHECK ================= */
 
 async function checkRegistration() {
@@ -362,6 +364,7 @@ menuToggle.addEventListener('click', () => {
 });
 
 /* ================= LOAD CARS ================= */
+
 async function loadAvailableCars(page = 1) {
   carsContainer.innerHTML = "<p>Loading...</p>";
 
@@ -382,7 +385,7 @@ async function loadAvailableCars(page = 1) {
   } catch {
     carsContainer.innerHTML = "<p>Failed to load cars.</p>";
   }
-  }
+}
 
 /* ================= RENDER PAGE ================= */
 
@@ -395,7 +398,7 @@ function renderPage(cars) {
   });
 
   renderPagination();
-  }
+}
 
 /* ================= CAR CARD ================= */
 
@@ -466,30 +469,32 @@ function createCarCard(car) {
 
 function renderPagination() {
 
-  const totalPages = Math.ceil(allCars.length / perPage);
-
   const nav = document.createElement("div");
   nav.style.textAlign = "center";
   nav.style.marginTop = "15px";
 
   nav.innerHTML = `
-    <button ${currentPage === 0 ? "disabled" : ""}>⬅ Prev</button>
+    <button ${currentPage === 1 ? "disabled" : ""}>⬅ Prev</button>
     <span style="margin:0 10px;">
-      Page ${currentPage + 1} of ${totalPages}
+      Page ${currentPage} of ${totalPages}
     </span>
-    <button ${currentPage >= totalPages - 1 ? "disabled" : ""}>Next ➡</button>
+    <button ${currentPage === totalPages ? "disabled" : ""}>Next ➡</button>
   `;
 
   const buttons = nav.querySelectorAll("button");
 
+  // PREV
   buttons[0].onclick = () => {
-    currentPage--;
-    renderPage();
+    if (currentPage > 1) {
+      loadAvailableCars(currentPage - 1);
+    }
   };
 
+  // NEXT
   buttons[1].onclick = () => {
-    currentPage++;
-    renderPage();
+    if (currentPage < totalPages) {
+      loadAvailableCars(currentPage + 1);
+    }
   };
 
   carsContainer.appendChild(nav);
@@ -501,7 +506,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const registered = await checkRegistration();
 
   if (registered) {
-    loadAvailableCars();
+    loadAvailableCars(1); // always start from page 1
   } else {
     carsContainer.innerHTML =
       "<p style='color:red;text-align:center'>Complete registration first.</p>";
@@ -509,7 +514,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 </script>
-
 
 
 
