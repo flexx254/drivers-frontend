@@ -258,10 +258,9 @@ if (!token) {
 const statusBox = document.getElementById("registrationStatus");
 const carsContainer = document.getElementById("availableCars");
 
-let allCars = [];
-let currentPage = 0;
+let currentPage = 1;
 const perPage = 4;
-
+let totalPages = 1;
 /* ================= REGISTRATION CHECK ================= */
 
 async function checkRegistration() {
@@ -363,12 +362,11 @@ menuToggle.addEventListener('click', () => {
 });
 
 /* ================= LOAD CARS ================= */
-
-async function loadAvailableCars() {
+async function loadAvailableCars(page = 1) {
   carsContainer.innerHTML = "<p>Loading...</p>";
 
   try {
-    const res = await fetch(`${BASE_URL}/available-cars`);
+    const res = await fetch(`${BASE_URL}/available-cars?page=${page}&limit=${perPage}`);
     const data = await res.json();
 
     if (!data.success || !data.cars.length) {
@@ -376,31 +374,28 @@ async function loadAvailableCars() {
       return;
     }
 
-    allCars = data.cars;
-    renderPage();
+    currentPage = data.pagination.page;
+    totalPages = data.pagination.total_pages;
+
+    renderPage(data.cars);
 
   } catch {
     carsContainer.innerHTML = "<p>Failed to load cars.</p>";
   }
-}
+  }
 
 /* ================= RENDER PAGE ================= */
 
-function renderPage() {
+function renderPage(cars) {
   carsContainer.innerHTML = "";
 
-  const start = currentPage * perPage;
-  const end = start + perPage;
-
-  const pageItems = allCars.slice(start, end);
-
-  pageItems.forEach(car => {
+  cars.forEach(car => {
     const card = createCarCard(car);
     carsContainer.appendChild(card);
   });
 
   renderPagination();
-}
+  }
 
 /* ================= CAR CARD ================= */
 
