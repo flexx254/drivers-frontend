@@ -295,10 +295,12 @@ if (!token) {
 
 const statusBox = document.getElementById("registrationStatus");
 const carsContainer = document.getElementById("availableCars");
+const requestBox = document.getElementById("requestStatus");
 
 let currentPage = 1;
 const perPage = 4;
 let totalPages = 1;
+let requestState = null; // 🔥 track status globally
 
 /* ================= REGISTRATION CHECK ================= */
 
@@ -341,6 +343,43 @@ async function checkRegistration() {
       <a href="continue-form.html">Click to complete registration</a>
     `;
     return false;
+  }
+}
+
+/* ================= REQUEST STATUS ================= */
+
+async function checkRequestStatus() {
+  try {
+    const res = await fetch(`${BASE_URL}/my-request-status`, {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      requestState = null;
+      requestBox.textContent = "";
+      return;
+    }
+
+    requestState = data.status;
+
+    if (data.status === "pending") {
+      requestBox.textContent = "⏳ Request pending approval";
+    }
+
+    if (data.status === "approved") {
+      requestBox.textContent = "✔ Request approved";
+    }
+
+    if (data.status === "rejected") {
+      requestBox.textContent = "❌ Request rejected";
+    }
+
+  } catch {
+    requestBox.textContent = "";
   }
 }
 
@@ -444,20 +483,36 @@ function createCarCard(car) {
   const card = document.createElement("div");
   card.className = "car-card";
 
+  // 🔥 determine button state based on request
+  let btnText = "Send Request";
+  let disabled = false;
+
+  if (requestState === "pending") {
+    btnText = "Pending";
+    disabled = true;
+  }
+
+  if (requestState === "approved") {
+    btnText = "Approved";
+    disabled = true;
+  }
+
   card.innerHTML = `
     <img src="${car.car_image_url || 'https://via.placeholder.com/60'}">
     <div style="flex:1">
       <strong>${car.car_make} ${car.car_model}</strong><br>
       ${car.number_plate}
     </div>
-    <button class="connect-btn">Connect</button>
+    <button class="connect-btn" ${disabled ? "disabled" : ""}>${btnText}</button>
   `;
 
   const btn = card.querySelector(".connect-btn");
 
+  if (disabled) return card;
+
   btn.onclick = async () => {
 
-    if (!confirm(`Connect to ${car.number_plate}?`)) return;
+    if (!confirm(`Send request for ${car.number_plate}?`)) return;
 
     const location = prompt("Enter your residential area:");
 
@@ -467,10 +522,10 @@ function createCarCard(car) {
     }
 
     btn.disabled = true;
-    btn.textContent = "Connecting...";
+    btn.textContent = "Sending...";
 
     try {
-      const res = await fetch(`${BASE_URL}/connect-owner`, {
+      const res = await fetch(`${BASE_URL}/send-request`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -485,17 +540,19 @@ function createCarCard(car) {
       const data = await res.json();
 
       if (res.ok) {
-        btn.textContent = "Connected";
+        btn.textContent = "Request Sent";
+        requestState = "pending";
+        checkRequestStatus(); // refresh UI
       } else {
         alert(data.error || "Failed");
         btn.disabled = false;
-        btn.textContent = "Connect";
+        btn.textContent = "Send Request";
       }
 
     } catch {
       alert("Network error");
       btn.disabled = false;
-      btn.textContent = "Connect";
+      btn.textContent = "Send Request";
     }
   };
 
@@ -525,14 +582,12 @@ function renderPagination() {
 
   const buttons = nav.querySelectorAll("button");
 
-  // PREV
   buttons[0].onclick = () => {
     if (currentPage > 1) {
       loadAvailableCars(currentPage - 1);
     }
   };
 
-  // NEXT
   buttons[1].onclick = () => {
     if (currentPage < totalPages) {
       loadAvailableCars(currentPage + 1);
@@ -540,14 +595,16 @@ function renderPagination() {
   };
 
   carsContainer.appendChild(nav);
-  }
+}
+
 /* ================= APP START ================= */
 
 window.addEventListener("DOMContentLoaded", async () => {
   const registered = await checkRegistration();
 
   if (registered) {
-    loadAvailableCars(1); // always start from page 1
+    await checkRequestStatus(); // 🔥 important first
+    loadAvailableCars(1);
   } else {
     carsContainer.innerHTML =
       "<p style='color:red;text-align:center'>Complete registration first.</p>";
@@ -555,7 +612,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 </script>
-
 
 
 </body>
