@@ -253,7 +253,6 @@ footer {
     <a href="#">About</a>
   </nav>
 </header>
-
 <div class="container">
 
   <!-- REGISTRATION STATUS -->
@@ -261,6 +260,7 @@ footer {
 
   <h2>Driver Dashboard</h2>
 
+  <!-- SEARCH (OPTIONAL TOOL) -->
   <label>Search by Number Plate</label>
   <input type="text" id="search_plate" placeholder="Enter number plate">
   <button onclick="searchDriver()">Search</button>
@@ -268,15 +268,21 @@ footer {
   <div id="result"></div>
   <div id="msg" class="msg"></div>
 
+  <!-- AVAILABLE CARS (DRIVER INITIATES CONTRACT) -->
+  <hr style="margin:25px 0;">
   <h2>Available Cars</h2>
   <div id="availableCars" style="margin-top:20px;"></div>
+
+  <!-- DRIVER CONTRACT REQUESTS -->
+  <hr style="margin:25px 0;">
+  <h2>My Contract Requests</h2>
+  <div id="driverContracts" style="margin-top:15px;"></div>
 
 </div>
 
 <footer>
   &copy; 2025 Driver App. All rights reserved.
 </footer>
-
   
 <script>
 
