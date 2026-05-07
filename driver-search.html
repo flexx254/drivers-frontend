@@ -736,15 +736,15 @@ function renderPagination() {
 /* ================= APP START ================= */
 
 window.addEventListener("DOMContentLoaded", async () => {
-  const registered = await checkRegistration();
 
-  if (registered) {
-    await checkRequestStatus(); // 🔥 important first
-    loadAvailableCars(1);
-  } else {
-    carsContainer.innerHTML =
-      "<p style='color:red;text-align:center'>Complete registration first.</p>";
-  }
+  // registration check
+  await checkRegistration();
+
+  // ALWAYS run these
+  await checkRequestStatus();
+
+  await loadAvailableCars(1);
+
 });
 
 </script>
