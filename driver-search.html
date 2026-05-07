@@ -258,6 +258,10 @@ footer {
   background: #f0fff4;
 }
 
+  .contract-card img {
+  display:block;
+  }
+
 .contract-header {
   display: flex;
   justify-content: space-between;
@@ -416,39 +420,101 @@ async function checkRegistration() {
 /* ================= REQUEST STATUS ================= */
 
 async function checkRequestStatus() {
+
   try {
+
     const res = await fetch(`${BASE_URL}/my-request-status`, {
       headers: {
         "Authorization": "Bearer " + token
       }
     });
 
+    // 🔥 JWT expired or invalid
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+      return;
+    }
+
     const data = await res.json();
 
     if (!data.success) {
       requestState = null;
-      requestBox.textContent = "";
+      requestBox.innerHTML = "";
       return;
     }
 
-    requestState = data.status;
+    const connection = data.connection;
 
-    if (data.status === "pending") {
-      requestBox.textContent = "⏳ Request pending approval";
+    requestState = connection.status;
+
+    let statusColor = "orange";
+    let statusText = "⏳ Pending";
+
+    if (connection.status === "approved") {
+      statusColor = "green";
+      statusText = "✔ Approved";
     }
 
-    if (data.status === "approved") {
-      requestBox.textContent = "✔ Request approved";
+    if (connection.status === "rejected") {
+      statusColor = "red";
+      statusText = "❌ Rejected";
     }
 
-    if (data.status === "rejected") {
-      requestBox.textContent = "❌ Request rejected";
-    }
+    requestBox.innerHTML = `
+      <div class="contract-card">
 
-  } catch {
-    requestBox.textContent = "";
+        <div class="contract-header">
+          <strong>${statusText}</strong>
+        </div>
+
+        <div style="margin-top:10px;">
+          <img 
+            src="${connection.car_image_url || 'https://via.placeholder.com/100'}"
+            style="
+              width:100px;
+              height:100px;
+              object-fit:cover;
+              border-radius:10px;
+              border:2px solid #1b8f2a;
+            "
+          >
+        </div>
+
+        <div style="margin-top:10px;">
+          <strong>Car:</strong>
+          ${connection.car_make || ''} ${connection.car_model || ''}
+        </div>
+
+        <div style="margin-top:6px;">
+          <strong>Number Plate:</strong>
+          ${connection.number_plate || 'N/A'}
+        </div>
+
+        <div style="margin-top:6px;">
+          <strong>Owner:</strong>
+          ${connection.owner_full_name || 'N/A'}
+        </div>
+
+        <div style="margin-top:6px;">
+          <strong>Phone:</strong>
+          ${connection.owner_phone_number || 'N/A'}
+        </div>
+
+      </div>
+    `;
+
+  } catch (err) {
+
+    console.log(err);
+
+    requestBox.innerHTML = `
+      <div class="status-box status-incomplete">
+        Failed to load request status
+      </div>
+    `;
   }
-}
+  }
 
 /* ================= SEARCH DRIVER ================= */
 
