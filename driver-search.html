@@ -445,6 +445,9 @@ async function checkRegistration() {
     }
 
     const connection = data.connection;
+    console.log(data);
+console.log(connection);
+console.log(connection.status);
 
     // 🔥 THIS WAS THE MAIN BUG
     requestState = connection.status;
