@@ -616,7 +616,6 @@ function renderPage(cars) {
 }
 
 /* ================= CAR CARD ================= */
-
 function createCarCard(car) {
 
   const card = document.createElement("div");
@@ -664,6 +663,13 @@ function createCarCard(car) {
     btn.textContent = "Sending...";
 
     try {
+
+      alert(
+        "SENDING REQUEST:\n\n" +
+        "Plate: " + car.number_plate + "\n" +
+        "Location: " + location.trim()
+      );
+
       const res = await fetch(`${BASE_URL}/send-request`, {
         method: "POST",
         headers: {
@@ -678,25 +684,43 @@ function createCarCard(car) {
 
       const data = await res.json();
 
+      alert(
+        "SEND REQUEST RESPONSE:\n\n" +
+        "Status Code: " + res.status + "\n" +
+        "Response: " + JSON.stringify(data)
+      );
+
       if (res.ok) {
+
         btn.textContent = "Request Sent";
+
         requestState = "pending";
+
         checkRequestStatus(); // refresh UI
+
       } else {
+
         alert(data.error || "Failed");
+
         btn.disabled = false;
         btn.textContent = "Send Request";
       }
 
-    } catch {
-      alert("Network error");
+    } catch (err) {
+
+      alert(
+        "SEND REQUEST ERROR:\n\n" +
+        "Message: " + err.message
+      );
+
       btn.disabled = false;
       btn.textContent = "Send Request";
     }
   };
 
   return card;
-}
+  }
+
 
 /* ================= PAGINATION ================= */
 
