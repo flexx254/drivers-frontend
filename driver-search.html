@@ -419,8 +419,7 @@ async function checkRegistration() {
 
 /* ================= REQUEST STATUS ================= */
 
-
-  async function checkRequestStatus() {
+async function checkRequestStatus() {
 
   try {
 
@@ -445,9 +444,13 @@ async function checkRegistration() {
     }
 
     const connection = data.connection;
-    console.log(data);
-console.log(connection);
-console.log(connection.status);
+
+    alert(
+      "REQUEST STATUS DEBUG:\n\n" +
+      "Success: " + data.success + "\n" +
+      "Connection Exists: " + (!!connection) + "\n" +
+      "Status: " + connection.status
+    );
 
     // 🔥 THIS WAS THE MAIN BUG
     requestState = connection.status;
@@ -512,7 +515,10 @@ console.log(connection.status);
 
   } catch (err) {
 
-    console.log(err);
+    alert(
+      "REQUEST STATUS ERROR:\n\n" +
+      "Message: " + err.message
+    );
 
     requestBox.innerHTML = `
       <div class="status-box status-incomplete">
@@ -520,7 +526,9 @@ console.log(connection.status);
       </div>
     `;
   }
-  }
+        }
+
+
 
 /* ================= SEARCH DRIVER ================= */
 
