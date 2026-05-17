@@ -524,15 +524,15 @@ async function checkRequestStatus() {
       </div>
     `;
 
-  } catch (err) {
+} catch (err) {
 
-    console.error("REQUEST STATUS ERROR:", err);
+  console.error("REQUEST STATUS ERROR:", err);
 
-    requestBox.innerHTML = `
-      <div class="status-box status-incomplete">
-        Failed to load request status
-      </div>
-    `;
+  requestBox.innerHTML = `
+    <div class="status-box status-incomplete">
+      ${err.message}
+    </div>
+  `;
   }
   }
   
