@@ -420,6 +420,12 @@ async function checkRegistration() {
 /* ================= REQUEST STATUS ================= */
 async function checkRequestStatus() {
 
+  requestBox.innerHTML = `
+    <div class="status-box">
+      Loading request status...
+    </div>
+  `;
+
   try {
 
     const res = await fetch(`${BASE_URL}/my-request-status`, {
@@ -428,18 +434,37 @@ async function checkRequestStatus() {
       }
     });
 
+    console.log("STATUS RESPONSE:", res);
+
     if (res.status === 401) {
       localStorage.removeItem("token");
       window.location.href = "login.html";
       return;
     }
 
+    if (!res.ok) {
+      throw new Error("Server returned " + res.status);
+    }
+
     const data = await res.json();
 
+    console.log("STATUS DATA:", data);
+
     if (!data.success) {
+
       requestState = null;
-      requestBox.innerHTML = "";
+
+      requestBox.innerHTML = `
+        <div class="status-box status-incomplete">
+          No active request found
+        </div>
+      `;
+
       return;
+    }
+
+    if (!data.connection) {
+      throw new Error("Connection object missing");
     }
 
     const connection = data.connection;
@@ -501,6 +526,8 @@ async function checkRequestStatus() {
 
   } catch (err) {
 
+    console.error("REQUEST STATUS ERROR:", err);
+
     requestBox.innerHTML = `
       <div class="status-box status-incomplete">
         Failed to load request status
@@ -508,6 +535,7 @@ async function checkRequestStatus() {
     `;
   }
   }
+  
 
 /* ================= SEARCH DRIVER ================= */
 
