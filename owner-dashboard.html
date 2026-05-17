@@ -167,6 +167,57 @@ footer {
   border-radius:6px;
   cursor:pointer;
   }
+
+
+  .request-card{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  margin-top:15px;
+  padding:12px;
+  border:1px solid var(--main-green);
+  border-radius:8px;
+  background:#f9f9f9;
+}
+
+.request-card img{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--main-green);
+}
+
+.request-info{
+  flex:1;
+}
+
+.request-location{
+  color:var(--main-green);
+  font-weight:bold;
+  margin-top:4px;
+}
+
+.request-phone{
+  margin-top:4px;
+}
+
+.request-status{
+  margin-top:6px;
+  font-weight:bold;
+}
+
+.status-pending{
+  color:orange;
+}
+
+.status-approved{
+  color:green;
+}
+
+.status-rejected{
+  color:red;
+}
 </style>  </head>  <body>  <header>  
   <img src="assets/logo/d4d-logo.png" alt="D4D">  
   <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>  
@@ -185,6 +236,11 @@ footer {
   <hr style="margin:20px 0;">
   <h2>Available Drivers</h2>
   <div id="owners"></div>
+
+    <!-- DRIVER REQUESTS -->
+<hr style="margin:25px 0;">
+<h2>Driver Requests</h2>
+<div id="driverRequests"></div>
 
   <!-- CONTRACTS SECTION -->
   <hr style="margin:25px 0;">
@@ -507,7 +563,7 @@ function showContractForm(card, driver) {
 })();
 
    const contractsDiv = document.getElementById("contracts");
-
+   const requestsDiv = document.getElementById("driverRequests");
 async function loadContracts() {
 
   try {
@@ -573,6 +629,106 @@ async function loadContracts() {
    }
 
 
+   async function loadOwnerRequests() {
+
+  requestsDiv.innerHTML = `
+    <p>Loading requests...</p>
+  `;
+
+  try {
+
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/owner-requests",
+      {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      }
+    );
+
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "partner-login.html";
+      return;
+    }
+
+    const data = await res.json();
+
+    console.log("OWNER REQUESTS:", data);
+
+    if (!data.success) {
+
+      requestsDiv.innerHTML = `
+        <p>No requests found.</p>
+      `;
+
+      return;
+    }
+
+    if (!Array.isArray(data.requests) || !data.requests.length) {
+
+      requestsDiv.innerHTML = `
+        <p>No driver requests.</p>
+      `;
+
+      return;
+    }
+
+    requestsDiv.innerHTML = "";
+
+    data.requests.forEach(req => {
+
+      let statusClass = "status-pending";
+
+      if (req.status === "approved") {
+        statusClass = "status-approved";
+      }
+
+      if (req.status === "rejected") {
+        statusClass = "status-rejected";
+      }
+
+      const card = document.createElement("div");
+
+      card.className = "request-card";
+
+      card.innerHTML = `
+        <img src="${req.profile_pic_url || 'https://via.placeholder.com/70'}">
+
+        <div class="request-info">
+
+          <strong>${req.full_name}</strong>
+
+          <div class="request-location">
+            ${req.location}
+          </div>
+
+          <div class="request-phone">
+            ${req.phone_number || 'No phone'}
+          </div>
+
+          <div class="request-status ${statusClass}">
+            ${req.status}
+          </div>
+
+        </div>
+      `;
+
+      requestsDiv.appendChild(card);
+
+    });
+
+  } catch (err) {
+
+    console.log("REQUEST ERROR:", err);
+
+    requestsDiv.innerHTML = `
+      <p>Error loading requests.</p>
+    `;
+  }
+   }
+
+
    async function checkPaymentStatus(contractId) {
 
   try {
@@ -602,7 +758,8 @@ async function loadContracts() {
 
   if (registered) {
     loadOwners();
-    loadContracts(); // ✅ ADD THIS LINE
+    loadContracts(); 
+    loadOwnerRequests();
   } else {
     ownersDiv.innerHTML =
       "<p style='color:red;text-align:center'>Complete registration to continue.</p>";
