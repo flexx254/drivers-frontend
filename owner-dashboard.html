@@ -337,12 +337,20 @@ function createDriverCard(driver) {
 
   card.innerHTML = `
     <img src="${driver.profile_pic_url}" alt="Profile">
+
     <div class="owner-info">
       <strong>${driver.full_name}</strong><br>
-      <span class="location">${driver.location}</span>
+
+      <span class="location">
+        ${driver.location}
+      </span>
+
       <div class="phone"></div>
     </div>
-    <button class="connect-btn">Connect</button>
+
+    <button class="connect-btn">
+      Connect
+    </button>
   `;
 
   const btn = card.querySelector(".connect-btn");
@@ -350,41 +358,122 @@ function createDriverCard(driver) {
 
   btn.onclick = async () => {
 
-    if (!confirm("Connect to this driver?")) return;
+    const confirmed = confirm(
+      "Are you sure you want to connect to this driver?"
+    );
+
+    if (!confirmed) return;
 
     btn.disabled = true;
     btn.textContent = "Connecting...";
 
     try {
-      const connectRes = await fetch(
-        "https://drivers-backend-4spp.onrender.com/connect-owner-secure",
+
+      /* ===============================
+         STEP 1: FETCH OWNER REQUESTS
+      =============================== */
+
+      const requestRes = await fetch(
+        "https://drivers-backend-4spp.onrender.com/owner-requests",
+        {
+          headers: {
+            "Authorization": "Bearer " + token
+          }
+        }
+      );
+
+      const requestData = await requestRes.json();
+
+      console.log("OWNER REQUESTS:", requestData);
+
+      if (!requestRes.ok) {
+
+        alert(requestData.error || "Failed to load requests");
+
+        btn.disabled = false;
+        btn.textContent = "Connect";
+
+        return;
+      }
+
+      /* ===============================
+         STEP 2: FIND PENDING REQUEST
+      =============================== */
+
+      const pendingRequest = requestData.requests.find(req =>
+        req.full_name === driver.full_name &&
+        req.status === "pending"
+      );
+
+      console.log("PENDING REQUEST:", pendingRequest);
+
+      if (!pendingRequest) {
+
+        alert("No pending request found for this driver.");
+
+        btn.disabled = false;
+        btn.textContent = "Connect";
+
+        return;
+      }
+
+      /* ===============================
+         STEP 3: APPROVE REQUEST
+      =============================== */
+
+      const approveRes = await fetch(
+        "https://drivers-backend-4spp.onrender.com/approve-request",
         {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + token
           },
-          body: JSON.stringify({ driver_id: driver.id }) // ✅ FIXED
+
+          body: JSON.stringify({
+            connection_id: pendingRequest.id
+          })
         }
       );
 
-      const result = await connectRes.json();
+      const approveData = await approveRes.json();
 
-      if (connectRes.ok) {
-        phoneEl.textContent = result.phone_number;
-        phoneEl.style.display = "block";
-        btn.textContent = "Connected";
+      console.log("APPROVE RESPONSE:", approveData);
 
-        showContractForm(card, driver); // ✅ NEW
+      if (!approveRes.ok) {
 
-      } else {
-        alert(result.message || "Failed");
+        alert(
+          approveData.error || "Failed to approve request"
+        );
+
         btn.disabled = false;
         btn.textContent = "Connect";
+
+        return;
       }
 
-    } catch {
+      /* ===============================
+         STEP 4: SUCCESS UI
+      =============================== */
+
+      btn.textContent = "Connected";
+
+      phoneEl.textContent =
+        pendingRequest.phone_number || "";
+
+      phoneEl.style.display = "block";
+
+      alert("Driver connected successfully.");
+
+      showContractForm(card, driver);
+
+    } catch (err) {
+
+      console.log("CONNECT ERROR:", err);
+
       alert("Network error");
+
       btn.disabled = false;
       btn.textContent = "Connect";
     }
@@ -392,6 +481,8 @@ function createDriverCard(driver) {
 
   return card;
 }
+
+
 
 
 /* ================= PAGINATION ================= */
