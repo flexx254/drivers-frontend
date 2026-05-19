@@ -330,7 +330,9 @@ function renderPage() {
 
 /* ================= DRIVER CARD ================= */
 
-function createDriverCard(driver) {
+
+
+    function createDriverCard(driver) {
 
   const card = document.createElement("div");
   card.className = "owner-card";
@@ -345,17 +347,29 @@ function createDriverCard(driver) {
         ${driver.location}
       </span>
 
-      <div class="phone"></div>
+      <div class="phone">
+        ${driver.phone_number || ""}
+      </div>
     </div>
 
     <button class="connect-btn">
-      Connect
+      ${driver.connect === "connected" ? "Connected" : "Connect"}
     </button>
   `;
 
   const btn = card.querySelector(".connect-btn");
   const phoneEl = card.querySelector(".phone");
 
+  /* Already connected */
+  if (driver.connect === "connected") {
+
+    btn.disabled = true;
+    phoneEl.style.display = "block";
+
+    return card;
+  }
+
+  /* Connect button */
   btn.onclick = async () => {
 
     const confirmed = confirm(
@@ -369,60 +383,8 @@ function createDriverCard(driver) {
 
     try {
 
-      /* ===============================
-         STEP 1: FETCH OWNER REQUESTS
-      =============================== */
-
-      const requestRes = await fetch(
-        "https://drivers-backend-4spp.onrender.com/owner-requests",
-        {
-          headers: {
-            "Authorization": "Bearer " + token
-          }
-        }
-      );
-
-      const requestData = await requestRes.json();
-
-      console.log("OWNER REQUESTS:", requestData);
-
-      if (!requestRes.ok) {
-
-        alert(requestData.error || "Failed to load requests");
-
-        btn.disabled = false;
-        btn.textContent = "Connect";
-
-        return;
-      }
-
-      /* ===============================
-         STEP 2: FIND PENDING REQUEST
-      =============================== */
-
-      const pendingRequest = requestData.requests.find(req =>
-        req.full_name === driver.full_name &&
-        req.status === "pending"
-      );
-
-      console.log("PENDING REQUEST:", pendingRequest);
-
-      if (!pendingRequest) {
-
-        alert("No pending request found for this driver.");
-
-        btn.disabled = false;
-        btn.textContent = "Connect";
-
-        return;
-      }
-
-      /* ===============================
-         STEP 3: APPROVE REQUEST
-      =============================== */
-
-      const approveRes = await fetch(
-        "https://drivers-backend-4spp.onrender.com/approve-request",
+      const res = await fetch(
+        "https://drivers-backend-4spp.onrender.com/connect-driver",
         {
           method: "POST",
 
@@ -432,20 +394,16 @@ function createDriverCard(driver) {
           },
 
           body: JSON.stringify({
-            connection_id: pendingRequest.id
+            connection_id: driver.id
           })
         }
       );
 
-      const approveData = await approveRes.json();
+      const data = await res.json();
 
-      console.log("APPROVE RESPONSE:", approveData);
+      if (!res.ok) {
 
-      if (!approveRes.ok) {
-
-        alert(
-          approveData.error || "Failed to approve request"
-        );
+        alert(data.error || "Failed to connect");
 
         btn.disabled = false;
         btn.textContent = "Connect";
@@ -453,14 +411,9 @@ function createDriverCard(driver) {
         return;
       }
 
-      /* ===============================
-         STEP 4: SUCCESS UI
-      =============================== */
+      /* SUCCESS */
 
       btn.textContent = "Connected";
-
-      phoneEl.textContent =
-        pendingRequest.phone_number || "";
 
       phoneEl.style.display = "block";
 
@@ -480,11 +433,8 @@ function createDriverCard(driver) {
   };
 
   return card;
-}
-
-
-
-
+   }
+        
 /* ================= PAGINATION ================= */
 
 function renderPagination() {
