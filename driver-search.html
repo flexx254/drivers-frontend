@@ -521,21 +521,177 @@ async function checkRequestStatus() {
           ${connection.owner_phone_number || 'N/A'}
         </div>
 
+        ${
+          connection.contract_status === "active"
+          ? `
+            <button 
+              class="connect-btn"
+              id="seeContractBtn"
+              style="margin-top:12px;"
+            >
+              See Contract
+            </button>
+          `
+          : ""
+        }
+
+      </div>
+
+      <!-- CONTRACT OVERLAY -->
+
+      <div id="contractOverlay" style="
+        display:none;
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.6);
+        z-index:999;
+        justify-content:center;
+        align-items:center;
+      ">
+
+        <div style="
+          background:white;
+          width:90%;
+          max-width:400px;
+          padding:20px;
+          border-radius:12px;
+        ">
+
+          <h3 style="
+            color:#1b8f2a;
+            text-align:center;
+            margin-bottom:20px;
+          ">
+            Contract Details
+          </h3>
+
+          <p>
+            <strong>Daily Amount:</strong>
+            KES ${connection.contract_amount || 0}
+          </p>
+
+          <p>
+            <strong>Work Days:</strong>
+            ${connection.work_days || 0} days/week
+          </p>
+
+          <p>
+            <strong>Status:</strong>
+            ${connection.contract_status || "inactive"}
+          </p>
+
+          <button
+            class="small-btn"
+            id="cancelContractBtn"
+          >
+            Cancel Contract
+          </button>
+
+          <button
+            class="connect-btn"
+            id="closeOverlayBtn"
+            style="margin-left:10px;"
+          >
+            Close
+          </button>
+
+        </div>
+
       </div>
     `;
 
-} catch (err) {
+    /* ================= OVERLAY EVENTS ================= */
 
-  console.error("REQUEST STATUS ERROR:", err);
+    const overlay = document.getElementById("contractOverlay");
 
-  requestBox.innerHTML = `
-    <div class="status-box status-incomplete">
-      ${err.message}
-    </div>
-  `;
+    const seeBtn = document.getElementById("seeContractBtn");
+
+    if (seeBtn) {
+
+      seeBtn.onclick = () => {
+        overlay.style.display = "flex";
+      };
+
+    }
+
+    const closeBtn = document.getElementById("closeOverlayBtn");
+
+    if (closeBtn) {
+
+      closeBtn.onclick = () => {
+        overlay.style.display = "none";
+      };
+
+    }
+
+    const cancelBtn = document.getElementById("cancelContractBtn");
+
+    if (cancelBtn) {
+
+      cancelBtn.onclick = async () => {
+
+        const confirmed = confirm(
+          "Are you sure you want to cancel this contract?"
+        );
+
+        if (!confirmed) return;
+
+        try {
+
+          const res = await fetch(
+            `${BASE_URL}/cancel-contract`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+              },
+              body: JSON.stringify({
+                connection_id: connection.id
+              })
+            }
+          );
+
+          const result = await res.json();
+
+          if (res.ok) {
+
+            alert("Contract cancelled");
+
+            overlay.style.display = "none";
+
+            checkRequestStatus();
+
+          } else {
+
+            alert(result.error || "Failed");
+
+          }
+
+        } catch {
+
+          alert("Network error");
+
+        }
+
+      };
+
+    }
+
+  } catch (err) {
+
+    console.error("REQUEST STATUS ERROR:", err);
+
+    requestBox.innerHTML = `
+      <div class="status-box status-incomplete">
+        ${err.message}
+      </div>
+    `;
   }
   }
-  
 
 /* ================= SEARCH DRIVER ================= */
 
