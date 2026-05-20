@@ -581,12 +581,70 @@ async function loadContracts() {
       card.className = "contract-card";
 
       card.innerHTML = `
-        <strong>Driver ID:</strong> ${contract.driver_id}<br>
-        <strong>Daily:</strong> KES ${contract.daily_amount}<br>
-        <strong>Status:</strong> ${contract.status}
-        <div class="contract-status" id="status-${contract.id}">Checking...</div>
-        <button class="terminate-btn">Terminate</button>
-      `;
+
+  <div style="
+    display:flex;
+    gap:12px;
+    align-items:center;
+  ">
+
+    <img
+      src="${contract.driver_profile_pic_url || 'https://via.placeholder.com/70'}"
+      style="
+        width:70px;
+        height:70px;
+        border-radius:50%;
+        object-fit:cover;
+        border:2px solid #1b8f2a;
+      "
+    >
+
+    <div>
+
+      <strong>
+        ${contract.driver_full_name || "Unknown Driver"}
+      </strong>
+
+      <br>
+
+      ${contract.driver_phone_number || "No phone"}
+
+      <br>
+
+      <span style="color:#1b8f2a;font-weight:bold;">
+        ${contract.location || "No location"}
+      </span>
+
+    </div>
+
+  </div>
+
+  <hr style="margin:10px 0;">
+
+  <strong>Daily Amount:</strong>
+  KES ${contract.contract_amount || 0}
+
+  <br><br>
+
+  <strong>Work Days:</strong>
+  ${contract.work_days || 0} days/week
+
+  <br><br>
+
+  <strong>Status:</strong>
+  ${contract.contract_status}
+
+  <div
+    class="contract-status"
+    id="status-${contract.id}"
+  >
+    Checking...
+  </div>
+
+  <button class="terminate-btn">
+    Terminate
+  </button>
+`;
 
       checkPaymentStatus(contract.id);
 
