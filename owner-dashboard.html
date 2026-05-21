@@ -734,36 +734,7 @@ async function loadContracts() {
   }
    }
 
-      checkPaymentStatus(contract.id);
-
-      const btn = card.querySelector(".terminate-btn");
-
-      btn.onclick = async () => {
-        if (!confirm("Terminate contract?")) return;
-
-        await fetch(
-          "https://drivers-backend-4spp.onrender.com/terminate-contract",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify({ contract_id: contract.id })
-          }
-        );
-
-        loadContracts();
-      };
-
-      contractsDiv.appendChild(card);
-    });
-
-  } catch {
-    contractsDiv.innerHTML = "<p>Error loading contracts</p>";
-  }
-   }
-
+      
 
 
 
