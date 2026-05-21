@@ -552,11 +552,17 @@ function showContractForm(card, driver) {
   }
 })();
 
+
+
+
    const contractsDiv = document.getElementById("contracts");
-   
+
 async function loadContracts() {
 
   try {
+
+    contractsDiv.innerHTML = "<p>Loading contracts...</p>";
+
     const res = await fetch(
       "https://drivers-backend-4spp.onrender.com/owner-contracts",
       {
@@ -566,10 +572,24 @@ async function loadContracts() {
       }
     );
 
+    /* TOKEN EXPIRED */
+    if (res.status === 401) {
+
+      localStorage.removeItem("token");
+
+      window.location.href = "partner-login.html";
+
+      return;
+    }
+
     const data = await res.json();
 
+    /* NO ACTIVE CONTRACTS */
     if (!Array.isArray(data) || !data.length) {
-      contractsDiv.innerHTML = "<p>No active contracts.</p>";
+
+      contractsDiv.innerHTML =
+        "<p>No active contracts.</p>";
+
       return;
     }
 
@@ -578,73 +598,141 @@ async function loadContracts() {
     data.forEach(contract => {
 
       const card = document.createElement("div");
+
       card.className = "contract-card";
 
       card.innerHTML = `
 
-  <div style="
-    display:flex;
-    gap:12px;
-    align-items:center;
-  ">
+        <div style="
+          display:flex;
+          gap:12px;
+          align-items:center;
+        ">
 
-    <img
-      src="${contract.driver_profile_pic_url || 'https://via.placeholder.com/70'}"
-      style="
-        width:70px;
-        height:70px;
-        border-radius:50%;
-        object-fit:cover;
-        border:2px solid #1b8f2a;
-      "
-    >
+          <img
+            src="${contract.driver_profile_pic_url || 'https://via.placeholder.com/70'}"
+            style="
+              width:70px;
+              height:70px;
+              border-radius:50%;
+              object-fit:cover;
+              border:2px solid #1b8f2a;
+            "
+          >
 
-    <div>
+          <div>
 
-      <strong>
-        ${contract.driver_full_name || "Unknown Driver"}
-      </strong>
+            <strong>
+              ${contract.driver_full_name || "Unknown Driver"}
+            </strong>
 
-      <br>
+            <br>
 
-      ${contract.driver_phone_number || "No phone"}
+            ${contract.driver_phone_number || "No phone"}
 
-      <br>
+            <br>
 
-      <span style="color:#1b8f2a;font-weight:bold;">
-        ${contract.location || "No location"}
-      </span>
+            <span style="
+              color:#1b8f2a;
+              font-weight:bold;
+            ">
+              ${contract.location || "No location"}
+            </span>
 
-    </div>
+          </div>
 
-  </div>
+        </div>
 
-  <hr style="margin:10px 0;">
+        <hr style="margin:10px 0;">
 
-  <strong>Daily Amount:</strong>
-  KES ${contract.contract_amount || 0}
+        <strong>Daily Amount:</strong>
+        KES ${contract.contract_amount || 0}
 
-  <br><br>
+        <br><br>
 
-  <strong>Work Days:</strong>
-  ${contract.work_days || 0} days/week
+        <strong>Work Days:</strong>
+        ${contract.work_days || 0} days/week
 
-  <br><br>
+        <div
+          class="contract-status"
+          id="status-${contract.id}"
+        >
+          Checking payment...
+        </div>
 
-  <strong>Status:</strong>
-  ${contract.contract_status}
+        <button class="terminate-btn">
+          Terminate
+        </button>
+      `;
 
-  <div
-    class="contract-status"
-    id="status-${contract.id}"
-  >
-    Checking...
-  </div>
+      contractsDiv.appendChild(card);
 
-  <button class="terminate-btn">
-    Terminate
-  </button>
-`;
+      /* PAYMENT STATUS */
+      checkPaymentStatus(contract.id);
+
+      /* TERMINATE BUTTON */
+      const btn = card.querySelector(".terminate-btn");
+
+      btn.onclick = async () => {
+
+        const confirmed = confirm(
+          "Terminate contract?"
+        );
+
+        if (!confirmed) return;
+
+        try {
+
+          const terminateRes = await fetch(
+            "https://drivers-backend-4spp.onrender.com/terminate-contract",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+              },
+
+              body: JSON.stringify({
+                contract_id: contract.id
+              })
+            }
+          );
+
+          const terminateData =
+            await terminateRes.json();
+
+          if (!terminateRes.ok) {
+
+            alert(
+              terminateData.error ||
+              "Failed to terminate"
+            );
+
+            return;
+          }
+
+          alert("Contract terminated");
+
+          loadContracts();
+
+        } catch (err) {
+
+          console.log(err);
+
+          alert("Network error");
+        }
+      };
+    });
+
+  } catch (err) {
+
+    console.log("LOAD CONTRACTS ERROR:", err);
+
+    contractsDiv.innerHTML =
+      "<p>Error loading contracts.</p>";
+  }
+   }
 
       checkPaymentStatus(contract.id);
 
