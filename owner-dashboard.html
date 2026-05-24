@@ -751,6 +751,34 @@ async function loadContracts() {
 
       contractsDiv.appendChild(card);
 
+
+   /* ================= REMITTANCE BUTTON ================= */
+
+const remittanceBtn =
+  card.querySelector(".remittance-btn");
+
+const remittanceContainer =
+  card.querySelector(".remittance-container");
+
+remittanceBtn.onclick = () => {
+
+  /* CLOSE PANEL */
+  if (
+    remittanceContainer.innerHTML.trim() !== ""
+  ) {
+
+    remittanceContainer.innerHTML = "";
+
+    return;
+  }
+
+  /* OPEN PANEL */
+  renderRemittancePanel(
+    remittanceContainer,
+    contract
+  );
+};
+
       /* PAYMENT STATUS */
       checkPaymentStatus(contract.id);
 
@@ -820,30 +848,7 @@ async function loadContracts() {
 
 
 
-   /* ================= REMITTANCE BUTTON ================= */
 
-const remittanceBtn =
-  card.querySelector(".remittance-btn");
-
-const remittanceContainer =
-  card.querySelector(".remittance-container");
-
-remittanceBtn.onclick = async () => {
-
-  if (
-    remittanceContainer.innerHTML.trim() !== ""
-  ) {
-
-    remittanceContainer.innerHTML = "";
-
-    return;
-  }
-
-  renderRemittancePanel(
-    remittanceContainer,
-    contract
-  );
-};
 
       
 
