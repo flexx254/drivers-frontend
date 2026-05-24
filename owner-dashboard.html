@@ -168,7 +168,86 @@ footer {
   cursor:pointer;
   }
 
+/* ================= REMITTANCE ================= */
 
+.remittance-btn{
+  margin-top:10px;
+  background:#1b8f2a;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.remittance-panel{
+  margin-top:15px;
+  padding:12px;
+  border:1px solid #ddd;
+  border-radius:8px;
+  background:#fafafa;
+}
+
+.week-title{
+  font-weight:bold;
+  color:#1b8f2a;
+  margin-bottom:10px;
+}
+
+.remittance-legend{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:15px;
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:14px;
+}
+
+.legend-color{
+  width:15px;
+  height:15px;
+  border-radius:4px;
+}
+
+.day-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.day-btn{
+  border:none;
+  padding:12px;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+  color:white;
+}
+
+.day-grey{
+  background:grey;
+}
+
+.day-green{
+  background:green;
+}
+
+.day-red{
+  background:red;
+}
+
+.balance-box{
+  margin-top:15px;
+  padding:10px;
+  background:#fff3cd;
+  border-radius:8px;
+  font-weight:bold;
+  }
 
 </style>  </head>  <body>  <header>  
   <img src="assets/logo/d4d-logo.png" alt="D4D">  
@@ -663,6 +742,11 @@ async function loadContracts() {
         <button class="terminate-btn">
           Terminate
         </button>
+        <button class="remittance-btn">
+  Open Remittance
+</button>
+
+<div class="remittance-container"></div>
       `;
 
       contractsDiv.appendChild(card);
@@ -734,6 +818,33 @@ async function loadContracts() {
   }
    }
 
+
+
+   /* ================= REMITTANCE BUTTON ================= */
+
+const remittanceBtn =
+  card.querySelector(".remittance-btn");
+
+const remittanceContainer =
+  card.querySelector(".remittance-container");
+
+remittanceBtn.onclick = async () => {
+
+  if (
+    remittanceContainer.innerHTML.trim() !== ""
+  ) {
+
+    remittanceContainer.innerHTML = "";
+
+    return;
+  }
+
+  renderRemittancePanel(
+    remittanceContainer,
+    contract
+  );
+};
+
       
 
 
@@ -776,6 +887,178 @@ async function loadContracts() {
   }
 })();
 
+
+   /* ================= REMITTANCE PANEL ================= */
+
+function renderRemittancePanel(container, contract){
+
+  const today = new Date();
+
+  const currentWeek = getWeekNumber(today);
+
+  const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ];
+
+  container.innerHTML = `
+
+    <div class="remittance-panel">
+
+      <div class="week-title">
+        Week ${currentWeek}
+      </div>
+
+      <div style="margin-bottom:10px;">
+        ${today.toDateString()}
+      </div>
+
+      <div class="remittance-legend">
+
+        <div class="legend-item">
+          <div class="legend-color day-grey"></div>
+          Pending
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-color day-green"></div>
+          Paid
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-color day-red"></div>
+          Unpaid
+        </div>
+
+      </div>
+
+      <div class="day-grid" id="days-${contract.id}">
+      </div>
+
+      <div class="balance-box" id="balance-${contract.id}">
+        Balance: KES 0
+      </div>
+
+    </div>
+  `;
+
+  const daysContainer =
+    document.getElementById(`days-${contract.id}`);
+
+  days.forEach(day => {
+
+    const btn = document.createElement("button");
+
+    btn.className = "day-btn day-grey";
+
+    btn.innerHTML = day;
+
+    btn.onclick = async () => {
+
+      const received = confirm(
+        `Did you receive payment for ${day}?`
+      );
+
+      if (!received) {
+
+        btn.className = "day-btn day-red";
+
+        return;
+      }
+
+      const fullPayment = confirm(
+        "Was it full payment?"
+      );
+
+      let paidAmount =
+        Number(contract.contract_amount);
+
+      if (!fullPayment) {
+
+        const partial =
+          prompt("How much was paid?");
+
+        paidAmount = Number(partial || 0);
+      }
+
+      const balance =
+        Number(contract.contract_amount)
+        - paidAmount;
+
+      if (paidAmount > 0) {
+
+        btn.className =
+          "day-btn day-green";
+
+      } else {
+
+        btn.className =
+          "day-btn day-red";
+      }
+
+      document.getElementById(
+        `balance-${contract.id}`
+      ).innerHTML = `
+        Balance:
+        KES ${balance}
+      `;
+
+      /* CREATE REMITTANCE DAY */
+
+      try {
+
+        await fetch(
+          "https://drivers-backend-4spp.onrender.com/create-remittance-day",
+          {
+            method:"POST",
+
+            headers:{
+              "Content-Type":"application/json",
+              "Authorization":
+                "Bearer " + token
+            },
+
+            body:JSON.stringify({
+              connection_id: contract.id
+            })
+          }
+        );
+
+      } catch(err){
+
+        console.log(
+          "REMINTTANCE ERROR:",
+          err
+        );
+      }
+    };
+
+    daysContainer.appendChild(btn);
+  });
+   }
+
+
+
+
+   /* ================= WEEK NUMBER ================= */
+
+function getWeekNumber(date){
+
+  const firstDay =
+    new Date(date.getFullYear(), 0, 1);
+
+  const pastDays =
+    (date - firstDay) / 86400000;
+
+  return Math.ceil(
+    (pastDays + firstDay.getDay() + 1) / 7
+  );
+   }
  </script>                 
 
 
