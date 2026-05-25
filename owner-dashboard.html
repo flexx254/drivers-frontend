@@ -1013,38 +1013,60 @@ function renderRemittancePanel(container, contract){
         KES ${balance}
       `;
 
-      /* CREATE REMITTANCE DAY */
+/* ================= SAVE REMITTANCE ================= */
 
-      try {
+try {
 
-        await fetch(
-          "https://drivers-backend-4spp.onrender.com/create-remittance-day",
-          {
-            method:"POST",
+  const paymentStatus =
+    paidAmount >= Number(contract.contract_amount)
+      ? "paid"
+      : paidAmount > 0
+      ? "partial"
+      : "unpaid";
 
-            headers:{
-              "Content-Type":"application/json",
-              "Authorization":
-                "Bearer " + token
-            },
+  const res = await fetch(
+    "https://drivers-backend-4spp.onrender.com/create-remittance-day",
+    {
+      method: "POST",
 
-            body:JSON.stringify({
-              connection_id: contract.id
-            })
-          }
-        );
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
 
-      } catch(err){
+      body: JSON.stringify({
+        connection_id: contract.id,
 
-        console.log(
-          "REMINTTANCE ERROR:",
-          err
-        );
-      }
-    };
+        amount_paid: paidAmount,
 
-    daysContainer.appendChild(btn);
-  });
+        remaining_balance: balance,
+
+        payment_status: paymentStatus,
+
+        payment_type:
+          fullPayment ? "full" : "partial"
+      })
+    }
+  );
+
+  const data = await res.json();
+
+  console.log("REMITTANCE RESPONSE:", data);
+
+  if (!res.ok) {
+
+    alert(data.error || "Failed to save remittance");
+
+    return;
+  }
+
+  alert("Remittance saved successfully");
+
+} catch (err) {
+
+  console.log("REMINTTANCE ERROR:", err);
+
+  alert("Network error");
    }
 
 
