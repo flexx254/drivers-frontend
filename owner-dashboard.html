@@ -241,6 +241,11 @@ footer {
   background:red;
 }
 
+.day-orange{
+  background:orange;
+  color:white;
+}
+
 .balance-box{
   margin-top:15px;
   padding:10px;
@@ -939,6 +944,10 @@ function renderRemittancePanel(container, contract){
           <div class="legend-color day-red"></div>
           Unpaid
         </div>
+        <div class="legend-item">
+  <div class="legend-color day-orange"></div>
+  Partial
+</div>
 
       </div>
 
@@ -995,16 +1004,23 @@ function renderRemittancePanel(container, contract){
         Number(contract.contract_amount)
         - paidAmount;
 
-      if (paidAmount > 0) {
+if (
+  paidAmount >= Number(contract.contract_amount)
+) {
 
-        btn.className =
-          "day-btn day-green";
+  btn.className =
+    "day-btn day-green";
 
-      } else {
+} else if (paidAmount > 0) {
 
-        btn.className =
-          "day-btn day-red";
-      }
+  btn.className =
+    "day-btn day-orange";
+
+} else {
+
+  btn.className =
+    "day-btn day-red";
+   }
 
       document.getElementById(
         `balance-${contract.id}`
