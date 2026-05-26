@@ -968,6 +968,72 @@ function renderRemittancePanel(container, contract){
 
     const btn = document.createElement("button");
 
+    /* ================= LOAD SAVED REMITTANCE ================= */
+
+loadSavedRemittance(contract.id);
+
+async function loadSavedRemittance(connectionId){
+
+  try{
+
+    const res = await fetch(
+      `https://drivers-backend-4spp.onrender.com/get-remittance-days/${connectionId}`,
+      {
+        headers:{
+          "Authorization":"Bearer " + token
+        }
+      }
+    );
+
+    const data = await res.json();
+
+    if(!Array.isArray(data)) return;
+
+    data.forEach(item => {
+
+      const buttons =
+        daysContainer.querySelectorAll(".day-btn");
+
+      buttons.forEach(btn => {
+
+        if(btn.innerText === item.day_name){
+
+          if(item.payment_status === "paid"){
+
+            btn.className =
+              "day-btn day-green";
+
+          } else if(
+            item.payment_status === "partial"
+          ){
+
+            btn.className =
+              "day-btn day-orange";
+
+          } else if(
+            item.payment_status === "unpaid"
+          ){
+
+            btn.className =
+              "day-btn day-red";
+          }
+
+        }
+
+      });
+
+    });
+
+  } catch(err){
+
+    console.log(
+      "LOAD REMITTANCE ERROR:",
+      err
+    );
+  }
+
+}
+
     btn.className = "day-btn day-grey";
 
     btn.innerHTML = day;
