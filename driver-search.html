@@ -1129,7 +1129,7 @@ function renderRemittancePanel(container, contract){
     try{
 
       const res = await fetch(
-        `${BASE_URL}/payment_installments/${connectionId}`,
+        `${BASE_URL}/payment-installments/${connectionId}`,
         {
           headers:{
             "Authorization":"Bearer " + token
