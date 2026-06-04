@@ -1054,17 +1054,28 @@ function renderRemittancePanel(container, contract){
             },
 
             body: JSON.stringify({
-              connection_id: contract.id,
 
-              amount_paid: paidAmount,
+  connection_id: contract.id,
 
-              remaining_balance: balance,
+  remittance_date:
+    new Date().toISOString(),
 
-              payment_status: paymentStatus,
+  day_name: day,
 
-              payment_type:
-                fullPayment ? "full" : "partial"
-            })
+  week_number: currentWeek,
+
+  expected_amount:
+    Number(contract.contract_amount),
+
+  amount_paid: paidAmount,
+
+  remaining_balance: balance,
+
+  payment_status: paymentStatus,
+
+  payment_type:
+    fullPayment ? "full" : "partial"
+})
           }
         );
 
