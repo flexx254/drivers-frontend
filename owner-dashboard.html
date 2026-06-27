@@ -974,141 +974,124 @@ function renderRemittancePanel(container, contract){
 
     btn.innerHTML = day;
 
-    btn.onclick = async () => {
+btn.onclick = async () => {
 
-      const received = confirm(
-        `Did you receive payment for ${day}?`
-      );
+  const received = confirm(
+    `Did you receive payment for ${day}?`
+  );
 
-      if (!received) {
+  let paidAmount = 0;
 
-        btn.className = "day-btn day-red";
+  if (received) {
 
-        return;
-      }
+    const fullPayment = confirm(
+      "Was it full payment?"
+    );
 
-      const fullPayment = confirm(
-        "Was it full payment?"
-      );
+    if (fullPayment) {
 
-      let paidAmount =
+      paidAmount =
         Number(contract.contract_amount);
 
-      if (!fullPayment) {
+    } else {
 
-        const partial =
-          prompt("How much was paid?");
+      const partial =
+        prompt("How much was paid?");
 
-        paidAmount = Number(partial || 0);
+      paidAmount =
+        Number(partial || 0);
+    }
+  }
+
+  try {
+
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/create-remittance-day",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+
+        body: JSON.stringify({
+
+          connection_id:
+            contract.id,
+
+          amount_paid:
+            paidAmount,
+
+          payment_type:
+            paidAmount >= Number(contract.contract_amount)
+              ? "full"
+              : "partial"
+
+        })
       }
+    );
 
-      const balance =
-        Number(contract.contract_amount)
-        - paidAmount;
+    const data = await res.json();
 
-      if (
-        paidAmount >=
-        Number(contract.contract_amount)
-      ) {
+    console.log(
+      "REMITTANCE RESPONSE:",
+      data
+    );
 
-        btn.className =
-          "day-btn day-green";
+    if (!res.ok) {
 
-      } else if (paidAmount > 0) {
+      alert(
+        data.error ||
+        "Failed to save remittance"
+      );
 
-        btn.className =
-          "day-btn day-orange";
+      return;
+    }
 
-      } else {
+    /* STATUS COMES FROM BACKEND */
 
-        btn.className =
-          "day-btn day-red";
-      }
+    const status =
+      data.summary?.payment_status;
 
-      document.getElementById(
-        `balance-${contract.id}`
-      ).innerHTML = `
-        Balance:
-        KES ${balance}
-      `;
+    if (status === "paid") {
 
-      /* ================= SAVE REMITTANCE ================= */
+      btn.className =
+        "day-btn day-green";
 
-      try {
+    } else if (status === "partial") {
 
-        const paymentStatus =
-          paidAmount >= Number(contract.contract_amount)
-            ? "paid"
-            : paidAmount > 0
-            ? "partial"
-            : "unpaid";
+      btn.className =
+        "day-btn day-orange";
 
-        const res = await fetch(
-          "https://drivers-backend-4spp.onrender.com/create-remittance-day",
-          {
-            method: "POST",
+    } else {
 
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + token
-            },
+      btn.className =
+        "day-btn day-red";
+    }
 
-            body: JSON.stringify({
+    document.getElementById(
+      `balance-${contract.id}`
+    ).innerHTML = `
+      Total Debt:
+      KES ${data.summary?.cumulative_balance || 0}
+    `;
 
-  connection_id: contract.id,
+    alert(
+      "Remittance saved successfully"
+    );
 
-  remittance_date:
-    new Date().toISOString(),
+  } catch (err) {
 
-  day_name: day,
+    console.log(
+      "REMITTANCE ERROR:",
+      err
+    );
 
-  week_number: currentWeek,
+    alert("Network error");
+  }
 
-  expected_amount:
-    Number(contract.contract_amount),
-
-  amount_paid: paidAmount,
-
-  remaining_balance: balance,
-
-  payment_status: paymentStatus,
-
-  payment_type:
-    fullPayment ? "full" : "partial"
-})
-          }
-        );
-
-        const data = await res.json();
-
-        console.log(
-          "REMITTANCE RESPONSE:",
-          data
-        );
-
-        if (!res.ok) {
-
-          alert(
-            data.error ||
-            "Failed to save remittance"
-          );
-
-          return;
-        }
-
-        alert(
-          "Remittance saved successfully"
-        );
-
-      } catch (err) {
-
-        console.log(
-          "REMINTTANCE ERROR:",
-          err
-        );
-
-        alert("Network error");
-      }
+};
 
     };
 
