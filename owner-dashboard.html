@@ -965,154 +965,140 @@ function renderRemittancePanel(container, contract){
     document.getElementById(`days-${contract.id}`);
 
   
-/* ================= CREATE SINGLE BUTTON ================= */
+/* ================= CREATE  BUTTON ================= */
 
-const btn = document.createElement("button");
+  days.forEach(day => {
 
-btn.className = "day-btn day-grey";
+  const btn = document.createElement("button");
 
-/* Temporary placeholder.
-   Later this will come from the new backend route. */
-btn.innerHTML = "Loading...";
+  btn.className = "day-btn day-grey";
 
-btn.onclick = async () => {
+  btn.innerHTML = day;
 
-  const day = btn.innerHTML;
+  btn.onclick = async () => {
 
-  const received = confirm(
-    `Did you receive payment for ${day}?`
-  );
-
-  let paidAmount = 0;
-
-  if (received) {
-
-    const fullPayment = confirm(
-      "Was it full payment?"
+    const received = confirm(
+      `Did you receive payment for ${day}?`
     );
 
-    if (fullPayment) {
+    let paidAmount = 0;
 
-      paidAmount =
-        Number(contract.contract_amount);
+    if (received) {
 
-    } else {
-
-      const partial =
-        prompt("How much was paid?");
-
-      paidAmount =
-        Number(partial || 0);
-    }
-  }
-
-  try {
-
-    const res = await fetch(
-      "https://drivers-backend-4spp.onrender.com/create-remittance-day",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-
-        body: JSON.stringify({
-
-          connection_id:
-            contract.id,
-
-          amount_paid:
-            paidAmount,
-
-          payment_type:
-            paidAmount === 0
-              ? "none"
-              : paidAmount >= Number(contract.contract_amount)
-                ? "full"
-                : "partial"
-
-        })
-      }
-    );
-
-    const data = await res.json();
-
-    console.log(
-      "REMITTANCE RESPONSE:",
-      data
-    );
-
-    if (!res.ok) {
-
-      alert(
-        data.error ||
-        "Failed to save remittance"
+      const fullPayment = confirm(
+        "Was it full payment?"
       );
 
-      return;
+      if (fullPayment) {
+
+        paidAmount =
+          Number(contract.contract_amount);
+
+      } else {
+
+        const partial =
+          prompt("How much was paid?");
+
+        paidAmount =
+          Number(partial || 0);
+      }
     }
 
-    const status =
-      data.summary?.payment_status;
+    try {
 
-    if (status === "paid") {
+      const res = await fetch(
+        "https://drivers-backend-4spp.onrender.com/create-remittance-day",
+        {
+          method: "POST",
 
-      btn.className =
-        "day-btn day-green";
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
 
-    } else if (status === "partial") {
+          body: JSON.stringify({
 
-      btn.className =
-        "day-btn day-orange";
+            connection_id:
+              contract.id,
 
-    } else {
+            amount_paid:
+              paidAmount,
 
-      btn.className =
-        "day-btn day-red";
+            payment_type:
+              paidAmount === 0
+                ? "none"
+                : paidAmount >= Number(contract.contract_amount)
+                  ? "full"
+                  : "partial"
+
+          })
+        }
+      );
+
+      const data = await res.json();
+
+      console.log(
+        "REMITTANCE RESPONSE:",
+        data
+      );
+
+      if (!res.ok) {
+
+        alert(
+          data.error ||
+          "Failed to save remittance"
+        );
+
+        return;
+      }
+
+      /* STATUS COMES FROM BACKEND */
+
+      const status =
+        data.summary?.payment_status;
+
+      if (status === "paid") {
+
+        btn.className =
+          "day-btn day-green";
+
+      } else if (status === "partial") {
+
+        btn.className =
+          "day-btn day-orange";
+
+      } else {
+
+        btn.className =
+          "day-btn day-red";
+      }
+
+      document.getElementById(
+        `balance-${contract.id}`
+      ).innerHTML = `
+        Total Debt:
+        KES ${data.summary?.cumulative_balance || 0}
+      `;
+
+      alert(
+        "Remittance saved successfully"
+      );
+
+    } catch (err) {
+
+      console.log(
+        "REMITTANCE ERROR:",
+        err
+      );
+
+      alert("Network error");
     }
 
-    document.getElementById(
-      `balance-${contract.id}`
-    ).innerHTML = `
-      Total Debt:
-      KES ${data.summary?.cumulative_balance || 0}
-    `;
+  };
 
-    alert(
-      "Remittance saved successfully"
-    );
+  daysContainer.appendChild(btn);
 
-  } catch (err) {
-
-    console.log(
-      "REMITTANCE ERROR:",
-      err
-    );
-
-    alert("Network error");
-  }
-
-};
-
-daysContainer.appendChild(btn);
-
-/* Temporary display of today's day.
-   This line will later be replaced with a call
-   to the new backend route. */
-
-const today = new Date();
-
-btn.innerHTML = days[
-  today.getDay() === 0
-    ? 6
-    : today.getDay() - 1
-];
-
-
-
-          
+});
 
 
   /* ================= LOAD SAVED REMITTANCE ================= */
