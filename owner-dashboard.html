@@ -1,11 +1,8 @@
-<!DOCTYPE html>  
-<html lang="en">  
+<!DOCTYPE html>  <html lang="en">  
 <head>  
 <meta charset="UTF-8">  
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>Owner Dashboard</title>  
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">  
-<style>  
+<title>Owner Dashboard</title>  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">  <style>  
 :root {  
   --main-green:#1b8f2a;  
   --white:#fff;  
@@ -104,109 +101,160 @@ footer {
   margin-top:40px;  
 }  
 
-.status-box{  
-  text-align:center;  
-  padding:12px;  
-  border-radius:8px;  
-  font-weight:bold;  
-  margin-bottom:15px;  
-}  
-  
-.status-complete{  
-  background:#e6f7ea;  
-  color:var(--main-green);  
-  border:1px solid var(--main-green);  
-}  
-  
-.status-incomplete{  
-  background:#ffe6e6;  
-  color:red;  
-  border:1px solid red;  
-}  
-  
-.status-incomplete a{  
-  color:red;  
-  text-decoration:none;  
-  font-weight:bold;  
-}  
-  
-.driver-login-link{  
-  display:block;  
-  margin-top:8px;  
-  color:var(--main-green) !important;  
-  text-decoration:none;  
-  font-weight:bold;  
-}   
-  
-/* CONTRACT CARD */  
-.contract-card{  
-  border:1px solid var(--main-green);  
-  border-radius:8px;  
-  padding:12px;  
-  margin-top:12px;  
-  background:#f0fff4;  
-}  
-  
-.contract-status{  
-  font-weight:bold;  
-  margin-top:6px;  
-}  
-  
-.status-green{  
-  color:green;  
-}  
-  
-.status-red{  
-  color:red;  
-}  
-  
-.terminate-btn{  
-  margin-top:8px;  
-  background:red;  
-  color:white;  
-  border:none;  
-  padding:6px 10px;  
-  border-radius:6px;  
-  cursor:pointer;  
-}  
-  
-/* ================= REMITTANCE ================= */  
-.remittance-btn{  
-  margin-top:10px;  
-  background:#1b8f2a;  
-  color:white;  
-  border:none;  
-  padding:8px 12px;  
-  border-radius:6px;  
-  cursor:pointer;  
-}  
-  
-.remittance-panel{  
-  margin-top:15px;  
-  padding:12px;  
-  border:1px solid #ddd;  
-  border-radius:8px;  
-  background:#fafafa;  
-}  
-  
-.week-title{  
-  font-weight:bold;  
-  color:#1b8f2a;  
-  margin-bottom:10px;  
-}  
-  
-.balance-box{  
-  margin-top:15px;  
-  padding:10px;  
-  background:#fff3cd;  
-  border-radius:8px;  
-  font-weight:bold;  
-}  
-</style>  
-</head>  
-<body>  
-  
-<header>  
+  .status-box{
+  text-align:center;
+  padding:12px;
+  border-radius:8px;
+  font-weight:bold;
+  margin-bottom:15px;
+}
+
+.status-complete{
+  background:#e6f7ea;
+  color:var(--main-green);
+  border:1px solid var(--main-green);
+}
+
+.status-incomplete{
+  background:#ffe6e6;
+  color:red;
+  border:1px solid red;
+}
+
+.status-incomplete a{
+  color:red;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+ /* Driver login link (green) */
+.driver-login-link{
+  display:block;
+  margin-top:8px;
+  color:var(--main-green) !important;
+  text-decoration:none;
+  font-weight:bold;
+} 
+
+  /* CONTRACT CARD */
+.contract-card{
+  border:1px solid var(--main-green);
+  border-radius:8px;
+  padding:12px;
+  margin-top:12px;
+  background:#f0fff4;
+}
+
+.contract-status{
+  font-weight:bold;
+  margin-top:6px;
+}
+
+.status-green{
+  color:green;
+}
+
+.status-red{
+  color:red;
+}
+
+.terminate-btn{
+  margin-top:8px;
+  background:red;
+  color:white;
+  border:none;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  }
+
+/* ================= REMITTANCE ================= */
+
+.remittance-btn{
+  margin-top:10px;
+  background:#1b8f2a;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.remittance-panel{
+  margin-top:15px;
+  padding:12px;
+  border:1px solid #ddd;
+  border-radius:8px;
+  background:#fafafa;
+}
+
+.week-title{
+  font-weight:bold;
+  color:#1b8f2a;
+  margin-bottom:10px;
+}
+
+.remittance-legend{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:15px;
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:14px;
+}
+
+.legend-color{
+  width:15px;
+  height:15px;
+  border-radius:4px;
+}
+
+.day-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.day-btn{
+  border:none;
+  padding:12px;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+  color:white;
+}
+
+.day-grey{
+  background:grey;
+}
+
+.day-green{
+  background:green;
+}
+
+.day-red{
+  background:red;
+}
+
+.day-orange{
+  background:orange;
+  color:white;
+}
+
+.balance-box{
+  margin-top:15px;
+  padding:10px;
+  background:#fff3cd;
+  border-radius:8px;
+  font-weight:bold;
+  }
+
+</style>  </head>  <body>  <header>  
   <img src="assets/logo/d4d-logo.png" alt="D4D">  
   <div class="menu-icon" id="menuToggle"><i class="fas fa-bars"></i></div>  
   <nav id="navMenu">  
@@ -214,513 +262,777 @@ footer {
     <a href="#">Dashboard</a>  
     <a href="#">Logout</a>  
   </nav>  
-</header>  
-  
-<div class="container">  
-  <div id="registrationStatus" class="status-box"></div>  
-  
-  <hr style="margin:20px 0;">  
-  <h2>Available Drivers</h2>  
-  <div id="owners"></div>  
-  
-  <hr style="margin:25px 0;">  
-  <h2>Active Contracts</h2>  
-  <div id="contracts"></div>  
-</div>  
-  
-<footer>&copy; 2026 D4D Platform</footer>      
-  
-<script>  
-/* ================= MENU ================= */  
-const menuToggle = document.getElementById("menuToggle");  
-const navMenu = document.getElementById("navMenu");  
-  
-menuToggle.onclick = () => {  
-  navMenu.classList.toggle("active");  
-  menuToggle.innerHTML = navMenu.classList.contains("active")  
-    ? '<i class="fas fa-times"></i>'  
-    : '<i class="fas fa-bars"></i>';  
-};  
-  
-/* ================= AUTH CHECK ================= */  
-const token = localStorage.getItem("token");  
-if (!token) {  
-  window.location.href = "partner-login.html";  
-}  
-  
-/* ================= GLOBALS ================= */  
-const statusBox = document.getElementById("registrationStatus");  
-const ownersDiv = document.getElementById("owners");  
-const contractsDiv = document.getElementById("contracts");  
-  
-let allDrivers = [];  
-let currentPage = 0;  
-const perPage = 4;  
-  
-/* ================= REGISTRATION CHECK ================= */  
-async function checkRegistration() {  
-  try {  
-    const res = await fetch(  
-      "https://drivers-backend-4spp.onrender.com/check-partner-status",  
-      {  
-        headers: { "Authorization": "Bearer " + token }  
-      }  
-    );  
-  
-    if (res.status === 401) {  
-      localStorage.removeItem("token");  
-      window.location.href = "partner-login.html";  
-      return false;  
-    }  
-  
-    const data = await res.json();  
-  
-    if (data.fully_registered) {  
-      statusBox.className = "status-box status-complete";  
-      statusBox.innerHTML = "✔ Fully Registered";  
-      return true;  
-    } else {  
-      statusBox.className = "status-box status-incomplete";  
-      statusBox.innerHTML = `  
-        ⚠ Not fully registered.<br>  
-        <a href="continue-partner-form.html">Complete registration</a>  
-        <a href="login.html" class="driver-login-link">Login as Driver</a>  
-      `;  
-      return false;  
-    }  
-  
-  } catch {  
-    statusBox.className = "status-box status-incomplete";  
-    statusBox.innerHTML = `  
-      ⚠ Unable to verify registration.<br>  
-      <a href="continue-partner-form.html">Complete registration</a>  
-      <a href="login.html" class="driver-login-link">Login as Driver</a>  
-    `;  
-    return false;  
-  }  
-}  
-  
-/* ================= LOAD DRIVERS ================= */  
-async function loadOwners() {  
-  try {  
-    const res = await fetch(  
-      "https://drivers-backend-4spp.onrender.com/owners-with-location",  
-      {  
-        headers: { "Authorization": "Bearer " + token }  
-      }  
-    );  
-  
-    if (res.status === 401) {  
-      localStorage.removeItem("token");  
-      window.location.href = "partner-login.html";  
-      return;  
-    }  
-  
-    const data = await res.json();  
-  
-    if (!Array.isArray(data) || !data.length) {  
-      ownersDiv.innerHTML = "<p>No drivers available.</p>";  
-      return;  
-    }  
-  
-    allDrivers = data;  
-    renderPage();  
-  
-  } catch {  
-    ownersDiv.innerHTML = "<p>Error loading drivers.</p>";  
-  }  
-}  
-  
-/* ================= RENDER PAGE ================= */  
-function renderPage() {  
-  ownersDiv.innerHTML = "";  
-  
-  const start = currentPage * perPage;  
-  const end = start + perPage;  
-  
-  const pageItems = allDrivers.slice(start, end);  
-  
-  pageItems.forEach(driver => {  
-    const card = createDriverCard(driver);  
-    ownersDiv.appendChild(card);  
-  });  
-  
-  renderPagination();  
-}  
-  
-/* ================= DRIVER CARD ================= */  
-function createDriverCard(driver) {  
-  const card = document.createElement("div");  
-  card.className = "owner-card";  
-  
-  card.innerHTML = `  
-    <img src="${driver.profile_pic_url}" alt="Profile">  
-  
-    <div class="owner-info">  
-      <strong>${driver.full_name}</strong><br>  
-      <span class="location">${driver.location}</span>  
-      <div class="phone">${driver.phone_number || ""}</div>  
-    </div>  
-  
-    <button class="connect-btn">  
-      ${driver.connect === "connected" ? "Connected" : "Connect"}  
-    </button>  
-  `;  
-  
-  const btn = card.querySelector(".connect-btn");  
-  const phoneEl = card.querySelector(".phone");  
-  
-  if (driver.connect === "connected") {  
-    btn.disabled = true;  
-    phoneEl.style.display = "block";  
-    return card;  
-  }  
-  
-  btn.onclick = async () => {  
-    const confirmed = confirm("Are you sure you want to connect to this driver?");  
-    if (!confirmed) return;  
-  
-    btn.disabled = true;  
-    btn.textContent = "Connecting...";  
-  
-    try {  
-      const res = await fetch(  
-        "https://drivers-backend-4spp.onrender.com/connect-driver",  
-        {  
-          method: "POST",  
-          headers: {  
-            "Content-Type": "application/json",  
-            "Authorization": "Bearer " + token  
-          },  
-          body: JSON.stringify({ connection_id: driver.id })  
-        }  
-      );  
-  
-      const data = await res.json();  
-  
-      if (!res.ok) {  
-        alert(data.error || "Failed to connect");  
-        btn.disabled = false;  
-        btn.textContent = "Connect";  
-        return;  
-      }  
-  
-      btn.textContent = "Connected";  
-      phoneEl.style.display = "block";  
-      alert("Driver connected successfully.");  
-      showContractForm(card, driver);  
-  
-    } catch (err) {  
-      console.log("CONNECT ERROR:", err);  
-      alert("Network error");  
-      btn.disabled = false;  
-      btn.textContent = "Connect";  
-    }  
-  };  
-  
-  return card;  
-}  
+</header>
+
+  <div class="container">
+
+  <div id="registrationStatus" class="status-box"></div>
+
+  <!-- DRIVERS SECTION -->
+  <hr style="margin:20px 0;">
+  <h2>Available Drivers</h2>
+  <div id="owners"></div>
+
+
+
+  <!-- CONTRACTS SECTION -->
+  <hr style="margin:25px 0;">
+  <h2>Active Contracts</h2>
+  <div id="contracts"></div>
+
+  </div>
+<footer>&copy; 2025 D4D Platform</footer>      
+ <script>
+
+/* ================= MENU ================= */
+const menuToggle = document.getElementById("menuToggle");
+const navMenu = document.getElementById("navMenu");
+
+menuToggle.onclick = () => {
+  navMenu.classList.toggle("active");
+  menuToggle.innerHTML = navMenu.classList.contains("active")
+    ? '<i class="fas fa-times"></i>'
+    : '<i class="fas fa-bars"></i>';
+};
+
+
+/* ================= AUTH CHECK ================= */
+
+const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "partner-login.html";
+}
+
+
+/* ================= GLOBALS ================= */
+
+const statusBox = document.getElementById("registrationStatus");
+const ownersDiv = document.getElementById("owners");
+
+let allDrivers = [];
+let currentPage = 0;
+const perPage = 4;
+
+
+/* ================= REGISTRATION CHECK ================= */
+
+async function checkRegistration() {
+  try {
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/check-partner-status",
+      {
+        headers: { "Authorization": "Bearer " + token }
+      }
+    );
+
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "partner-login.html";
+      return false;
+    }
+
+    const data = await res.json();
+
+    if (data.fully_registered) {
+      statusBox.className = "status-box status-complete";
+      statusBox.innerHTML = "✔ Fully Registered";
+      return true;
+    } else {
+      statusBox.className = "status-box status-incomplete";
+      statusBox.innerHTML = `
+        ⚠ Not fully registered.<br>
+        <a href="continue-partner-form.html">Complete registration</a>
+        <a href="login.html" class="driver-login-link">Login as Driver</a>
+      `;
+      return false;
+    }
+
+  } catch {
+    statusBox.className = "status-box status-incomplete";
+    statusBox.innerHTML = `
+      ⚠ Unable to verify registration.<br>
+      <a href="continue-partner-form.html">Complete registration</a>
+      <a href="login.html" class="driver-login-link">Login as Driver</a>
+    `;
+    return false;
+  }
+}
+
+
+/* ================= LOAD DRIVERS ================= */
+
+async function loadOwners() {
+  try {
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/owners-with-location",
+      {
+        headers: { "Authorization": "Bearer " + token }
+      }
+    );
+
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "partner-login.html";
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!Array.isArray(data) || !data.length) {
+      ownersDiv.innerHTML = "<p>No drivers available.</p>";
+      return;
+    }
+
+    allDrivers = data;
+    renderPage();
+
+  } catch {
+    ownersDiv.innerHTML = "<p>Error loading drivers.</p>";
+  }
+}
+
+
+/* ================= RENDER PAGE ================= */
+
+function renderPage() {
+  ownersDiv.innerHTML = "";
+
+  const start = currentPage * perPage;
+  const end = start + perPage;
+
+  const pageItems = allDrivers.slice(start, end);
+
+  pageItems.forEach(driver => {
+    const card = createDriverCard(driver);
+    ownersDiv.appendChild(card);
+  });
+
+  renderPagination();
+}
+
+
+/* ================= DRIVER CARD ================= */
+
+
+
+    function createDriverCard(driver) {
+
+  const card = document.createElement("div");
+  card.className = "owner-card";
+
+  card.innerHTML = `
+    <img src="${driver.profile_pic_url}" alt="Profile">
+
+    <div class="owner-info">
+      <strong>${driver.full_name}</strong><br>
+
+      <span class="location">
+        ${driver.location}
+      </span>
+
+      <div class="phone">
+        ${driver.phone_number || ""}
+      </div>
+    </div>
+
+    <button class="connect-btn">
+      ${driver.connect === "connected" ? "Connected" : "Connect"}
+    </button>
+  `;
+
+  const btn = card.querySelector(".connect-btn");
+  const phoneEl = card.querySelector(".phone");
+
+  /* Already connected */
+  if (driver.connect === "connected") {
+
+    btn.disabled = true;
+    phoneEl.style.display = "block";
+
+    return card;
+  }
+
+  /* Connect button */
+  btn.onclick = async () => {
+
+    const confirmed = confirm(
+      "Are you sure you want to connect to this driver?"
+    );
+
+    if (!confirmed) return;
+
+    btn.disabled = true;
+    btn.textContent = "Connecting...";
+
+    try {
+
+      const res = await fetch(
+        "https://drivers-backend-4spp.onrender.com/connect-driver",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+
+          body: JSON.stringify({
+  connection_id: driver.id
+})
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+
+        alert(data.error || "Failed to connect");
+
+        btn.disabled = false;
+        btn.textContent = "Connect";
+
+        return;
+      }
+
+      /* SUCCESS */
+
+      btn.textContent = "Connected";
+
+      phoneEl.style.display = "block";
+
+      alert("Driver connected successfully.");
+
+      showContractForm(card, driver);
+
+    } catch (err) {
+
+      console.log("CONNECT ERROR:", err);
+
+      alert("Network error");
+
+      btn.disabled = false;
+      btn.textContent = "Connect";
+    }
+  };
+
+  return card;
+   }
         
-/* ================= PAGINATION ================= */  
-function renderPagination() {  
-  const totalPages = Math.ceil(allDrivers.length / perPage);  
+/* ================= PAGINATION ================= */
+
+function renderPagination() {
+  const totalPages = Math.ceil(allDrivers.length / perPage);
+
+  const nav = document.createElement("div");
+  nav.style.textAlign = "center";
+  nav.style.marginTop = "15px";
+
+  nav.innerHTML = `
+    <button ${currentPage === 0 ? "disabled" : ""}>⬅ Prev</button>
+    <span style="margin:0 10px;">
+      Page ${currentPage + 1} of ${totalPages}
+    </span>
+    <button ${currentPage >= totalPages - 1 ? "disabled" : ""}>Next ➡</button>
+  `;
+
+  const buttons = nav.querySelectorAll("button");
+
+  buttons[0].onclick = () => {
+    currentPage--;
+    renderPage();
+  };
+
+  buttons[1].onclick = () => {
+    currentPage++;
+    renderPage();
+  };
+
+  ownersDiv.appendChild(nav);
+}
+
+
+/* ================= CONTRACT FORM ================= */
+
+function showContractForm(card, driver) {
+
+  const form = document.createElement("div");
+  form.style.marginTop = "10px";
+
+  form.innerHTML = `
+    <hr>
+    <h4 style="color:var(--main-green)">Create Contract</h4>
+
+    <input type="number" placeholder="Daily amount (KES)" id="amount-${driver.id}" />
+
+    <select id="days-${driver.id}">
+      <option value="6">Mon–Sat</option>
+      <option value="7">Mon–Sun</option>
+    </select>
+
+    <button class="connect-btn">Start Contract</button>
+  `;
+
+  const startBtn = form.querySelector("button");
+
+  startBtn.onclick = async () => {
+
+    const amount = document.getElementById(`amount-${driver.id}`).value;
+    const days = document.getElementById(`days-${driver.id}`).value;
+
+    if (!amount) {
+      alert("Enter amount");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        "https://drivers-backend-4spp.onrender.com/set-contract",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({
+            driver_id: driver.id,
+            daily_amount: Number(amount),
+            work_days: Number(days)
+          })
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        form.innerHTML = `
+          <p style="color:green;font-weight:bold;">
+            Contract sent. Waiting for driver acceptance...
+          </p>
+        `;
+      } else {
+        alert(data.error || "Failed");
+      }
+
+    } catch {
+      alert("Network error");
+    }
+  };
+
+  card.appendChild(form);
+}
+
+
+/* ================= START APP ================= */
+
+(async () => {
+  const registered = await checkRegistration();
+
+  if (registered) {
+    loadOwners();
+  } else {
+    ownersDiv.innerHTML =
+      "<p style='color:red;text-align:center'>Complete registration to continue.</p>";
+  }
+})();
+
+
+
+
+   const contractsDiv = document.getElementById("contracts");
+
+async function loadContracts() {
+
+  try {
+
+    contractsDiv.innerHTML = "<p>Loading contracts...</p>";
+
+    const res = await fetch(
+      "https://drivers-backend-4spp.onrender.com/owner-contracts",
+      {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      }
+    );
+
+    /* TOKEN EXPIRED */
+    if (res.status === 401) {
+
+      localStorage.removeItem("token");
+
+      window.location.href = "partner-login.html";
+
+      return;
+    }
+
+    const data = await res.json();
+
+    /* NO ACTIVE CONTRACTS */
+    if (!Array.isArray(data) || !data.length) {
+
+      contractsDiv.innerHTML =
+        "<p>No active contracts.</p>";
+
+      return;
+    }
+
+    contractsDiv.innerHTML = "";
+
+    data.forEach(contract => {
+
+      const card = document.createElement("div");
+
+      card.className = "contract-card";
+
+      card.innerHTML = `
+
+        <div style="
+          display:flex;
+          gap:12px;
+          align-items:center;
+        ">
+
+          <img
+            src="${contract.driver_profile_pic_url || 'https://via.placeholder.com/70'}"
+            style="
+              width:70px;
+              height:70px;
+              border-radius:50%;
+              object-fit:cover;
+              border:2px solid #1b8f2a;
+            "
+          >
+
+          <div>
+
+            <strong>
+              ${contract.driver_full_name || "Unknown Driver"}
+            </strong>
+
+            <br>
+
+            ${contract.driver_phone_number || "No phone"}
+
+            <br>
+
+            <span style="
+              color:#1b8f2a;
+              font-weight:bold;
+            ">
+              ${contract.location || "No location"}
+            </span>
+
+          </div>
+
+        </div>
+
+        <hr style="margin:10px 0;">
+
+        <strong>Daily Amount:</strong>
+        KES ${contract.contract_amount || 0}
+
+        <br><br>
+
+        <strong>Work Days:</strong>
+        ${contract.work_days || 0} days/week
+
+        <div
+          class="contract-status"
+          id="status-${contract.id}"
+        >
+          Checking payment...
+        </div>
+
+        <button class="terminate-btn">
+          Terminate
+        </button>
+        <button class="remittance-btn">
+  Open Remittance
+</button>
+
+<div class="remittance-container"></div>
+      `;
+
+      contractsDiv.appendChild(card);
+
+
+   /* ================= REMITTANCE BUTTON ================= */
+
+const remittanceBtn =
+  card.querySelector(".remittance-btn");
+
+const remittanceContainer =
+  card.querySelector(".remittance-container");
+
+remittanceBtn.onclick = () => {
+
+  /* CLOSE PANEL */
+  if (
+    remittanceContainer.innerHTML.trim() !== ""
+  ) {
+
+    remittanceContainer.innerHTML = "";
+
+    return;
+  }
+
+  /* OPEN PANEL */
+  renderRemittancePanel(
+    remittanceContainer,
+    contract
+  );
+};
+
+      /* PAYMENT STATUS */
+      checkPaymentStatus(contract.id);
+
+      /* TERMINATE BUTTON */
+      const btn = card.querySelector(".terminate-btn");
+
+      btn.onclick = async () => {
+
+        const confirmed = confirm(
+          "Terminate contract?"
+        );
+
+        if (!confirmed) return;
+
+        try {
+
+          const terminateRes = await fetch(
+            "https://drivers-backend-4spp.onrender.com/terminate-contract",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+              },
+
+              body: JSON.stringify({
+                contract_id: contract.id
+              })
+            }
+          );
+
+          const terminateData =
+            await terminateRes.json();
+
+          if (!terminateRes.ok) {
+
+            alert(
+              terminateData.error ||
+              "Failed to terminate"
+            );
+
+            return;
+          }
+
+          alert("Contract terminated");
+
+          loadContracts();
+
+        } catch (err) {
+
+          console.log(err);
+
+          alert("Network error");
+        }
+      };
+    });
+
+  } catch (err) {
+
+    console.log("LOAD CONTRACTS ERROR:", err);
+
+    contractsDiv.innerHTML =
+      "<p>Error loading contracts.</p>";
+  }
+   }
+
+
+
+
+
+      
+
+
+
+
+
+   async function checkPaymentStatus(contractId) {
+
+  try {
+    const res = await fetch(
+      `https://drivers-backend-4spp.onrender.com/payment-status/${contractId}`
+    );
+
+    const data = await res.json();
+
+    const el = document.getElementById(`status-${contractId}`);
+
+    if (data.paid_today) {
+      el.textContent = "✔ Paid Today";
+      el.className = "contract-status status-green";
+    } else {
+      el.textContent = "❌ Not Paid Today";
+      el.className = "contract-status status-red";
+    }
+
+  } catch {
+    console.log("status error");
+  }
+   }
+
+   (async () => {
+  const registered = await checkRegistration();
+
+  if (registered) {
+    loadOwners();
+    loadContracts(); 
+  } else {
+    ownersDiv.innerHTML =
+      "<p style='color:red;text-align:center'>Complete registration to continue.</p>";
+  }
+})();
+
+
+/* ================= REMITTANCE PANEL (SINGLE INPUT WATERFALL) ================= */
+function renderRemittancePanel(container, contract){
+
+  container.innerHTML = `
+    <div class="remittance-panel" style="margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa;">
+      <div class="week-title" style="font-weight: bold; color: #1b8f2a; margin-bottom: 12px; font-size: 16px;">
+        Record Remittance Payment
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <input 
+          type="number" 
+          id="remit-amount-${contract.id}" 
+          placeholder="Enter Amount (KES)" 
+          style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px;"
+        />
+        <button 
+          id="submit-remit-${contract.id}" 
+          class="connect-btn" 
+          style="background: #1b8f2a; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;"
+        >
+          Submit Payment
+        </button>
+      </div>
+
+      <div class="balance-box" id="balance-${contract.id}" style="padding: 10px; background: #fff3cd; border-radius: 8px; font-weight: bold; text-align: center;">
+        Loading Outstanding Balance...
+      </div>
+    </div>
+  `;
+
+  const submitBtn = document.getElementById(`submit-remit-${contract.id}`);
+  const amountInput = document.getElementById(`remit-amount-${contract.id}`);
+
+  submitBtn.onclick = async () => {
+    const paidAmount = Number(amountInput.value || 0);
+
+    if (paidAmount <= 0) {
+      alert("Please enter a valid amount greater than 0");
+      return;
+    }
+
+    const confirmed = confirm(`Confirm recording a payment of KES ${paidAmount}?`);
+    if (!confirmed) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Processing...";
+
+    try {
+      const res = await fetch("https://drivers-backend-4spp.onrender.com/create-remittance-day", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          connection_id: contract.id,
+          amount_paid: paidAmount,
+          payment_type: "cash"
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to process remittance");
+        return;
+      }
+
+      alert("Remittance processed successfully!");
+      amountInput.value = "";
+      fetchCurrentBalance(contract.id);
+      checkPaymentStatus(contract.id);
+
+    } catch (err) {
+      console.log("REMITTANCE ERROR:", err);
+      alert("Network error occurred.");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Payment";
+    }
+  };
+
+  fetchCurrentBalance(contract.id);
+
+  async function fetchCurrentBalance(connectionId) {
+    try {
+      const res = await fetch(`https://drivers-backend-4spp.onrender.com/contract-remittance/${connectionId}`, {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      
+      const data = await res.json();
+      if (!Array.isArray(data)) {
+        document.getElementById(`balance-${contract.id}`).innerText = "Balance: KES 0";
+        return;
+      }
+
+      let totalOutstandingDebt = 0;
+      data.forEach(item => {
+        totalOutstandingDebt += Number(item.remaining_balance || 0);
+      });
+
+      document.getElementById(`balance-${contract.id}`).innerHTML = `
+        Total Outstanding Debt: <span style="color: red;">KES ${totalOutstandingDebt}</span>
+      `;
+
+    } catch (err) {
+      console.log("BALANCE FETCH ERROR:", err);
+      document.getElementById(`balance-${contract.id}`).innerText = "Error loading balance";
+    }
+  }
+}
+
   
-  const nav = document.createElement("div");  
-  nav.style.textAlign = "center";  
-  nav.style.marginTop = "15px";  
-  
-  nav.innerHTML = `  
-    <button ${currentPage === 0 ? "disabled" : ""}>⬅ Prev</button>  
-    <span style="margin:0 10px;">Page ${currentPage + 1} of ${totalPages}</span>  
-    <button ${currentPage >= totalPages - 1 ? "disabled" : ""}>Next ➡</button>  
-  `;  
-  
-  const buttons = nav.querySelectorAll("button");  
-  
-  buttons[0].onclick = () => {  
-    currentPage--;  
-    renderPage();  
-  };  
-  
-  buttons[1].onclick = () => {  
-    currentPage++;  
-    renderPage();  
-  };  
-  
-  ownersDiv.appendChild(nav);  
-}  
-  
-/* ================= CONTRACT FORM ================= */  
-function showContractForm(card, driver) {  
-  const form = document.createElement("div");  
-  form.style.marginTop = "10px";  
-  
-  form.innerHTML = `  
-    <hr>  
-    <h4 style="color:var(--main-green)">Create Contract</h4>  
-    <input type="number" placeholder="Daily amount (KES)" id="amount-${driver.id}" />  
-    <select id="days-${driver.id}">  
-      <option value="6">Mon–Sat</option>  
-      <option value="7">Mon–Sun</option>  
-    </select>  
-    <button class="connect-btn">Start Contract</button>  
-  `;  
-  
-  const startBtn = form.querySelector("button");  
-  
-  startBtn.onclick = async () => {  
-    const amount = document.getElementById(`amount-${driver.id}`).value;  
-    const days = document.getElementById(`days-${driver.id}`).value;  
-  
-    if (!amount) {  
-      alert("Enter amount");  
-      return;  
-    }  
-  
-    try {  
-      const res = await fetch(  
-        "https://drivers-backend-4spp.onrender.com/set-contract",  
-        {  
-          method: "POST",  
-          headers: {  
-            "Content-Type": "application/json",  
-            "Authorization": "Bearer " + token  
-          },  
-          body: JSON.stringify({  
-            driver_id: driver.id,  
-            daily_amount: Number(amount),  
-            work_days: Number(days)  
-          })  
-        }  
-      );  
-  
-      const data = await res.json();  
-  
-      if (res.ok) {  
-        form.innerHTML = `  
-          <p style="color:green;font-weight:bold;">Contract sent. Waiting for driver acceptance...</p>  
-        `;  
-      } else {  
-        alert(data.error || "Failed");  
-      }  
-  
-    } catch {  
-      alert("Network error");  
-    }  
-  };  
-  
-  card.appendChild(form);  
-}  
-  
-/* ================= LOAD CONTRACTS ================= */  
-async function loadContracts() {  
-  try {  
-    contractsDiv.innerHTML = "<p>Loading contracts...</p>";  
-  
-    const res = await fetch(  
-      "https://drivers-backend-4spp.onrender.com/owner-contracts",  
-      { headers: { "Authorization": "Bearer " + token } }  
-    );  
-  
-    if (res.status === 401) {  
-      localStorage.removeItem("token");  
-      window.location.href = "partner-login.html";  
-      return;  
-    }  
-  
-    const data = await res.json();  
-  
-    if (!Array.isArray(data) || !data.length) {  
-      contractsDiv.innerHTML = "<p>No active contracts.</p>";  
-      return;  
-    }  
-  
-    contractsDiv.innerHTML = "";  
-  
-    data.forEach(contract => {  
-      const card = document.createElement("div");  
-      card.className = "contract-card";  
-  
-      card.innerHTML = `  
-        <div style="display:flex; gap:12px; align-items:center;">  
-          <img src="${contract.driver_profile_pic_url || 'https://via.placeholder.com/70'}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid #1b8f2a;">  
-          <div>  
-            <strong>${contract.driver_full_name || "Unknown Driver"}</strong><br>  
-            ${contract.driver_phone_number || "No phone"}<br>  
-            <span style="color:#1b8f2a; font-weight:bold;">${contract.location || "No location"}</span>  
-          </div>  
-        </div>  
-        <hr style="margin:10px 0;">  
-        <strong>Daily Amount:</strong> KES ${contract.contract_amount || 0}<br><br>  
-        <strong>Work Days:</strong> ${contract.work_days || 0} days/week  
-        <div class="contract-status" id="status-${contract.id}">Checking payment...</div>  
-        <button class="terminate-btn">Terminate</button>  
-        <button class="remittance-btn">Open Remittance</button>  
-        <div class="remittance-container"></div>  
-      `;  
-  
-      contractsDiv.appendChild(card);  
-  
-      /* ================= REMITTANCE PANEL TOGGLE ================= */  
-      const remittanceBtn = card.querySelector(".remittance-btn");  
-      const remittanceContainer = card.querySelector(".remittance-container");  
-  
-      remittanceBtn.onclick = () => {  
-        if (remittanceContainer.innerHTML.trim() !== "") {  
-          remittanceContainer.innerHTML = "";  
-          remittanceBtn.textContent = "Open Remittance";  
-          return;  
-        }  
-        renderRemittancePanel(remittanceContainer, contract);  
-        remittanceBtn.textContent = "Close Remittance";  
-      };  
-  
-      /* PAYMENT STATUS */  
-      checkPaymentStatus(contract.id);  
-  
-      /* TERMINATE BUTTON */  
-      const terminateBtn = card.querySelector(".terminate-btn");  
-      terminateBtn.onclick = async () => {  
-        const confirmed = confirm("Terminate contract?");  
-        if (!confirmed) return;  
-  
-        try {  
-          const terminateRes = await fetch(  
-            "https://drivers-backend-4spp.onrender.com/terminate-contract",  
-            {  
-              method: "POST",  
-              headers: {  
-                "Content-Type": "application/json",  
-                "Authorization": "Bearer " + token  
-              },  
-              body: JSON.stringify({ contract_id: contract.id })  
-            }  
-          );  
-  
-          const terminateData = await terminateRes.json();  
-  
-          if (!terminateRes.ok) {  
-            alert(terminateData.error || "Failed to terminate");  
-            return;  
-          }  
-  
-          alert("Contract terminated");  
-          loadContracts();  
-  
-        } catch (err) {  
-          console.log(err);  
-          alert("Network error");  
-        }  
-      };  
-    });  
-  
-  } catch (err) {  
-    console.log("LOAD CONTRACTS ERROR:", err);  
-    contractsDiv.innerHTML = "<p>Error loading contracts.</p>";  
-  }  
-}  
-  
-/* ================= CHECK PAYMENT STATUS INDICATOR ================= */  
-async function checkPaymentStatus(contractId) {  
-  try {  
-    const res = await fetch(`https://drivers-backend-4spp.onrender.com/payment-status/${contractId}`);  
-    const data = await res.json();  
-    const el = document.getElementById(`status-${contractId}`);  
-  
-    if (data.paid_today) {  
-      el.textContent = "✔ Paid Today";  
-      el.className = "contract-status status-green";  
-    } else {  
-      el.textContent = "❌ Not Paid Today";  
-      el.className = "contract-status status-red";  
-    }  
-  } catch {  
-    console.log("status error");  
-  }  
-}  
-  
-/* ================= REMITTANCE PANEL (SINGLE INPUT WATERFALL) ================= */  
-function renderRemittancePanel(container, contract){  
-  container.innerHTML = `  
-    <div class="remittance-panel" style="margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa;">  
-      <div class="week-title" style="font-weight: bold; color: #1b8f2a; margin-bottom: 12px; font-size: 16px;">  
-        Record Remittance Payment  
-      </div>  
-  
-      <div style="display: flex; gap: 10px; margin-bottom: 15px;">  
-        <input   
-          type="number"   
-          id="remit-amount-${contract.id}"   
-          placeholder="Enter Amount (KES)"   
-          style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px;"  
-        />  
-        <button   
-          id="submit-remit-${contract.id}"   
-          class="connect-btn"   
-          style="background: #1b8f2a; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;"  
-        >  
-          Submit Payment  
-        </button>  
-      </div>  
-  
-      <div class="balance-box" id="balance-${contract.id}" style="padding: 10px; background: #fff3cd; border-radius: 8px; font-weight: bold; text-align: center;">  
-        Loading Outstanding Balance...  
-      </div>  
-    </div>  
-  `;  
-  
-  const submitBtn = document.getElementById(`submit-remit-${contract.id}`);  
-  const amountInput = document.getElementById(`remit-amount-${contract.id}`);  
-  
-  submitBtn.onclick = async () => {  
-    const paidAmount = Number(amountInput.value || 0);  
-  
-    if (paidAmount <= 0) {  
-      alert("Please enter a valid amount greater than 0");  
-      return;  
-    }  
-  
-    const confirmed = confirm(`Confirm recording a payment of KES ${paidAmount}?`);  
-    if (!confirmed) return;  
-  
-    submitBtn.disabled = true;  
-    submitBtn.textContent = "Processing...";  
-  
-    try {  
-      const res = await fetch("https://drivers-backend-4spp.onrender.com/create-remittance-day", {  
-        method: "POST",  
-        headers: {  
-          "Content-Type": "application/json",  
-          "Authorization": "Bearer " + token  
-        },  
-        body: JSON.stringify({  
-          connection_id: contract.id,  
-          amount_paid: paidAmount,  
-          payment_type: "cash"  
-        })  
-      });  
-  
-      const data = await res.json();  
-  
-      if (!res.ok) {  
-        alert(data.error || "Failed to process remittance");  
-        return;  
-      }  
-  
-      alert("Remittance processed successfully!");  
-      amountInput.value = "";  
-      fetchCurrentBalance(contract.id);  
-      checkPaymentStatus(contract.id);  
-  
-    } catch (err) {  
-      console.log("REMITTANCE ERROR:", err);  
-      alert("Network error occurred.");  
-    } finally {  
-      submitBtn.disabled = false;  
-      submitBtn.textContent = "Submit Payment";  
-    }  
-  };  
-  
-  fetchCurrentBalance(contract.id);  
-  
-  async fu
+
+    
+          
+
+
+/* ================= WEEK NUMBER ================= */
+
+function getWeekNumber(date){
+
+  const firstDay =
+    new Date(date.getFullYear(), 0, 1);
+
+  const pastDays =
+    (date - firstDay) / 86400000;
+
+  return Math.ceil(
+    (pastDays + firstDay.getDay() + 1) / 7
+  );
+   }
+ </script>                 
+
+
+</body>  
+  </html>
