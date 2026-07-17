@@ -983,32 +983,38 @@ function renderRemittancePanel(container, contract){
 
   fetchCurrentBalance(contract.id);
 
-  async function fetchCurrentBalance(connectionId) {
-    try {
-      const res = await fetch(`https://drivers-backend-4spp.onrender.com/contract-remittance/${connectionId}`, {
-        headers: { "Authorization": "Bearer " + token }
-      });
-      
-      const data = await res.json();
-      if (!Array.isArray(data)) {
-        document.getElementById(`balance-${contract.id}`).innerText = "Balance: KES 0";
-        return;
+async function fetchCurrentBalance(connectionId) {
+
+  try {
+
+    const res = await fetch(
+      `https://drivers-backend-4spp.onrender.com/contract-balance/${connectionId}`,
+      {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
       }
+    );
 
-      let totalOutstandingDebt = 0;
-      data.forEach(item => {
-        totalOutstandingDebt += Number(item.remaining_balance || 0);
-      });
+    const data = await res.json();
 
-      document.getElementById(`balance-${contract.id}`).innerHTML = `
-        Total Outstanding Debt: <span style="color: red;">KES ${totalOutstandingDebt}</span>
-      `;
+    document.getElementById(`balance-${contract.id}`).innerHTML = `
+      Outstanding Debt:
+      <span style="color:red;">
+        KES ${Number(data.outstanding_balance || 0).toLocaleString()}
+      </span>
+    `;
 
-    } catch (err) {
-      console.log("BALANCE FETCH ERROR:", err);
-      document.getElementById(`balance-${contract.id}`).innerText = "Error loading balance";
-    }
+  } catch (err) {
+
+    console.log("BALANCE FETCH ERROR:", err);
+
+    document.getElementById(`balance-${contract.id}`).innerHTML =
+      "Unable to load balance.";
+
   }
+
+   }
 }
 
   
