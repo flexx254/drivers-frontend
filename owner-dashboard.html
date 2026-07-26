@@ -998,21 +998,21 @@ async function fetchCurrentBalance(connectionId) {
 
     const data = await res.json();
 
-    document.getElementById(`balance-${contract.id}`).innerHTML = `
-      Outstanding Debt:
-      <span style="color:red;">
-        const title =
-    data.type === "debt"
-        ? "Outstanding Debt"
-        : data.type === "credit"
-        ? "+Balance"
-        : "Up To Date";
+    let title = "Up To Date";
+    let color = "green";
 
-document.getElementById(`balance-${contract.id}`).innerHTML = `
-    ${title}: <span style="color:red;">
+    if (data.type === "debt") {
+      title = "Outstanding Debt";
+      color = "red";
+    } else if (data.type === "credit") {
+      title = "+Balance";
+      color = "blue";
+    }
+
+    document.getElementById(`balance-${contract.id}`).innerHTML = `
+      ${title}: 
+      <span style="color:${color};">
         KES ${Number(data.balance || 0).toLocaleString()}
-    </span>
-`;
       </span>
     `;
 
@@ -1026,7 +1026,6 @@ document.getElementById(`balance-${contract.id}`).innerHTML = `
   }
 
    }
-}
 
   
 
