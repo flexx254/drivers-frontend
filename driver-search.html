@@ -1035,8 +1035,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 
-
-
 /* ================= DRIVER REMITTANCE PANEL ================= */
 
 function renderRemittancePanel(container, contract){
@@ -1046,8 +1044,34 @@ function renderRemittancePanel(container, contract){
   container.innerHTML = `
     <div class="remittance-panel">
 
-      <div class="week-title">
-        Current Remittance Week
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:10px;
+      ">
+
+        <button
+          id="prevWeekBtn"
+          class="connect-btn"
+          style="padding:6px 10px;">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <div
+          id="weekTitle"
+          class="week-title"
+          style="margin:0;">
+          Loading...
+        </div>
+
+        <button
+          id="nextWeekBtn"
+          class="connect-btn"
+          style="padding:6px 10px;">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+
       </div>
 
       <div style="margin-bottom:10px;">
@@ -1102,7 +1126,7 @@ function renderRemittancePanel(container, contract){
   fetchCurrentBalance(contract.id);
 
   /* ==========================================
-     LOAD CURRENT WEEK REMITTANCE
+     LOAD REMITTANCE
   ========================================== */
 
   async function loadSavedRemittance(connectionId){
@@ -1122,8 +1146,6 @@ function renderRemittancePanel(container, contract){
 
       console.log(rows);
 
-      daysContainer.innerHTML = "";
-
       if(!Array.isArray(rows) || rows.length === 0){
 
         daysContainer.innerHTML = `
@@ -1139,68 +1161,129 @@ function renderRemittancePanel(container, contract){
         return;
       }
 
-      rows.forEach(row=>{
+      // All available weeks
+      const weeks = [...new Set(rows.map(r => r.week_number))];
 
-        let colour = "day-grey";
+      // Open latest week by default
+      let currentWeekIndex = weeks.length - 1;
 
-        if(row.payment_status === "paid"){
-          colour = "day-green";
+      renderWeek();
+
+      document.getElementById("prevWeekBtn").onclick = () => {
+
+        if(currentWeekIndex > 0){
+
+          currentWeekIndex--;
+
+          renderWeek();
+
         }
-        else if(row.payment_status === "partial"){
-          colour = "day-orange";
+
+      };
+
+      document.getElementById("nextWeekBtn").onclick = () => {
+
+        if(currentWeekIndex < weeks.length - 1){
+
+          currentWeekIndex++;
+
+          renderWeek();
+
         }
-        else if(row.payment_status === "unpaid"){
-          colour = "day-red";
-        }
 
-        const btn = document.createElement("button");
+      };
 
-        btn.className = `day-btn ${colour}`;
+      function renderWeek(){
 
-        btn.disabled = true;
+        const week = weeks[currentWeekIndex];
 
-        btn.innerHTML = `
-          <div style="font-size:15px;font-weight:bold;">
-            ${row.day_name}
-          </div>
+        document.getElementById(
+          "weekTitle"
+        ).innerHTML = `Week ${week}`;
 
-          <div style="font-size:12px;margin-top:4px;">
-            ${row.remittance_date}
-          </div>
+        daysContainer.innerHTML = "";
 
-          <div style="font-size:12px;margin-top:6px;">
-            KES ${Number(row.expected_amount || 0).toLocaleString()}
-          </div>
+        const weekRows =
+          rows.filter(r => r.week_number === week);
 
-          ${
-            row.amount_paid
-            ? `
-              <div style="font-size:11px;">
-                Paid: KES ${Number(row.amount_paid).toLocaleString()}
-              </div>
-            `
-            : ""
+        weekRows.forEach(row=>{
+
+          let colour = "day-grey";
+
+          if(row.payment_status === "paid"){
+            colour = "day-green";
+          }
+          else if(row.payment_status === "partial"){
+            colour = "day-orange";
+          }
+          else if(row.payment_status === "unpaid"){
+            colour = "day-red";
           }
 
-        `;
+          const btn = document.createElement("button");
 
-        daysContainer.appendChild(btn);
+          btn.className = `day-btn ${colour}`;
 
-      });
+          btn.disabled = true;
+
+          btn.innerHTML = `
+            <div style="font-size:15px;font-weight:bold;">
+              ${row.day_name}
+            </div>
+
+            <div style="font-size:12px;margin-top:4px;">
+              ${row.remittance_date}
+            </div>
+
+            <div style="font-size:12px;margin-top:6px;">
+              KES ${Number(
+                row.expected_amount || 0
+              ).toLocaleString()}
+            </div>
+
+            ${
+              row.amount_paid
+              ? `
+                <div style="font-size:11px;">
+                  Paid:
+                  KES ${Number(
+                    row.amount_paid
+                  ).toLocaleString()}
+                </div>
+              `
+              : ""
+            }
+
+          `;
+
+          daysContainer.appendChild(btn);
+
+        });
+
+        document.getElementById(
+          "prevWeekBtn"
+        ).disabled = currentWeekIndex === 0;
+
+        document.getElementById(
+          "nextWeekBtn"
+        ).disabled =
+          currentWeekIndex === weeks.length - 1;
+
+      }
 
     }catch(err){
 
       console.log(err);
 
       daysContainer.innerHTML = `
-  <div style="
-    color:red;
-    grid-column:1/-1;
-    text-align:center;
-  ">
-    Failed to load remittance.
-  </div>
-`;
+        <div style="
+          color:red;
+          grid-column:1/-1;
+          text-align:center;
+        ">
+          Failed to load remittance.
+        </div>
+      `;
 
     }
 
@@ -1248,7 +1331,9 @@ function renderRemittancePanel(container, contract){
           font-size:18px;
           font-weight:bold;
         ">
-          KES ${Number(data.balance || 0).toLocaleString()}
+          KES ${Number(
+            data.balance || 0
+          ).toLocaleString()}
         </span>
       `;
 
@@ -1266,6 +1351,13 @@ function renderRemittancePanel(container, contract){
   }
 
   }
+
+
+
+        
+
+
+        
 
 /* ================= WEEK NUMBER ================= */
 
