@@ -1120,87 +1120,127 @@ function renderRemittancePanel(container, contract){
 
   });
 
-  /* LOAD REMITTANCE */
+/* LOAD REMITTANCE */
 
-  loadSavedRemittance(contract.id);
+loadSavedRemittance(contract.id);
+fetchCurrentBalance(contract.id);
 
-  async function loadSavedRemittance(connectionId){
+async function loadSavedRemittance(connectionId){
 
-    try{
+  try{
 
-      const res = await fetch(
-        `${BASE_URL}/payment-installments/${connectionId}`,
-        {
-          headers:{
-            "Authorization":"Bearer " + token
-          }
+    const res = await fetch(
+      `${BASE_URL}/payment-installments/${connectionId}`,
+      {
+        headers:{
+          "Authorization":"Bearer " + token
         }
-      );
+      }
+    );
 
-      const data = await res.json();
+    const data = await res.json();
 
-      console.log(
-        "DRIVER REMITTANCE:",
-        data
-      );
+    console.log(
+      "DRIVER REMITTANCE:",
+      data
+    );
 
-      if(!Array.isArray(data)) return;
+    if(!Array.isArray(data)) return;
 
-      let totalBalance = 0;
+    data.forEach(item => {
 
-      data.forEach(item => {
+      const buttons =
+        daysContainer.querySelectorAll(".day-btn");
 
-        const buttons =
-          daysContainer.querySelectorAll(".day-btn");
+      buttons.forEach(btn => {
 
-        buttons.forEach(btn => {
+        if(btn.innerText === item.day_name){
 
-          if(btn.innerText === item.day_name){
+          if(item.payment_status === "paid"){
 
-            if(item.payment_status === "paid"){
+            btn.className =
+              "day-btn day-green";
 
-              btn.className =
-                "day-btn day-green";
+          } else if(
+            item.payment_status === "partial"
+          ){
 
-            } else if(
-              item.payment_status === "partial"
-            ){
+            btn.className =
+              "day-btn day-orange";
 
-              btn.className =
-                "day-btn day-orange";
+          } else if(
+            item.payment_status === "unpaid"
+          ){
 
-            } else if(
-              item.payment_status === "unpaid"
-            ){
-
-              btn.className =
-                "day-btn day-red";
-            }
+            btn.className =
+              "day-btn day-red";
 
           }
 
-        });
-
-        totalBalance += Number(
-          item.remaining_balance || 0
-        );
+        }
 
       });
 
-      document.getElementById(
-        `driver-balance-${contract.id}`
-      ).innerHTML = `
-        Balance:
-        KES ${totalBalance}
-      `;
+    });
 
-    } catch(err){
+  } catch(err){
 
-      console.log(
-        "LOAD DRIVER REMITTANCE ERROR:",
-        err
-      );
+    console.log(
+      "LOAD DRIVER REMITTANCE ERROR:",
+      err
+    );
+
+  }
+
+}
+
+async function fetchCurrentBalance(connectionId){
+
+  try{
+
+    const res = await fetch(
+      `${BASE_URL}/contract-balance/${connectionId}`,
+      {
+        headers:{
+          "Authorization":"Bearer " + token
+        }
+      }
+    );
+
+    const data = await res.json();
+
+    let title = "Up To Date";
+    let color = "#1b8f2a";
+
+    if(data.type === "debt"){
+      title = "Outstanding Debt";
+      color = "red";
     }
+    else if(data.type === "credit"){
+      title = "+Balance";
+      color = "green";
+    }
+
+    document.getElementById(
+      `driver-balance-${contract.id}`
+    ).innerHTML = `
+      ${title}:
+      <span style="color:${color};">
+        KES ${Number(data.balance || 0).toLocaleString()}
+      </span>
+    `;
+
+  }catch(err){
+
+    console.log(
+      "BALANCE FETCH ERROR:",
+      err
+    );
+
+    document.getElementById(
+      `driver-balance-${contract.id}`
+    ).innerHTML =
+      "Unable to load balance.";
 
   }
 
