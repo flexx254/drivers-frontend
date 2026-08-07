@@ -1034,30 +1034,20 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 });
 
-  /* ================= DRIVER REMITTANCE PANEL ================= */
+
+
+
+/* ================= DRIVER REMITTANCE PANEL ================= */
 
 function renderRemittancePanel(container, contract){
 
   const today = new Date();
 
-  const currentWeek = getWeekNumber(today);
-
-  const days = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday"
-  ];
-
   container.innerHTML = `
-
     <div class="remittance-panel">
 
       <div class="week-title">
-        Week ${currentWeek}
+        Current Remittance Week
       </div>
 
       <div style="margin-bottom:10px;">
@@ -1088,11 +1078,15 @@ function renderRemittancePanel(container, contract){
 
       </div>
 
-      <div class="day-grid" id="driver-days-${contract.id}">
+      <div
+        class="day-grid"
+        id="driver-days-${contract.id}">
       </div>
 
-      <div class="balance-box" id="driver-balance-${contract.id}">
-        Balance: KES 0
+      <div
+        class="balance-box"
+        id="driver-balance-${contract.id}">
+        Loading balance...
       </div>
 
     </div>
@@ -1103,148 +1097,174 @@ function renderRemittancePanel(container, contract){
       `driver-days-${contract.id}`
     );
 
-  /* CREATE NON-CLICKABLE BUTTONS */
+  loadSavedRemittance(contract.id);
 
-  days.forEach(day => {
+  fetchCurrentBalance(contract.id);
 
-    const btn = document.createElement("button");
+  /* ==========================================
+     LOAD CURRENT WEEK REMITTANCE
+  ========================================== */
 
-    btn.className =
-      "day-btn day-grey";
+  async function loadSavedRemittance(connectionId){
 
-    btn.innerHTML = day;
+    try{
 
-    btn.disabled = true;
-
-    daysContainer.appendChild(btn);
-
-  });
-
-/* LOAD REMITTANCE */
-
-loadSavedRemittance(contract.id);
-fetchCurrentBalance(contract.id);
-
-async function loadSavedRemittance(connectionId){
-
-  try{
-
-    const res = await fetch(
-      `${BASE_URL}/payment-installments/${connectionId}`,
-      {
-        headers:{
-          "Authorization":"Bearer " + token
+      const res = await fetch(
+        `${BASE_URL}/payment-installments/${connectionId}`,
+        {
+          headers:{
+            Authorization:"Bearer " + token
+          }
         }
+      );
+
+      const rows = await res.json();
+
+      console.log(rows);
+
+      daysContainer.innerHTML = "";
+
+      if(!Array.isArray(rows) || rows.length === 0){
+
+        daysContainer.innerHTML = `
+          <div style="
+            grid-column:1/-1;
+            text-align:center;
+            color:grey;
+          ">
+            No remittance schedule available.
+          </div>
+        `;
+
+        return;
       }
-    );
 
-    const data = await res.json();
+      rows.forEach(row=>{
 
-    console.log(
-      "DRIVER REMITTANCE:",
-      data
-    );
+        let colour = "day-grey";
 
-    if(!Array.isArray(data)) return;
+        if(row.payment_status === "paid"){
+          colour = "day-green";
+        }
+        else if(row.payment_status === "partial"){
+          colour = "day-orange";
+        }
+        else if(row.payment_status === "unpaid"){
+          colour = "day-red";
+        }
 
-    data.forEach(item => {
+        const btn = document.createElement("button");
 
-      const buttons =
-        daysContainer.querySelectorAll(".day-btn");
+        btn.className = `day-btn ${colour}`;
 
-      buttons.forEach(btn => {
+        btn.disabled = true;
 
-        if(btn.innerText === item.day_name){
+        btn.innerHTML = `
+          <div style="font-size:15px;font-weight:bold;">
+            ${row.day_name}
+          </div>
 
-          if(item.payment_status === "paid"){
+          <div style="font-size:12px;margin-top:4px;">
+            ${row.remittance_date}
+          </div>
 
-            btn.className =
-              "day-btn day-green";
+          <div style="font-size:12px;margin-top:6px;">
+            KES ${Number(row.expected_amount || 0).toLocaleString()}
+          </div>
 
-          } else if(
-            item.payment_status === "partial"
-          ){
-
-            btn.className =
-              "day-btn day-orange";
-
-          } else if(
-            item.payment_status === "unpaid"
-          ){
-
-            btn.className =
-              "day-btn day-red";
-
+          ${
+            row.amount_paid
+            ? `
+              <div style="font-size:11px;">
+                Paid: KES ${Number(row.amount_paid).toLocaleString()}
+              </div>
+            `
+            : ""
           }
 
-        }
+        `;
+
+        daysContainer.appendChild(btn);
 
       });
 
-    });
+    }catch(err){
 
-  } catch(err){
+      console.log(err);
 
-    console.log(
-      "LOAD DRIVER REMITTANCE ERROR:",
-      err
-    );
+      daysContainer.innerHTML = `
+        <div style="
+          color:red;
+          grid-column:1/-1;
+          text-align:center;
+        ">
+          Failed to load remittance.
+        </div>
+      ;
+
+    }
 
   }
 
-}
+  /* ==========================================
+     BALANCE
+  ========================================== */
 
-async function fetchCurrentBalance(connectionId){
+  async function fetchCurrentBalance(connectionId){
 
-  try{
+    try{
 
-    const res = await fetch(
-      `${BASE_URL}/contract-balance/${connectionId}`,
-      {
-        headers:{
-          "Authorization":"Bearer " + token
+      const res = await fetch(
+        `${BASE_URL}/contract-balance/${connectionId}`,
+        {
+          headers:{
+            Authorization:"Bearer " + token
+          }
         }
+      );
+
+      const data = await res.json();
+
+      let title = "Up To Date";
+      let colour = "#1b8f2a";
+
+      if(data.type === "debt"){
+        title = "Outstanding Debt";
+        colour = "red";
       }
-    );
 
-    const data = await res.json();
+      if(data.type === "credit"){
+        title = "Credit Balance";
+        colour = "green";
+      }
 
-    let title = "Up To Date";
-    let color = "#1b8f2a";
+      document.getElementById(
+        `driver-balance-${contract.id}`
+      ).innerHTML = `
+        ${title}:<br>
 
-    if(data.type === "debt"){
-      title = "Outstanding Debt";
-      color = "red";
-    }
-    else if(data.type === "credit"){
-      title = "+Balance";
-      color = "green";
-    }
+        <span style="
+          color:${colour};
+          font-size:18px;
+          font-weight:bold;
+        ">
+          KES ${Number(data.balance || 0).toLocaleString()}
+        </span>
+      `;
 
-    document.getElementById(
-      `driver-balance-${contract.id}`
-    ).innerHTML = `
-      ${title}:
-      <span style="color:${color};">
-        KES ${Number(data.balance || 0).toLocaleString()}
-      </span>
-    `;
+    }catch(err){
 
-  }catch(err){
+      console.log(err);
 
-    console.log(
-      "BALANCE FETCH ERROR:",
-      err
-    );
-
-    document.getElementById(
-      `driver-balance-${contract.id}`
-    ).innerHTML =
+      document.getElementById(
+        `driver-balance-${contract.id}`
+      ).innerHTML =
       "Unable to load balance.";
 
+    }
+
   }
 
-}
   }
 
 /* ================= WEEK NUMBER ================= */
