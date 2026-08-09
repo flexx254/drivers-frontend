@@ -1036,8 +1036,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 
 
-
-
 /* ================= DRIVER REMITTANCE PANEL ================= */
 
 function renderRemittancePanel(container, contract) {
@@ -1075,8 +1073,7 @@ function renderRemittancePanel(container, contract) {
 
       </div>
 
-      <div
-        class="remittance-legend">
+      <div class="remittance-legend">
 
         <div class="legend-item">
           <div class="legend-color day-grey"></div>
@@ -1128,9 +1125,13 @@ function renderRemittancePanel(container, contract) {
   const weekTitle =
     document.getElementById("weekTitle");
 
-  /* ================= LOAD DATA ================= */
+
+  /* =====================================================
+     LOAD REMITTANCE DATA
+  ===================================================== */
 
   loadRemittanceData();
+
 
   async function loadRemittanceData() {
 
@@ -1139,24 +1140,48 @@ function renderRemittancePanel(container, contract) {
       const res = await fetch(
         `${BASE_URL}/payment-installments/${contract.id}`,
         {
+          method: "GET",
           headers: {
             "Authorization": "Bearer " + token
           }
         }
       );
 
+
+      /* ================= CHECK HTTP RESPONSE ================= */
+
       if (!res.ok) {
+
+        const errorText =
+          await res.text();
+
+        console.error(
+          "REMITTANCE SERVER ERROR:",
+          res.status,
+          errorText
+        );
+
         throw new Error(
           "Server returned " + res.status
         );
       }
 
-      const rows = await res.json();
+
+      /* ================= READ JSON ================= */
+
+      const rows =
+        await res.json();
+
 
       console.log(
         "REMITTANCE DATA:",
         rows
       );
+
+
+      /* =====================================================
+         CHECK DATA
+      ===================================================== */
 
       if (
         !Array.isArray(rows) ||
@@ -1185,33 +1210,98 @@ function renderRemittancePanel(container, contract) {
         return;
       }
 
-      /* ================= SORT BY DATE ================= */
 
-      rows.sort((a, b) =>
-        new Date(a.remittance_date) -
-        new Date(b.remittance_date)
-      );
+      /* =====================================================
+         SORT BY DATE
+      ===================================================== */
 
-      /* ================= GET WEEKS ================= */
+      rows.sort((a, b) => {
+
+        return (
+          new Date(a.remittance_date) -
+          new Date(b.remittance_date)
+        );
+
+      });
+
+
+      /* =====================================================
+         GET UNIQUE WEEKS
+      ===================================================== */
 
       const weeks = [
         ...new Set(
-          rows.map(row =>
-            Number(row.week_number)
-          )
+          rows
+            .map(row =>
+              Number(row.week_number)
+            )
+            .filter(
+              week => !isNaN(week)
+            )
         )
-      ].sort((a, b) => a - b);
+      ].sort(
+        (a, b) => a - b
+      );
+
+
+      /* =====================================================
+         SAFETY CHECK
+      ===================================================== */
+
+      if (!weeks.length) {
+
+        console.error(
+          "REMITTANCE ROWS HAVE NO VALID WEEK NUMBERS:",
+          rows
+        );
+
+        daysContainer.innerHTML = `
+          <div style="
+            grid-column:1/-1;
+            text-align:center;
+            color:red;
+            padding:15px;
+          ">
+            Remittance data has no valid week number.
+          </div>
+        `;
+
+        weekTitle.textContent =
+          "Invalid Schedule";
+
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+
+        fetchCurrentBalance();
+
+        return;
+      }
+
+
+      /* =====================================================
+         START AT LATEST WEEK
+      ===================================================== */
 
       let currentWeekIndex =
         weeks.length - 1;
 
-      /* ================= RENDER WEEK ================= */
+
+      /* =====================================================
+         RENDER CURRENT WEEK
+      ===================================================== */
 
       renderWeek();
 
+
+      /* =====================================================
+         PREVIOUS WEEK
+      ===================================================== */
+
       prevBtn.onclick = () => {
 
-        if (currentWeekIndex > 0) {
+        if (
+          currentWeekIndex > 0
+        ) {
 
           currentWeekIndex--;
 
@@ -1220,6 +1310,11 @@ function renderRemittancePanel(container, contract) {
         }
 
       };
+
+
+      /* =====================================================
+         NEXT WEEK
+      ===================================================== */
 
       nextBtn.onclick = () => {
 
@@ -1236,21 +1331,37 @@ function renderRemittancePanel(container, contract) {
 
       };
 
+
+      /* =====================================================
+         RENDER WEEK FUNCTION
+      ===================================================== */
+
       function renderWeek() {
 
         const week =
           weeks[currentWeekIndex];
 
+
         weekTitle.innerHTML =
           `Week ${week}`;
 
-        daysContainer.innerHTML = "";
+
+        daysContainer.innerHTML =
+          "";
+
 
         const weekRows =
-          rows.filter(row =>
-            Number(row.week_number) ===
-            Number(week)
-          );
+          rows.filter(row => {
+
+            return (
+              Number(row.week_number) ===
+              Number(week)
+            );
+
+          });
+
+
+        /* ================= NO ROWS ================= */
 
         if (!weekRows.length) {
 
@@ -1259,6 +1370,7 @@ function renderRemittancePanel(container, contract) {
               grid-column:1/-1;
               text-align:center;
               color:grey;
+              padding:15px;
             ">
               No records for this week.
             </div>
@@ -1267,15 +1379,26 @@ function renderRemittancePanel(container, contract) {
           return;
         }
 
+
+        /* =====================================================
+           RENDER EACH DAY
+        ===================================================== */
+
         weekRows.forEach(row => {
 
           let colour =
             "day-grey";
 
+
           const paymentStatus =
             String(
               row.payment_status || ""
-            ).toLowerCase();
+            )
+            .trim()
+            .toLowerCase();
+
+
+          /* ================= PAID ================= */
 
           if (
             paymentStatus === "paid"
@@ -1285,6 +1408,10 @@ function renderRemittancePanel(container, contract) {
               "day-green";
 
           }
+
+
+          /* ================= PARTIAL ================= */
+
           else if (
             paymentStatus === "partial"
           ) {
@@ -1293,6 +1420,10 @@ function renderRemittancePanel(container, contract) {
               "day-orange";
 
           }
+
+
+          /* ================= UNPAID ================= */
+
           else if (
             paymentStatus === "unpaid"
           ) {
@@ -1302,33 +1433,48 @@ function renderRemittancePanel(container, contract) {
 
           }
 
+
+          /* ================= CREATE DAY BUTTON ================= */
+
           const btn =
             document.createElement(
               "button"
             );
 
+
           btn.className =
             `day-btn ${colour}`;
 
-          btn.disabled = true;
+
+          btn.disabled =
+            true;
+
+
+          /* ================= AMOUNTS ================= */
 
           const expected =
             Number(
               row.expected_amount || 0
             );
 
+
           const paid =
             Number(
               row.amount_paid || 0
             );
 
+
+          /* ================= DAY CONTENT ================= */
+
           btn.innerHTML = `
+
             <div style="
               font-size:15px;
               font-weight:bold;
             ">
               ${row.day_name || ""}
             </div>
+
 
             <div style="
               font-size:12px;
@@ -1337,6 +1483,7 @@ function renderRemittancePanel(container, contract) {
               ${row.remittance_date || ""}
             </div>
 
+
             <div style="
               font-size:12px;
               margin-top:6px;
@@ -1344,6 +1491,7 @@ function renderRemittancePanel(container, contract) {
               Expected:
               KES ${expected.toLocaleString()}
             </div>
+
 
             ${
               paid > 0
@@ -1361,12 +1509,21 @@ function renderRemittancePanel(container, contract) {
 
           `;
 
-          daysContainer.appendChild(btn);
+
+          daysContainer.appendChild(
+            btn
+          );
 
         });
 
+
+        /* =====================================================
+           PAGINATION BUTTON STATES
+        ===================================================== */
+
         prevBtn.disabled =
           currentWeekIndex === 0;
+
 
         nextBtn.disabled =
           currentWeekIndex ===
@@ -1374,15 +1531,27 @@ function renderRemittancePanel(container, contract) {
 
       }
 
+
+      /* =====================================================
+         LOAD BALANCE
+      ===================================================== */
+
       fetchCurrentBalance();
 
     }
+
+
+    /* =====================================================
+       REMITTANCE ERROR
+    ===================================================== */
+
     catch (err) {
 
       console.error(
         "REMITTANCE ERROR:",
         err
       );
+
 
       daysContainer.innerHTML = `
         <div style="
@@ -1395,8 +1564,14 @@ function renderRemittancePanel(container, contract) {
         </div>
       `;
 
+
       weekTitle.textContent =
         "Error";
+
+
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+
 
       fetchCurrentBalance();
 
@@ -1404,7 +1579,10 @@ function renderRemittancePanel(container, contract) {
 
   }
 
-  /* ================= BALANCE ================= */
+
+  /* =====================================================
+     BALANCE
+  ===================================================== */
 
   async function fetchCurrentBalance() {
 
@@ -1413,37 +1591,60 @@ function renderRemittancePanel(container, contract) {
         `driver-balance-${contract.id}`
       );
 
+
     try {
 
       const res = await fetch(
         `${BASE_URL}/contract-balance/${contract.id}`,
         {
+          method: "GET",
+
           headers: {
             "Authorization": "Bearer " + token
           }
+
         }
       );
 
+
       if (!res.ok) {
+
+        const errorText =
+          await res.text();
+
+        console.error(
+          "BALANCE SERVER ERROR:",
+          res.status,
+          errorText
+        );
+
         throw new Error(
           "Balance server returned " +
           res.status
         );
+
       }
+
 
       const data =
         await res.json();
+
 
       console.log(
         "BALANCE DATA:",
         data
       );
 
+
       let title =
         "Up To Date";
 
+
       let colour =
         "#1b8f2a";
+
+
+      /* ================= DEBT ================= */
 
       if (
         data.type === "debt"
@@ -1456,6 +1657,10 @@ function renderRemittancePanel(container, contract) {
           "red";
 
       }
+
+
+      /* ================= CREDIT ================= */
+
       else if (
         data.type === "credit"
       ) {
@@ -1468,7 +1673,11 @@ function renderRemittancePanel(container, contract) {
 
       }
 
+
+      /* ================= DISPLAY BALANCE ================= */
+
       balanceBox.innerHTML = `
+
         ${title}:<br>
 
         <span style="
@@ -1480,15 +1689,23 @@ function renderRemittancePanel(container, contract) {
             data.balance || 0
           ).toLocaleString()}
         </span>
+
       `;
 
     }
+
+
+    /* =====================================================
+       BALANCE ERROR
+    ===================================================== */
+
     catch (err) {
 
       console.error(
         "BALANCE ERROR:",
         err
       );
+
 
       balanceBox.innerHTML =
         "Unable to load balance.";
@@ -1498,7 +1715,9 @@ function renderRemittancePanel(container, contract) {
   }
 
   }
-        
+
+
+              
 
 
         
