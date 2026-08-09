@@ -1035,11 +1035,12 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 
+
+
+
 /* ================= DRIVER REMITTANCE PANEL ================= */
 
-function renderRemittancePanel(container, contract){
-
-  const today = new Date();
+function renderRemittancePanel(container, contract) {
 
   container.innerHTML = `
     <div class="remittance-panel">
@@ -1074,11 +1075,8 @@ function renderRemittancePanel(container, contract){
 
       </div>
 
-      <div style="margin-bottom:10px;">
-        ${today.toDateString()}
-      </div>
-
-      <div class="remittance-legend">
+      <div
+        class="remittance-legend">
 
         <div class="legend-item">
           <div class="legend-color day-grey"></div>
@@ -1121,57 +1119,99 @@ function renderRemittancePanel(container, contract){
       `driver-days-${contract.id}`
     );
 
-  loadSavedRemittance(contract.id);
+  const prevBtn =
+    document.getElementById("prevWeekBtn");
 
-  fetchCurrentBalance(contract.id);
+  const nextBtn =
+    document.getElementById("nextWeekBtn");
 
-  /* ==========================================
-     LOAD REMITTANCE
-  ========================================== */
+  const weekTitle =
+    document.getElementById("weekTitle");
 
-  async function loadSavedRemittance(connectionId){
+  /* ================= LOAD DATA ================= */
 
-    try{
+  loadRemittanceData();
+
+  async function loadRemittanceData() {
+
+    try {
 
       const res = await fetch(
-        `${BASE_URL}/payment-installments/${connectionId}`,
+        `${BASE_URL}/payment-installments/${contract.id}`,
         {
-          headers:{
-            Authorization:"Bearer " + token
+          headers: {
+            "Authorization": "Bearer " + token
           }
         }
       );
 
+      if (!res.ok) {
+        throw new Error(
+          "Server returned " + res.status
+        );
+      }
+
       const rows = await res.json();
 
-      console.log(rows);
+      console.log(
+        "REMITTANCE DATA:",
+        rows
+      );
 
-      if(!Array.isArray(rows) || rows.length === 0){
+      if (
+        !Array.isArray(rows) ||
+        rows.length === 0
+      ) {
 
         daysContainer.innerHTML = `
           <div style="
             grid-column:1/-1;
             text-align:center;
             color:grey;
+            padding:15px;
           ">
             No remittance schedule available.
           </div>
         `;
 
+        weekTitle.textContent =
+          "No Schedule";
+
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+
+        fetchCurrentBalance();
+
         return;
       }
 
-      // All available weeks
-      const weeks = [...new Set(rows.map(r => r.week_number))];
+      /* ================= SORT BY DATE ================= */
 
-      // Open latest week by default
-      let currentWeekIndex = weeks.length - 1;
+      rows.sort((a, b) =>
+        new Date(a.remittance_date) -
+        new Date(b.remittance_date)
+      );
+
+      /* ================= GET WEEKS ================= */
+
+      const weeks = [
+        ...new Set(
+          rows.map(row =>
+            Number(row.week_number)
+          )
+        )
+      ].sort((a, b) => a - b);
+
+      let currentWeekIndex =
+        weeks.length - 1;
+
+      /* ================= RENDER WEEK ================= */
 
       renderWeek();
 
-      document.getElementById("prevWeekBtn").onclick = () => {
+      prevBtn.onclick = () => {
 
-        if(currentWeekIndex > 0){
+        if (currentWeekIndex > 0) {
 
           currentWeekIndex--;
 
@@ -1181,9 +1221,12 @@ function renderRemittancePanel(container, contract){
 
       };
 
-      document.getElementById("nextWeekBtn").onclick = () => {
+      nextBtn.onclick = () => {
 
-        if(currentWeekIndex < weeks.length - 1){
+        if (
+          currentWeekIndex <
+          weeks.length - 1
+        ) {
 
           currentWeekIndex++;
 
@@ -1193,62 +1236,124 @@ function renderRemittancePanel(container, contract){
 
       };
 
-      function renderWeek(){
+      function renderWeek() {
 
-        const week = weeks[currentWeekIndex];
+        const week =
+          weeks[currentWeekIndex];
 
-        document.getElementById(
-          "weekTitle"
-        ).innerHTML = `Week ${week}`;
+        weekTitle.innerHTML =
+          `Week ${week}`;
 
         daysContainer.innerHTML = "";
 
         const weekRows =
-          rows.filter(r => r.week_number === week);
+          rows.filter(row =>
+            Number(row.week_number) ===
+            Number(week)
+          );
 
-        weekRows.forEach(row=>{
+        if (!weekRows.length) {
 
-          let colour = "day-grey";
+          daysContainer.innerHTML = `
+            <div style="
+              grid-column:1/-1;
+              text-align:center;
+              color:grey;
+            ">
+              No records for this week.
+            </div>
+          `;
 
-          if(row.payment_status === "paid"){
-            colour = "day-green";
+          return;
+        }
+
+        weekRows.forEach(row => {
+
+          let colour =
+            "day-grey";
+
+          const paymentStatus =
+            String(
+              row.payment_status || ""
+            ).toLowerCase();
+
+          if (
+            paymentStatus === "paid"
+          ) {
+
+            colour =
+              "day-green";
+
           }
-          else if(row.payment_status === "partial"){
-            colour = "day-orange";
+          else if (
+            paymentStatus === "partial"
+          ) {
+
+            colour =
+              "day-orange";
+
           }
-          else if(row.payment_status === "unpaid"){
-            colour = "day-red";
+          else if (
+            paymentStatus === "unpaid"
+          ) {
+
+            colour =
+              "day-red";
+
           }
 
-          const btn = document.createElement("button");
+          const btn =
+            document.createElement(
+              "button"
+            );
 
-          btn.className = `day-btn ${colour}`;
+          btn.className =
+            `day-btn ${colour}`;
 
           btn.disabled = true;
 
+          const expected =
+            Number(
+              row.expected_amount || 0
+            );
+
+          const paid =
+            Number(
+              row.amount_paid || 0
+            );
+
           btn.innerHTML = `
-            <div style="font-size:15px;font-weight:bold;">
-              ${row.day_name}
+            <div style="
+              font-size:15px;
+              font-weight:bold;
+            ">
+              ${row.day_name || ""}
             </div>
 
-            <div style="font-size:12px;margin-top:4px;">
-              ${row.remittance_date}
+            <div style="
+              font-size:12px;
+              margin-top:4px;
+            ">
+              ${row.remittance_date || ""}
             </div>
 
-            <div style="font-size:12px;margin-top:6px;">
-              KES ${Number(
-                row.expected_amount || 0
-              ).toLocaleString()}
+            <div style="
+              font-size:12px;
+              margin-top:6px;
+            ">
+              Expected:
+              KES ${expected.toLocaleString()}
             </div>
 
             ${
-              row.amount_paid
+              paid > 0
               ? `
-                <div style="font-size:11px;">
+                <div style="
+                  font-size:11px;
+                  margin-top:3px;
+                ">
                   Paid:
-                  KES ${Number(
-                    row.amount_paid
-                  ).toLocaleString()}
+                  KES ${paid.toLocaleString()}
                 </div>
               `
               : ""
@@ -1260,70 +1365,110 @@ function renderRemittancePanel(container, contract){
 
         });
 
-        document.getElementById(
-          "prevWeekBtn"
-        ).disabled = currentWeekIndex === 0;
+        prevBtn.disabled =
+          currentWeekIndex === 0;
 
-        document.getElementById(
-          "nextWeekBtn"
-        ).disabled =
-          currentWeekIndex === weeks.length - 1;
+        nextBtn.disabled =
+          currentWeekIndex ===
+          weeks.length - 1;
 
       }
 
-    }catch(err){
+      fetchCurrentBalance();
 
-      console.log(err);
+    }
+    catch (err) {
+
+      console.error(
+        "REMITTANCE ERROR:",
+        err
+      );
 
       daysContainer.innerHTML = `
         <div style="
-          color:red;
           grid-column:1/-1;
           text-align:center;
+          color:red;
+          padding:15px;
         ">
           Failed to load remittance.
         </div>
       `;
 
+      weekTitle.textContent =
+        "Error";
+
+      fetchCurrentBalance();
+
     }
 
   }
 
-  /* ==========================================
-     BALANCE
-  ========================================== */
+  /* ================= BALANCE ================= */
 
-  async function fetchCurrentBalance(connectionId){
+  async function fetchCurrentBalance() {
 
-    try{
+    const balanceBox =
+      document.getElementById(
+        `driver-balance-${contract.id}`
+      );
+
+    try {
 
       const res = await fetch(
-        `${BASE_URL}/contract-balance/${connectionId}`,
+        `${BASE_URL}/contract-balance/${contract.id}`,
         {
-          headers:{
-            Authorization:"Bearer " + token
+          headers: {
+            "Authorization": "Bearer " + token
           }
         }
       );
 
-      const data = await res.json();
-
-      let title = "Up To Date";
-      let colour = "#1b8f2a";
-
-      if(data.type === "debt"){
-        title = "Outstanding Debt";
-        colour = "red";
+      if (!res.ok) {
+        throw new Error(
+          "Balance server returned " +
+          res.status
+        );
       }
 
-      if(data.type === "credit"){
-        title = "Credit Balance";
-        colour = "green";
+      const data =
+        await res.json();
+
+      console.log(
+        "BALANCE DATA:",
+        data
+      );
+
+      let title =
+        "Up To Date";
+
+      let colour =
+        "#1b8f2a";
+
+      if (
+        data.type === "debt"
+      ) {
+
+        title =
+          "Outstanding Debt";
+
+        colour =
+          "red";
+
+      }
+      else if (
+        data.type === "credit"
+      ) {
+
+        title =
+          "Credit Balance";
+
+        colour =
+          "green";
+
       }
 
-      document.getElementById(
-        `driver-balance-${contract.id}`
-      ).innerHTML = `
+      balanceBox.innerHTML = `
         ${title}:<br>
 
         <span style="
@@ -1337,23 +1482,22 @@ function renderRemittancePanel(container, contract){
         </span>
       `;
 
-    }catch(err){
+    }
+    catch (err) {
 
-      console.log(err);
+      console.error(
+        "BALANCE ERROR:",
+        err
+      );
 
-      document.getElementById(
-        `driver-balance-${contract.id}`
-      ).innerHTML =
-      "Unable to load balance.";
+      balanceBox.innerHTML =
+        "Unable to load balance.";
 
     }
 
   }
 
   }
-
-
-
         
 
 
