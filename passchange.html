@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Change Password - D4D</title>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+/* =========================
+   THEME
+========================= */
+
+:root {
+  --main-green: #1b8f2a;
+  --dark-green: #166d20;
+  --white: #ffffff;
+}
+
+
+/* =========================
+   RESET
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+
+/* =========================
+   BODY
+========================= */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+  background-color: var(--main-green);
+  color: var(--white);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+header .logo {
+  display: flex;
+  align-items: center;
+}
+
+header .logo img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 480px) {
+
+  header .logo img {
+    height: 28px;
+  }
+
+}
+
+
+/* =========================
+   MENU
+========================= */
+
+header .menu-icon {
+  font-size: 24px;
+  cursor: pointer;
+  display: none;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+nav.active {
+  display: block;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: var(--main-green);
+  padding: 15px;
+  border-radius: 5px;
+  width: 150px;
+  z-index: 100;
+}
+
+nav.active a {
+  display: block;
+  margin: 10px 0;
+}
+
+
+/* =========================
+   MAIN CONTAINER
+========================= */
+
+.container {
+  width: calc(100% - 30px);
+  max-width: 400px;
+  margin: 25px auto;
+  background: var(--white);
+  padding: 22px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+
+
+/* =========================
+   HEADING
+========================= */
+
+h2 {
+  color: var(--main-green);
+  text-align: center;
+  margin: 0 0 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+
+/* =========================
+   LABELS
+========================= */
+
+label {
+  font-weight: bold;
+  color: var(--main-green);
+  display: block;
+  margin-bottom: 6px;
+}
+
+
+/* =========================
+   PASSWORD INPUT
+========================= */
+
+.password-wrapper {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding: 12px 45px 12px 12px;
+  border: 2px solid var(--main-green);
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+}
+
+.password-wrapper input:focus {
+  box-shadow: 0 0 0 2px rgba(27,143,42,0.15);
+}
+
+
+/* =========================
+   PASSWORD TOGGLE
+========================= */
+
+.toggle-pass {
+  cursor: pointer;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: var(--main-green);
+  user-select: none;
+}
+
+
+/* =========================
+   PASSWORD REQUIREMENTS
+========================= */
+
+.requirements {
+  background: #f7f7f7;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: -5px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: #666;
+}
+
+.requirements-title {
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.requirement {
+  margin: 4px 0;
+}
+
+.requirement.valid {
+  color: var(--main-green);
+}
+
+.requirement.invalid {
+  color: #777;
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+button {
+  width: 100%;
+  background: var(--main-green);
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  position: relative;
+}
+
+button:hover {
+  background: var(--dark-green);
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+
+/* =========================
+   SPINNER
+========================= */
+
+.spinner {
+  display: none;
+  margin-left: 10px;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255,255,255,0.5);
+  border-top-color: white;
+  border-radius: 50%;
+  vertical-align: middle;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+.msg {
+  display: none;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 8px;
+  font-size: 15px;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.success {
+  background: #d8ffd8;
+  color: #0f6e12;
+}
+
+.error {
+  background: #ffd6d6;
+  color: #a30000;
+}
+
+
+/* =========================
+   BACK LINK
+========================= */
+
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 18px;
+  color: var(--main-green);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+  background-color: var(--main-green);
+  color: var(--white);
+  text-align: center;
+  padding: 15px;
+  margin-top: auto;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media screen and (max-width: 768px) {
+
+  nav {
+    display: none;
+    flex-direction: column;
+  }
+
+  header .menu-icon {
+    display: block;
+  }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+
+  <div class="logo">
+    <img src="assets/logo/d4d-logo.png" alt="D4D Logo">
+  </div>
+
+  <div class="menu-icon" id="menuToggle">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <nav id="navMenu">
+    <a href="driver-search.html">Home</a>
+    <a href="driver-search.html">Dashboard</a>
+    <a href="#">About</a>
+  </nav>
+
+</header>
+
+
+
+<!-- =========================
+     CHANGE PASSWORD
+========================= -->
+
+<div class="container">
+
+  <h2>Change Password</h2>
+
+  <div class="subtitle">
+    Update your D4D account password
+  </div>
+
+
+  <!-- CURRENT PASSWORD -->
+
+  <label for="currentPassword">
+    Current Password
+  </label>
+
+  <div class="password-wrapper">
+
+    <input
+      type="password"
+      id="currentPassword"
+      placeholder="Enter current password"
+      autocomplete="current-password"
+    >
+
+    <span
+      class="toggle-pass"
+      onclick="togglePassword('currentPassword', this)"
+    >👁️</span>
+
+  </div>
+
+
+
+  <!-- NEW PASSWORD -->
+
+  <label for="newPassword">
+    New Password
+  </label>
+
+  <div class="password-wrapper">
+
+    <input
+      type="password"
+      id="newPassword"
+      placeholder="Enter new password"
+      autocomplete="new-password"
+    >
+
+    <span
+      class="toggle-pass"
+      onclick="togglePassword('newPassword', this)"
+    >👁️</span>
+
+  </div>
+
+
+
+  <!-- PASSWORD REQUIREMENTS -->
+
+  <div class="requirements">
+
+    <div class="requirements-title">
+      Password must contain:
+    </div>
+
+    <div id="lengthReq" class="requirement invalid">
+      • At least 8 characters
+    </div>
+
+    <div id="upperReq" class="requirement invalid">
+      • At least one capital letter
+    </div>
+
+    <div id="lowerReq" class="requirement invalid">
+      • At least one lowercase letter
+    </div>
+
+    <div id="numberReq" class="requirement invalid">
+      • At least one number
+    </div>
+
+    <div id="specialReq" class="requirement invalid">
+      • At least one special character
+    </div>
+
+  </div>
+
+
+
+  <!-- CONFIRM PASSWORD -->
+
+  <label for="confirmPassword">
+    Confirm New Password
+  </label>
+
+  <div class="password-wrapper">
+
+    <input
+      type="password"
+      id="confirmPassword"
+      placeholder="Confirm new password"
+      autocomplete="new-password"
+    >
+
+    <span
+      class="toggle-pass"
+      onclick="togglePassword('confirmPassword', this)"
+    >👁️</span>
+
+  </div>
+
+
+
+  <!-- BUTTON -->
+
+  <button id="changeBtn">
+
+    Change Password
+
+    <span
+      class="spinner"
+      id="btnSpinner"
+    ></span>
+
+  </button>
+
+
+  <!-- MESSAGE -->
+
+  <div
+    id="msgBox"
+    class="msg"
+  ></div>
+
+
+  <a
+    href="driver-search.html"
+    class="back-link"
+  >
+    ← Back to Dashboard
+  </a>
+
+</div>
+
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+  &copy; 2025 Driver App. All rights reserved.
+
+</footer>
+
+
+
+<script>
+
+/* =====================================================
+   CHECK LOGIN TOKEN
+===================================================== */
+
+const token = localStorage.getItem("token");
+
+if (!token) {
+
+  window.location.href = "/login";
+
+}
+
+
+/* =====================================================
+   PASSWORD TOGGLE
+===================================================== */
+
+function togglePassword(id, element) {
+
+  const input = document.getElementById(id);
+
+  if (input.type === "password") {
+
+    input.type = "text";
+    element.textContent = "🙈";
+
+  } else {
+
+    input.type = "password";
+    element.textContent = "👁️";
+
+  }
+
+}
+
+
+/* =====================================================
+   SHOW MESSAGE
+===================================================== */
+
+function showMessage(text, type) {
+
+  const msg = document.getElementById("msgBox");
+
+  msg.textContent = text;
+
+  msg.className = "msg " + type;
+
+  msg.style.display = "block";
+
+}
+
+
+/* =====================================================
+   PASSWORD VALIDATION
+===================================================== */
+
+function validatePassword(password) {
+
+  return {
+
+    length: password.length >= 8,
+
+    upper: /[A-Z]/.test(password),
+
+    lower: /[a-z]/.test(password),
+
+    number: /[0-9]/.test(password),
+
+    special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+
+  };
+
+}
+
+
+/* =====================================================
+   UPDATE REQUIREMENTS VISUALLY
+===================================================== */
+
+function updateRequirements() {
+
+  const password =
+    document.getElementById("newPassword").value;
+
+  const result = validatePassword(password);
+
+
+  document.getElementById("lengthReq")
+    .className =
+    "requirement " +
+    (result.length ? "valid" : "invalid");
+
+
+  document.getElementById("upperReq")
+    .className =
+    "requirement " +
+    (result.upper ? "valid" : "invalid");
+
+
+  document.getElementById("lowerReq")
+    .className =
+    "requirement " +
+    (result.lower ? "valid" : "invalid");
+
+
+  document.getElementById("numberReq")
+    .className =
+    "requirement " +
+    (result.number ? "valid" : "invalid");
+
+
+  document.getElementById("specialReq")
+    .className =
+    "requirement " +
+    (result.special ? "valid" : "invalid");
+
+}
+
+
+document
+  .getElementById("newPassword")
+  .addEventListener("input", updateRequirements);
+
+
+
+/* =====================================================
+   CHANGE PASSWORD
+===================================================== */
+
+async function changePassword() {
+
+  const currentPassword =
+    document.getElementById("currentPassword").value;
+
+  const newPassword =
+    document.getElementById("newPassword").value;
+
+  const confirmPassword =
+    document.getElementById("confirmPassword").value;
+
+
+  /* Clear previous message */
+
+  document.getElementById("msgBox").style.display = "none";
+
+
+  /* =========================
+     FRONTEND VALIDATION
+  ========================= */
+
+  if (!currentPassword) {
+
+    showMessage(
+      "Please enter your current password.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (!newPassword) {
+
+    showMessage(
+      "Please enter your new password.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const requirements =
+    validatePassword(newPassword);
+
+
+  if (
+    !requirements.length ||
+    !requirements.upper ||
+    !requirements.lower ||
+    !requirements.number ||
+    !requirements.special
+  ) {
+
+    showMessage(
+      "Your new password does not meet all the requirements.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (newPassword !== confirmPassword) {
+
+    showMessage(
+      "The new passwords do not match.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (currentPassword === newPassword) {
+
+    showMessage(
+      "Your new password must be different from your current password.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  /* =========================
+     BUTTON LOADING
+  ========================= */
+
+  const button =
+    document.getElementById("changeBtn");
+
+  const spinner =
+    document.getElementById("btnSpinner");
+
+
+  button.disabled = true;
+
+  spinner.style.display = "inline-block";
+
+
+  try {
+
+    /* =========================
+       SEND TO FLASK
+    ========================= */
+
+    const response = await fetch(
+      "https://drivers-backend-4spp.onrender.com/change-password",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+
+          "Authorization":
+            "Bearer " + token
+        },
+
+        body: JSON.stringify({
+
+          current_password: currentPassword,
+
+          new_password: newPassword,
+
+          confirm_password: confirmPassword
+
+        })
+
+      }
+    );
+
+
+    const data = await response.json();
+
+
+    /* =========================
+       SUCCESS
+    ========================= */
+
+    if (response.ok && data.success) {
+
+      showMessage(
+        "Password changed successfully!",
+        "success"
+      );
+
+
+      /* Clear fields */
+
+      document.getElementById("currentPassword").value = "";
+
+      document.getElementById("newPassword").value = "";
+
+      document.getElementById("confirmPassword").value = "";
+
+
+      updateRequirements();
+
+
+      /*
+       * Keep the current JWT.
+       * The user remains logged in.
+       */
+
+    }
+
+
+    /* =========================
+       ERROR
+    ========================= */
+
+    else {
+
+      showMessage(
+        data.error || "Unable to change password.",
+        "error"
+      );
+
+    }
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      "Network error. Please try again.",
+      "error"
+    );
+
+  }
+
+
+  /* =========================
+     STOP LOADING
+  ========================= */
+
+  button.disabled = false;
+
+  spinner.style.display = "none";
+
+}
+
+
+
+/* =====================================================
+   BUTTON EVENT
+===================================================== */
+
+document
+  .getElementById("changeBtn")
+  .addEventListener("click", changePassword);
+
+
+
+/* =====================================================
+   RESPONSIVE MENU
+===================================================== */
+
+const menuToggle =
+  document.getElementById("menuToggle");
+
+const navMenu =
+  document.getElementById("navMenu");
+
+
+menuToggle.addEventListener("click", () => {
+
+  navMenu.classList.toggle("active");
+
+  menuToggle.innerHTML =
+    navMenu.classList.contains("active")
+
+      ? '<i class="fas fa-times"></i>'
+
+      : '<i class="fas fa-bars"></i>';
+
+});
+
+</script>
+
+</body>
+  </html>
