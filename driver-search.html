@@ -427,6 +427,7 @@ footer {
   &copy; 2025 Driver App. All rights reserved.
 </footer>
   
+                            
 <script>
 
 /* ================= CONFIG ================= */
@@ -449,12 +450,14 @@ const requestBox = document.getElementById("requestStatus");
 let currentPage = 1;
 const perPage = 4;
 let totalPages = 1;
-let requestState = null; // 🔥 track status globally
+let requestState = null;
 
 /* ================= REGISTRATION CHECK ================= */
 
 async function checkRegistration() {
+
   try {
+
     const res = await fetch(`${BASE_URL}/check-driver-status`, {
       headers: {
         "Authorization": "Bearer " + token
@@ -462,40 +465,66 @@ async function checkRegistration() {
     });
 
     if (res.status === 401) {
+
       localStorage.removeItem("token");
       window.location.href = "login.html";
+
       return false;
     }
 
     const data = await res.json();
 
     if (data.fully_registered) {
-      statusBox.className = "status-box status-complete";
-      statusBox.innerHTML = "✔ Fully Registered";
+
+      statusBox.className =
+        "status-box status-complete";
+
+      statusBox.innerHTML =
+        "✔ Fully Registered";
+
       return true;
+
     } else {
-      statusBox.className = "status-box status-incomplete";
+
+      statusBox.className =
+        "status-box status-incomplete";
+
       statusBox.innerHTML = `
         ⚠ Not Fully Registered<br>
-        <a href="continue-form.html">Complete registration</a>
-        <a href="partner-login.html" class="partner-login-link">
+
+        <a href="continue-form.html">
+          Complete registration
+        </a>
+
+        <a href="partner-login.html"
+           class="partner-login-link">
           Login as Partner
         </a>
       `;
+
       return false;
     }
 
   } catch {
-    statusBox.className = "status-box status-incomplete";
+
+    statusBox.className =
+      "status-box status-incomplete";
+
     statusBox.innerHTML = `
       ⚠ Unable to verify registration<br>
-      <a href="continue-form.html">Click to complete registration</a>
+
+      <a href="continue-form.html">
+        Click to complete registration
+      </a>
     `;
+
     return false;
   }
 }
 
+
 /* ================= REQUEST STATUS ================= */
+
 async function checkRequestStatus() {
 
   requestBox.innerHTML = `
@@ -506,27 +535,42 @@ async function checkRequestStatus() {
 
   try {
 
-    const res = await fetch(`${BASE_URL}/my-request-status`, {
-      headers: {
-        "Authorization": "Bearer " + token
+    const res = await fetch(
+      `${BASE_URL}/my-request-status`,
+      {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
       }
-    });
+    );
 
     console.log("STATUS RESPONSE:", res);
 
+    /* ================= AUTH ================= */
+
     if (res.status === 401) {
+
       localStorage.removeItem("token");
       window.location.href = "login.html";
+
       return;
     }
 
+    /* ================= SERVER ERROR ================= */
+
     if (!res.ok) {
-      throw new Error("Server returned " + res.status);
+      throw new Error(
+        "Server returned " + res.status
+      );
     }
+
+    /* ================= READ RESPONSE ================= */
 
     const data = await res.json();
 
     console.log("STATUS DATA:", data);
+
+    /* ================= NO REQUEST ================= */
 
     if (!data.success) {
 
@@ -541,39 +585,69 @@ async function checkRequestStatus() {
       return;
     }
 
+    /* ================= CONNECTION CHECK ================= */
+
     if (!data.connection) {
-      throw new Error("Connection object missing");
+      throw new Error(
+        "Connection object missing"
+      );
     }
 
     const connection = data.connection;
 
     requestState = connection.status;
 
+    /* ================= STATUS ================= */
+
     let statusText = "⏳ Pending";
     let statusClass = "status-pending";
 
-    if (connection.status === "approved") {
+    if (
+      connection.status === "approved"
+    ) {
+
       statusText = "✔ Approved";
       statusClass = "status-accepted";
+
     }
 
-    if (connection.status === "rejected") {
+    if (
+      connection.status === "rejected"
+    ) {
+
       statusText = "❌ Rejected";
       statusClass = "status-rejected";
+
     }
 
+
+    /* =====================================================
+       DISPLAY REQUEST / CONTRACT
+    ===================================================== */
+
     requestBox.innerHTML = `
+
       <div class="contract-card">
 
         <div class="contract-header">
+
           <strong class="${statusClass}">
             ${statusText}
           </strong>
+
         </div>
 
+
+        <!-- CAR IMAGE -->
+
         <div style="margin-top:10px;">
-          <img 
-            src="${connection.car_image_url || 'https://via.placeholder.com/100'}"
+
+          <img
+            src="${
+              connection.car_image_url ||
+              'https://via.placeholder.com/100'
+            }"
+
             style="
               width:100px;
               height:100px;
@@ -582,27 +656,61 @@ async function checkRequestStatus() {
               border:2px solid #1b8f2a;
             "
           >
+
         </div>
+
+
+        <!-- CAR -->
 
         <div style="margin-top:10px;">
+
           <strong>Car:</strong>
-          ${connection.car_make || ''} ${connection.car_model || ''}
+
+          ${
+            connection.car_make || ''
+          }
+
+          ${
+            connection.car_model || ''
+          }
+
         </div>
 
+
+        <!-- OWNER -->
+
         <div style="margin-top:6px;">
+
           <strong>Owner:</strong>
-          ${connection.owner_full_name || 'N/A'}
+
+          ${
+            connection.owner_full_name ||
+            'N/A'
+          }
+
         </div>
 
+
+        <!-- PHONE -->
+
         <div style="margin-top:6px;">
+
           <strong>Phone:</strong>
-          ${connection.owner_phone_number || 'N/A'}
+
+          ${
+            connection.owner_phone_number ||
+            'N/A'
+          }
+
         </div>
+
+
+        <!-- SEE CONTRACT -->
 
         ${
           connection.contract_status === "active"
           ? `
-            <button 
+            <button
               class="connect-btn"
               id="seeContractBtn"
               style="margin-top:12px;"
@@ -615,54 +723,94 @@ async function checkRequestStatus() {
 
       </div>
 
-      <!-- CONTRACT OVERLAY -->
 
-      <div id="contractOverlay" style="
-        display:none;
-        position:fixed;
-        top:0;
-        left:0;
-        width:100%;
-        height:100%;
-        background:rgba(0,0,0,0.6);
-        z-index:999;
-        justify-content:center;
-        align-items:center;
-      ">
+      <!-- ================= CONTRACT OVERLAY ================= -->
 
-        <div style="
-          background:white;
-          width:90%;
-          max-width:400px;
-          padding:20px;
-          border-radius:12px;
-        ">
+      <div
+        id="contractOverlay"
+        style="
+          display:none;
+          position:fixed;
+          top:0;
+          left:0;
+          width:100%;
+          height:100%;
+          background:rgba(0,0,0,0.6);
+          z-index:999;
+          justify-content:center;
+          align-items:center;
+        "
+      >
 
-          <h3 style="
-            color:#1b8f2a;
-            text-align:center;
-            margin-bottom:20px;
-          ">
+        <div
+          style="
+            background:white;
+            width:90%;
+            max-width:400px;
+            padding:20px;
+            border-radius:12px;
+          "
+        >
+
+          <h3
+            style="
+              color:#1b8f2a;
+              text-align:center;
+              margin-bottom:20px;
+            "
+          >
             Contract Details
           </h3>
 
-          <p>
-            <strong>Daily Amount:</strong>
-            KES ${connection.contract_amount || 0}
-          </p>
+
+          <!-- DAILY AMOUNT -->
 
           <p>
-            <strong>Work Days:</strong>
-            ${connection.work_days || 0} days/week
+
+            <strong>
+              Daily Amount:
+            </strong>
+
+            KES ${
+              connection.contract_amount || 0
+            }
+
           </p>
+
+
+          <!-- WORK DAYS -->
 
           <p>
-            <strong>Status:</strong>
-            ${connection.contract_status || "inactive"}
+
+            <strong>
+              Work Days:
+            </strong>
+
+            ${
+              connection.work_days || 0
+            }
+            days/week
+
           </p>
-          <div id="driverRemittanceContainer"></div>
 
 
+          <!-- STATUS -->
+
+          <p>
+
+            <strong>
+              Status:
+            </strong>
+
+            ${
+              connection.contract_status ||
+              "inactive"
+            }
+
+          </p>
+
+
+          <!-- CANCEL -->
 
           <button
             class="small-btn"
@@ -670,6 +818,9 @@ async function checkRequestStatus() {
           >
             Cancel Contract
           </button>
+
+
+          <!-- CLOSE -->
 
           <button
             class="connect-btn"
@@ -682,43 +833,62 @@ async function checkRequestStatus() {
         </div>
 
       </div>
+
     `;
 
-    /* ================= OVERLAY EVENTS ================= */
 
-    const overlay = document.getElementById("contractOverlay");
+    /* =====================================================
+       OVERLAY EVENTS
+    ===================================================== */
 
-    const seeBtn = document.getElementById("seeContractBtn");
+    const overlay =
+      document.getElementById(
+        "contractOverlay"
+      );
+
+    const seeBtn =
+      document.getElementById(
+        "seeContractBtn"
+      );
+
+
+    /* ================= SEE CONTRACT ================= */
 
     if (seeBtn) {
 
       seeBtn.onclick = () => {
 
-  overlay.style.display = "flex";
+        overlay.style.display = "flex";
 
-  const remittanceContainer =
-    document.getElementById(
-      "driverRemittanceContainer"
-    );
-
-  renderRemittancePanel(
-    remittanceContainer,
-    connection
-  );
-};
-    }
-
-    const closeBtn = document.getElementById("closeOverlayBtn");
-
-    if (closeBtn) {
-
-      closeBtn.onclick = () => {
-        overlay.style.display = "none";
       };
 
     }
 
-    const cancelBtn = document.getElementById("cancelContractBtn");
+
+    /* ================= CLOSE CONTRACT ================= */
+
+    const closeBtn =
+      document.getElementById(
+        "closeOverlayBtn"
+      );
+
+    if (closeBtn) {
+
+      closeBtn.onclick = () => {
+
+        overlay.style.display = "none";
+
+      };
+
+    }
+
+
+    /* ================= CANCEL CONTRACT ================= */
+
+    const cancelBtn =
+      document.getElementById(
+        "cancelContractBtn"
+      );
 
     if (cancelBtn) {
 
@@ -730,41 +900,59 @@ async function checkRequestStatus() {
 
         if (!confirmed) return;
 
+
         try {
 
           const res = await fetch(
             `${BASE_URL}/cancel-contract`,
             {
               method: "POST",
+
               headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
+                "Content-Type":
+                  "application/json",
+
+                "Authorization":
+                  "Bearer " + token
               },
+
               body: JSON.stringify({
-                connection_id: connection.id
+                connection_id:
+                  connection.id
               })
             }
           );
 
-          const result = await res.json();
+
+          const result =
+            await res.json();
+
 
           if (res.ok) {
 
-            alert("Contract cancelled");
+            alert(
+              "Contract cancelled"
+            );
 
-            overlay.style.display = "none";
+            overlay.style.display =
+              "none";
 
             checkRequestStatus();
 
           } else {
 
-            alert(result.error || "Failed");
+            alert(
+              result.error ||
+              "Failed"
+            );
 
           }
 
         } catch {
 
-          alert("Network error");
+          alert(
+            "Network error"
+          );
 
         }
 
@@ -774,973 +962,604 @@ async function checkRequestStatus() {
 
   } catch (err) {
 
-    console.error("REQUEST STATUS ERROR:", err);
+    console.error(
+      "REQUEST STATUS ERROR:",
+      err
+    );
 
     requestBox.innerHTML = `
       <div class="status-box status-incomplete">
+
         ${err.message}
+
       </div>
     `;
   }
-  }
+
+}
+
 
 /* ================= SEARCH DRIVER ================= */
 
-async function searchDriver(){
-  const plate = document.getElementById("search_plate").value.trim();
-  const msg = document.getElementById("msg");
-  const result = document.getElementById("result");
+async function searchDriver() {
+
+  const plate =
+    document
+      .getElementById("search_plate")
+      .value
+      .trim();
+
+  const msg =
+    document.getElementById("msg");
+
+  const result =
+    document.getElementById("result");
+
 
   result.innerHTML = "";
+
   msg.textContent = "";
 
-  if(!plate){
-    msg.textContent = "Please enter a number plate.";
+
+  if (!plate) {
+
+    msg.textContent =
+      "Please enter a number plate.";
+
     return;
   }
 
-  try{
+
+  try {
+
     const res = await fetch(
       `${BASE_URL}/search-driver?number_plate=${encodeURIComponent(plate)}`
     );
 
-    const data = await res.json();
 
-    if(!data.success){
-      msg.textContent = data.error || "Driver not found.";
+    const data =
+      await res.json();
+
+
+    if (!data.success) {
+
+      msg.textContent =
+        data.error ||
+        "Driver not found.";
+
       return;
     }
 
-    const driver = data.driver;
+
+    const driver =
+      data.driver;
+
 
     result.innerHTML = `
+
       <div class="driver-card">
-        <img src="${driver.profile_pic_url || 'https://via.placeholder.com/60'}">
+
+        <img
+          src="${
+            driver.profile_pic_url ||
+            'https://via.placeholder.com/60'
+          }"
+        >
+
         <div>
-          <strong>${driver.full_name}</strong><br>
+
+          <strong>
+            ${driver.full_name}
+          </strong>
+
+          <br>
+
           ${driver.number_plate}
+
         </div>
+
       </div>
+
     `;
 
   } catch {
-    msg.textContent = "Network error.";
+
+    msg.textContent =
+      "Network error.";
+
   }
+
 }
+
 
 /* ================= MENU ================= */
 
-const menuToggle = document.getElementById('menuToggle');
-const navMenu = document.getElementById('navMenu');
+const menuToggle =
+  document.getElementById(
+    "menuToggle"
+  );
 
-menuToggle.addEventListener('click', () => {
-  navMenu.classList.toggle('active');
-  menuToggle.innerHTML = navMenu.classList.contains('active')
-    ? '<i class="fas fa-times"></i>'
-    : '<i class="fas fa-bars"></i>';
-});
+const navMenu =
+  document.getElementById(
+    "navMenu"
+  );
+
+
+menuToggle.addEventListener(
+  "click",
+  () => {
+
+    navMenu.classList.toggle(
+      "active"
+    );
+
+
+    menuToggle.innerHTML =
+      navMenu.classList.contains(
+        "active"
+      )
+
+      ? '<i class="fas fa-times"></i>'
+
+      : '<i class="fas fa-bars"></i>';
+
+  }
+);
+
 
 /* ================= LOAD CARS ================= */
 
-async function loadAvailableCars(page = 1) {
-  carsContainer.innerHTML = "<p>Loading...</p>";
+async function loadAvailableCars(
+  page = 1
+) {
+
+  carsContainer.innerHTML =
+    "<p>Loading...</p>";
+
 
   try {
-    const res = await fetch(`${BASE_URL}/available-cars?page=${page}&limit=${perPage}`);
-    const data = await res.json();
 
-    if (!data.success || !data.cars.length) {
-      carsContainer.innerHTML = "<p>No available cars.</p>";
+    const res = await fetch(
+      `${BASE_URL}/available-cars?page=${page}&limit=${perPage}`
+    );
+
+
+    const data =
+      await res.json();
+
+
+    if (
+      !data.success ||
+      !data.cars.length
+    ) {
+
+      carsContainer.innerHTML =
+        "<p>No available cars.</p>";
+
       return;
     }
 
-    currentPage = data.pagination.page;
-    totalPages = data.pagination.total_pages;
 
-    renderPage(data.cars);
+    currentPage =
+      data.pagination.page;
+
+    totalPages =
+      data.pagination.total_pages;
+
+
+    renderPage(
+      data.cars
+    );
+
 
   } catch {
-    carsContainer.innerHTML = "<p>Failed to load cars.</p>";
+
+    carsContainer.innerHTML =
+      "<p>Failed to load cars.</p>";
+
   }
+
 }
+
 
 /* ================= RENDER PAGE ================= */
 
 function renderPage(cars) {
+
   carsContainer.innerHTML = "";
 
+
   cars.forEach(car => {
-    const card = createCarCard(car);
-    carsContainer.appendChild(card);
+
+    const card =
+      createCarCard(car);
+
+    carsContainer.appendChild(
+      card
+    );
+
   });
 
+
   renderPagination();
+
 }
 
+
 /* ================= CAR CARD ================= */
+
 function createCarCard(car) {
 
-  const card = document.createElement("div");
-  card.className = "car-card";
+  const card =
+    document.createElement("div");
 
-  // 🔥 determine button state based on request
-  let btnText = "Send Request";
-  let disabled = false;
+  card.className =
+    "car-card";
 
-  if (requestState === "pending") {
-    btnText = "Pending";
-    disabled = true;
+
+  /* ================= BUTTON STATE ================= */
+
+  let btnText =
+    "Send Request";
+
+  let disabled =
+    false;
+
+
+  if (
+    requestState === "pending"
+  ) {
+
+    btnText =
+      "Pending";
+
+    disabled =
+      true;
+
   }
 
-  if (requestState === "approved") {
-    btnText = "Approved";
-    disabled = true;
+
+  if (
+    requestState === "approved"
+  ) {
+
+    btnText =
+      "Approved";
+
+    disabled =
+      true;
+
   }
+
+
+  /* ================= CARD HTML ================= */
 
   card.innerHTML = `
-    <img src="${car.car_image_url || 'https://via.placeholder.com/60'}">
+
+    <img
+      src="${
+        car.car_image_url ||
+        'https://via.placeholder.com/60'
+      }"
+    >
+
     <div style="flex:1">
-      <strong>${car.car_make} ${car.car_model}</strong><br>
+
+      <strong>
+
+        ${car.car_make}
+        ${car.car_model}
+
+      </strong>
+
+      <br>
+
       ${car.number_plate}
+
     </div>
-    <button class="connect-btn" ${disabled ? "disabled" : ""}>${btnText}</button>
+
+
+    <button
+      class="connect-btn"
+      ${disabled ? "disabled" : ""}
+    >
+
+      ${btnText}
+
+    </button>
+
   `;
 
-  const btn = card.querySelector(".connect-btn");
 
-  if (disabled) return card;
+  const btn =
+    card.querySelector(
+      ".connect-btn"
+    );
+
+
+  if (disabled)
+    return card;
+
+
+  /* ================= SEND REQUEST ================= */
 
   btn.onclick = async () => {
 
-    if (!confirm(`Send request for ${car.number_plate}?`)) return;
+    if (
+      !confirm(
+        `Send request for ${car.number_plate}?`
+      )
+    ) {
 
-    const location = prompt("Enter your residential area:");
-
-    if (!location || !location.trim()) {
-      alert("Location required");
       return;
     }
 
-    btn.disabled = true;
-    btn.textContent = "Sending...";
+
+    const location =
+      prompt(
+        "Enter your residential area:"
+      );
+
+
+    if (
+      !location ||
+      !location.trim()
+    ) {
+
+      alert(
+        "Location required"
+      );
+
+      return;
+    }
+
+
+    btn.disabled =
+      true;
+
+    btn.textContent =
+      "Sending...";
+
 
     try {
 
       alert(
         "SENDING REQUEST:\n\n" +
-        "Plate: " + car.number_plate + "\n" +
-        "Location: " + location.trim()
-      );
 
-      const res = await fetch(`${BASE_URL}/send-request`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({
-          number_plate: car.number_plate,
-          location: location.trim()
-        })
-      });
+        "Plate: " +
+        car.number_plate +
 
-      const data = await res.json();
+        "\n" +
 
-      alert(
-        "SEND REQUEST RESPONSE:\n\n" +
-        "Status Code: " + res.status + "\n" +
-        "Response: " + JSON.stringify(data)
-      );
-
-      if (res.ok) {
-
-        btn.textContent = "Request Sent";
-
-        requestState = "pending";
-
-        checkRequestStatus(); // refresh UI
-
-      } else {
-
-        alert(data.error || "Failed");
-
-        btn.disabled = false;
-        btn.textContent = "Send Request";
-      }
-
-    } catch (err) {
-
-      alert(
-        "SEND REQUEST ERROR:\n\n" +
-        "Message: " + err.message
-      );
-
-      btn.disabled = false;
-      btn.textContent = "Send Request";
-    }
-  };
-
-  return card;
-  }
-
-
-/* ================= PAGINATION ================= */
-
-function renderPagination() {
-
-  const nav = document.createElement("div");
-  nav.className = "pagination";
-
-  nav.innerHTML = `
-    <button class="page-btn" ${currentPage === 1 ? "disabled" : ""}>
-      <i class="fas fa-chevron-left"></i>
-    </button>
-
-    <span class="page-info">
-      Page ${currentPage} of ${totalPages}
-    </span>
-
-    <button class="page-btn" ${currentPage === totalPages ? "disabled" : ""}>
-      <i class="fas fa-chevron-right"></i>
-    </button>
-  `;
-
-  const buttons = nav.querySelectorAll("button");
-
-  buttons[0].onclick = () => {
-    if (currentPage > 1) {
-      loadAvailableCars(currentPage - 1);
-    }
-  };
-
-  buttons[1].onclick = () => {
-    if (currentPage < totalPages) {
-      loadAvailableCars(currentPage + 1);
-    }
-  };
-
-  carsContainer.appendChild(nav);
-}
-
-/* ================= APP START ================= */
-
-window.addEventListener("DOMContentLoaded", async () => {
-
-  // registration check
-  await checkRegistration();
-
-  // ALWAYS run these
-  await checkRequestStatus();
-
-  await loadAvailableCars(1);
-
-});
-
-
-
-/* ================= DRIVER REMITTANCE PANEL ================= */
-
-function renderRemittancePanel(container, contract) {
-
-  container.innerHTML = `
-    <div class="remittance-panel">
-
-      <div style="
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-bottom:10px;
-      ">
-
-        <button
-          id="prevWeekBtn"
-          class="connect-btn"
-          style="padding:6px 10px;">
-          <i class="fas fa-chevron-left"></i>
-        </button>
-
-        <div
-          id="weekTitle"
-          class="week-title"
-          style="margin:0;">
-          Loading...
-        </div>
-
-        <button
-          id="nextWeekBtn"
-          class="connect-btn"
-          style="padding:6px 10px;">
-          <i class="fas fa-chevron-right"></i>
-        </button>
-
-      </div>
-
-      <div class="remittance-legend">
-
-        <div class="legend-item">
-          <div class="legend-color day-grey"></div>
-          Pending
-        </div>
-
-        <div class="legend-item">
-          <div class="legend-color day-green"></div>
-          Paid
-        </div>
-
-        <div class="legend-item">
-          <div class="legend-color day-red"></div>
-          Unpaid
-        </div>
-
-        <div class="legend-item">
-          <div class="legend-color day-orange"></div>
-          Partial
-        </div>
-
-      </div>
-
-      <div
-        class="day-grid"
-        id="driver-days-${contract.id}">
-      </div>
-
-      <div
-        class="balance-box"
-        id="driver-balance-${contract.id}">
-        Loading balance...
-      </div>
-
-    </div>
-  `;
-
-  const daysContainer =
-    document.getElementById(
-      `driver-days-${contract.id}`
-    );
-
-  const prevBtn =
-    document.getElementById("prevWeekBtn");
-
-  const nextBtn =
-    document.getElementById("nextWeekBtn");
-
-  const weekTitle =
-    document.getElementById("weekTitle");
-
-
-  /* =====================================================
-     LOAD REMITTANCE DATA
-  ===================================================== */
-
-  loadRemittanceData();
-
-
-  async function loadRemittanceData() {
-
-    try {
-
-      const res = await fetch(
-        `${BASE_URL}/payment-installments/${contract.id}`,
-        {
-          method: "GET",
-          headers: {
-            "Authorization": "Bearer " + token
-          }
-        }
+        "Location: " +
+        location.trim()
       );
 
 
-      /* ================= CHECK HTTP RESPONSE ================= */
+      const res =
+        await fetch(
+          `${BASE_URL}/send-request`,
+          {
+            method: "POST",
 
-      if (!res.ok) {
+            headers: {
 
-        const errorText =
-          await res.text();
+              "Content-Type":
+                "application/json",
 
-        console.error(
-          "REMITTANCE SERVER ERROR:",
-          res.status,
-          errorText
-        );
+              "Authorization":
+                "Bearer " + token
 
-        throw new Error(
-          "Server returned " + res.status
-        );
-      }
+            },
 
+            body:
+              JSON.stringify({
 
-      /* ================= READ JSON ================= */
+                number_plate:
+                  car.number_plate,
 
-      const rows =
-        await res.json();
+                location:
+                  location.trim()
 
-
-      console.log(
-        "REMITTANCE DATA:",
-        rows
-      );
-
-
-      /* =====================================================
-         CHECK DATA
-      ===================================================== */
-
-      if (
-        !Array.isArray(rows) ||
-        rows.length === 0
-      ) {
-
-        daysContainer.innerHTML = `
-          <div style="
-            grid-column:1/-1;
-            text-align:center;
-            color:grey;
-            padding:15px;
-          ">
-            No remittance schedule available.
-          </div>
-        `;
-
-        weekTitle.textContent =
-          "No Schedule";
-
-        prevBtn.disabled = true;
-        nextBtn.disabled = true;
-
-        fetchCurrentBalance();
-
-        return;
-      }
-
-
-      /* =====================================================
-         SORT BY DATE
-      ===================================================== */
-
-      rows.sort((a, b) => {
-
-        return (
-          new Date(a.remittance_date) -
-          new Date(b.remittance_date)
-        );
-
-      });
-
-
-      /* =====================================================
-         GET UNIQUE WEEKS
-      ===================================================== */
-
-      const weeks = [
-        ...new Set(
-          rows
-            .map(row =>
-              Number(row.week_number)
-            )
-            .filter(
-              week => !isNaN(week)
-            )
-        )
-      ].sort(
-        (a, b) => a - b
-      );
-
-
-      /* =====================================================
-         SAFETY CHECK
-      ===================================================== */
-
-      if (!weeks.length) {
-
-        console.error(
-          "REMITTANCE ROWS HAVE NO VALID WEEK NUMBERS:",
-          rows
-        );
-
-        daysContainer.innerHTML = `
-          <div style="
-            grid-column:1/-1;
-            text-align:center;
-            color:red;
-            padding:15px;
-          ">
-            Remittance data has no valid week number.
-          </div>
-        `;
-
-        weekTitle.textContent =
-          "Invalid Schedule";
-
-        prevBtn.disabled = true;
-        nextBtn.disabled = true;
-
-        fetchCurrentBalance();
-
-        return;
-      }
-
-
-      /* =====================================================
-         START AT LATEST WEEK
-      ===================================================== */
-
-      let currentWeekIndex =
-        weeks.length - 1;
-
-
-      /* =====================================================
-         RENDER CURRENT WEEK
-      ===================================================== */
-
-      renderWeek();
-
-
-      /* =====================================================
-         PREVIOUS WEEK
-      ===================================================== */
-
-      prevBtn.onclick = () => {
-
-        if (
-          currentWeekIndex > 0
-        ) {
-
-          currentWeekIndex--;
-
-          renderWeek();
-
-        }
-
-      };
-
-
-      /* =====================================================
-         NEXT WEEK
-      ===================================================== */
-
-      nextBtn.onclick = () => {
-
-        if (
-          currentWeekIndex <
-          weeks.length - 1
-        ) {
-
-          currentWeekIndex++;
-
-          renderWeek();
-
-        }
-
-      };
-
-
-      /* =====================================================
-         RENDER WEEK FUNCTION
-      ===================================================== */
-
-      function renderWeek() {
-
-        const week =
-          weeks[currentWeekIndex];
-
-
-        weekTitle.innerHTML =
-          `Week ${week}`;
-
-
-        daysContainer.innerHTML =
-          "";
-
-
-        const weekRows =
-          rows.filter(row => {
-
-            return (
-              Number(row.week_number) ===
-              Number(week)
-            );
-
-          });
-
-
-        /* ================= NO ROWS ================= */
-
-        if (!weekRows.length) {
-
-          daysContainer.innerHTML = `
-            <div style="
-              grid-column:1/-1;
-              text-align:center;
-              color:grey;
-              padding:15px;
-            ">
-              No records for this week.
-            </div>
-          `;
-
-          return;
-        }
-
-
-        /* =====================================================
-           RENDER EACH DAY
-        ===================================================== */
-
-        weekRows.forEach(row => {
-
-          let colour =
-            "day-grey";
-
-
-          const paymentStatus =
-            String(
-              row.payment_status || ""
-            )
-            .trim()
-            .toLowerCase();
-
-
-          /* ================= PAID ================= */
-
-          if (
-            paymentStatus === "paid"
-          ) {
-
-            colour =
-              "day-green";
+              })
 
           }
-
-
-          /* ================= PARTIAL ================= */
-
-          else if (
-            paymentStatus === "partial"
-          ) {
-
-            colour =
-              "day-orange";
-
-          }
-
-
-          /* ================= UNPAID ================= */
-
-          else if (
-            paymentStatus === "unpaid"
-          ) {
-
-            colour =
-              "day-red";
-
-          }
-
-
-          /* ================= CREATE DAY BUTTON ================= */
-
-          const btn =
-            document.createElement(
-              "button"
-            );
-
-
-          btn.className =
-            `day-btn ${colour}`;
-
-
-          btn.disabled =
-            true;
-
-
-          /* ================= AMOUNTS ================= */
-
-          const expected =
-            Number(
-              row.expected_amount || 0
-            );
-
-
-          const paid =
-            Number(
-              row.amount_paid || 0
-            );
-
-
-          /* ================= DAY CONTENT ================= */
-
-          btn.innerHTML = `
-
-            <div style="
-              font-size:15px;
-              font-weight:bold;
-            ">
-              ${row.day_name || ""}
-            </div>
-
-
-            <div style="
-              font-size:12px;
-              margin-top:4px;
-            ">
-              ${row.remittance_date || ""}
-            </div>
-
-
-            <div style="
-              font-size:12px;
-              margin-top:6px;
-            ">
-              Expected:
-              KES ${expected.toLocaleString()}
-            </div>
-
-
-            ${
-              paid > 0
-              ? `
-                <div style="
-                  font-size:11px;
-                  margin-top:3px;
-                ">
-                  Paid:
-                  KES ${paid.toLocaleString()}
-                </div>
-              `
-              : ""
-            }
-
-          `;
-
-
-          daysContainer.appendChild(
-            btn
-          );
-
-        });
-
-
-        /* =====================================================
-           PAGINATION BUTTON STATES
-        ===================================================== */
-
-        prevBtn.disabled =
-          currentWeekIndex === 0;
-
-
-        nextBtn.disabled =
-          currentWeekIndex ===
-          weeks.length - 1;
-
-      }
-
-
-      /* =====================================================
-         LOAD BALANCE
-      ===================================================== */
-
-      fetchCurrentBalance();
-
-    }
-
-
-    /* =====================================================
-       REMITTANCE ERROR
-    ===================================================== */
-
-    catch (err) {
-
-      console.error(
-        "REMITTANCE ERROR:",
-        err
-      );
-
-
-      daysContainer.innerHTML = `
-        <div style="
-          grid-column:1/-1;
-          text-align:center;
-          color:red;
-          padding:15px;
-        ">
-          Failed to load remittance.
-        </div>
-      `;
-
-
-      weekTitle.textContent =
-        "Error";
-
-
-      prevBtn.disabled = true;
-      nextBtn.disabled = true;
-
-
-      fetchCurrentBalance();
-
-    }
-
-  }
-
-
-  /* =====================================================
-     BALANCE
-  ===================================================== */
-
-  async function fetchCurrentBalance() {
-
-    const balanceBox =
-      document.getElementById(
-        `driver-balance-${contract.id}`
-      );
-
-
-    try {
-
-      const res = await fetch(
-        `${BASE_URL}/contract-balance/${contract.id}`,
-        {
-          method: "GET",
-
-          headers: {
-            "Authorization": "Bearer " + token
-          }
-
-        }
-      );
-
-
-      if (!res.ok) {
-
-        const errorText =
-          await res.text();
-
-        console.error(
-          "BALANCE SERVER ERROR:",
-          res.status,
-          errorText
         );
-
-        throw new Error(
-          "Balance server returned " +
-          res.status
-        );
-
-      }
 
 
       const data =
         await res.json();
 
 
-      console.log(
-        "BALANCE DATA:",
-        data
+      alert(
+        "SEND REQUEST RESPONSE:\n\n" +
+
+        "Status Code: " +
+        res.status +
+
+        "\n" +
+
+        "Response: " +
+        JSON.stringify(data)
       );
 
 
-      let title =
-        "Up To Date";
+      if (res.ok) {
+
+        btn.textContent =
+          "Request Sent";
+
+        requestState =
+          "pending";
 
 
-      let colour =
-        "#1b8f2a";
+        checkRequestStatus();
+
+      } else {
+
+        alert(
+          data.error ||
+          "Failed"
+        );
 
 
-      /* ================= DEBT ================= */
+        btn.disabled =
+          false;
 
-      if (
-        data.type === "debt"
-      ) {
-
-        title =
-          "Outstanding Debt";
-
-        colour =
-          "red";
+        btn.textContent =
+          "Send Request";
 
       }
 
 
-      /* ================= CREDIT ================= */
+    } catch (err) {
 
-      else if (
-        data.type === "credit"
-      ) {
+      alert(
+        "SEND REQUEST ERROR:\n\n" +
 
-        title =
-          "Credit Balance";
-
-        colour =
-          "green";
-
-      }
-
-
-      /* ================= DISPLAY BALANCE ================= */
-
-      balanceBox.innerHTML = `
-
-        ${title}:<br>
-
-        <span style="
-          color:${colour};
-          font-size:18px;
-          font-weight:bold;
-        ">
-          KES ${Number(
-            data.balance || 0
-          ).toLocaleString()}
-        </span>
-
-      `;
-
-    }
-
-
-    /* =====================================================
-       BALANCE ERROR
-    ===================================================== */
-
-    catch (err) {
-
-      console.error(
-        "BALANCE ERROR:",
-        err
+        "Message: " +
+        err.message
       );
 
 
-      balanceBox.innerHTML =
-        "Unable to load balance.";
+      btn.disabled =
+        false;
+
+      btn.textContent =
+        "Send Request";
 
     }
 
-  }
-
-  }
+  };
 
 
-              
+  return card;
+
+}
 
 
-        
+/* ================= PAGINATION ================= */
 
-/* ================= WEEK NUMBER ================= */
+function renderPagination() {
 
-function getWeekNumber(date){
+  const nav =
+    document.createElement(
+      "div"
+    );
 
-  const firstDay =
-    new Date(date.getFullYear(), 0, 1);
+  nav.className =
+    "pagination";
 
-  const pastDays =
-    (date - firstDay) / 86400000;
 
-  return Math.ceil(
-    (pastDays + firstDay.getDay() + 1) / 7
+  nav.innerHTML = `
+
+    <button
+      class="page-btn"
+      ${currentPage === 1 ? "disabled" : ""}
+    >
+
+      <i class="fas fa-chevron-left"></i>
+
+    </button>
+
+
+    <span class="page-info">
+
+      Page
+      ${currentPage}
+      of
+      ${totalPages}
+
+    </span>
+
+
+    <button
+      class="page-btn"
+      ${
+        currentPage === totalPages
+        ? "disabled"
+        : ""
+      }
+    >
+
+      <i class="fas fa-chevron-right"></i>
+
+    </button>
+
+  `;
+
+
+  const buttons =
+    nav.querySelectorAll(
+      "button"
+    );
+
+
+  /* ================= PREVIOUS ================= */
+
+  buttons[0].onclick = () => {
+
+    if (
+      currentPage > 1
+    ) {
+
+      loadAvailableCars(
+        currentPage - 1
+      );
+
+    }
+
+  };
+
+
+  /* ================= NEXT ================= */
+
+  buttons[1].onclick = () => {
+
+    if (
+      currentPage < totalPages
+    ) {
+
+      loadAvailableCars(
+        currentPage + 1
+      );
+
+    }
+
+  };
+
+
+  carsContainer.appendChild(
+    nav
   );
+
+}
+
+
+/* ================= APP START ================= */
+
+window.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    /* ================= REGISTRATION ================= */
+
+    await checkRegistration();
+
+
+    /* ================= REQUEST STATUS ================= */
+
+    await checkRequestStatus();
+
+
+    /* ================= AVAILABLE CARS ================= */
+
+    await loadAvailableCars(1);
+
   }
+);
 
 </script>
-
 
 </body>
    </html>
