@@ -737,21 +737,9 @@ async function loadContracts() {
         <strong>Work Days:</strong>
         ${contract.work_days || 0} days/week
 
-        <div
-          class="contract-status"
-          id="status-${contract.id}"
-        >
-          Checking payment...
-        </div>
-
         <button class="terminate-btn">
-          Terminate
-        </button>
-        <button class="remittance-btn">
-  Open Remittance
+  Terminate
 </button>
-
-<div class="remittance-container"></div>
       `;
 
       contractsDiv.appendChild(card);
