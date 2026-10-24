@@ -105,7 +105,7 @@ section { margin-bottom: 32px; }
   position: relative;
   background:
     linear-gradient(rgba(0,90,42,.65), rgba(0,90,42,.65)),
-    url("assets/logo/happydriver.png") center / cover no-repeat;
+    url("../assets/logo/happydriver.png") center / cover no-repeat;
   color: white;
   padding: 32px;
   overflow: hidden;
