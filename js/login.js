@@ -29,6 +29,7 @@ async function login() {
     const password = pwd.value;
     const btn = document.getElementById("loginBtn");
     const spinner = document.getElementById("btnSpinner");
+    if (btn.disabled) return;
 
     if (!email) {
         showMessage("Email is required", "error");
