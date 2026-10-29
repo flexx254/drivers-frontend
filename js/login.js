@@ -1,14 +1,20 @@
 const toggle = document.getElementById("togglePass");
 const pwd = document.getElementById("password");
 
-toggle.addEventListener("click", () => {
-  if (pwd.type === "password") {
-    pwd.type = "text";
-    toggle.textContent = "👁️";
-  } else {
+function hidePassword() {
     pwd.type = "password";
-    toggle.textContent = "🙈";
-  }
+    toggle.textContent = "👁️";
+}
+
+toggle.addEventListener("click", () => {
+    if (toggle.disabled) return;
+
+    if (pwd.type === "password") {
+        pwd.type = "text";
+        toggle.textContent = "🙈";
+    } else {
+        hidePassword();
+    }
 });
 
 function showMessage(text, type){
