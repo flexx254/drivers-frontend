@@ -1,4 +1,61 @@
-const toggle = document.getElementById("togglePass");
+[29/10, 3:22 am] Sir Felix: @app.route("/login", methods=["POST"])
+def login():
+    try:
+        data = request.get_json(force=True, silent=False) or {}
+    except Exception as e:
+        logger.exception("Failed to parse JSON body: %s", str(e))
+        return jsonify({"success": False, "error": "Invalid JSON body"}), 400
+
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+
+    if not email:
+        return jsonify({"success": False, "error": "Email is required"}), 400
+    if not password:
+        return jsonify({"success": False, "error": "Password is required"}), 400
+
+    if supabase is None:
+        return jsonify({"success": False, "error": "Database client missing"}), 500
+
+    # Fetch user
+    try:
+        response = (
+            supabase
+            .table("dere")
+            .select("*")
+            .eq("email", email)
+            .single()
+            .execute()
+        )
+        user = response.data
+    except Exception as e:
+        logger.exception("Supabase lookup error: %s", str(e))
+        return jsonify({"success": False, "error": "Database lookup failed"}), 500
+
+    if not user:
+        return jsonify({"success": False, "error": "Invalid email or password"}), 401
+
+    hashed = user.get("password")
+    if not hashed:
+        return jsonify({"success": False, "error": "User password not set"}), 500
+
+    # Check password
+    try:
+        if not bcrypt.checkpw(password.encode(), hashed.encode()):
+            return jsonify({"success": False, "error": "Invalid email or password"}), 401
+    except Exception as e:
+        logger.exception("Password check error: %s", str(e))
+        return jsonify({"success": False, "error": "Password verification failed"}), 500
+
+    # 🔥 CREATE REAL JWT TOKEN
+    access_token = create_access_token(identity=email)
+
+    return jsonify({
+        "success": True,
+        "access_token": access_token,
+        "message": "Login successful"
+    }), 200
+[29/10, 12:17 pm] Sir Felix: const toggle = document.getElementById("togglePass");
 const pwd = document.getElementById("password");
 
 toggle.addEventListener("click", () => {
@@ -18,104 +75,50 @@ function showMessage(text, type){
     msg.style.display = "block";
 }
 
-async function login() {
-    const emailInput = document.getElementById("email");
-    const pwd = document.getElementById("password");
-    const toggle = document.getElementById("togglePass");
-    const email = emailInput.value.trim().toLowerCase();
-    const password = pwd.value;
+async function login(){
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
     const btn = document.getElementById("loginBtn");
     const spinner = document.getElementById("btnSpinner");
 
-    if (!email) {
-        showMessage("Email is required", "error");
-        emailInput.focus();
-        return;
-    }
-
-    if (!password) {
-        showMessage("Password is required", "error");
-        pwd.focus();
-        return;
-    }
+    if(!email){ showMessage("Email is required","error"); return; }
+    if(!password){ showMessage("Password is required","error"); return; }
 
     btn.disabled = true;
     spinner.style.display = "inline-block";
 
-    // Hide the password immediately while login is processing
-    pwd.type = "password";
-    toggle.textContent = "👁️";
+    try{
+        const res = await fetch("https://drivers-backend-4spp.onrender.com/login", {
+            method:"POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
 
-    try {
-        const res = await fetch(
-            "https://drivers-backend-4spp.onrender.com/login",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ email, password })
-            }
-        );
+        const data = await res.json();
 
-        let data;
-
-        try {
-            data = await res.json();
-        } catch {
-            data = null;
-        }
-
-        if (res.ok && data && data.access_token) {
+        // 🔥 UPDATED PART
+        if(res.ok && data.access_token){
             showMessage("Login successful! Redirecting...", "success");
 
-            // Save the JWT token
+            // Save real JWT
             localStorage.setItem("token", data.access_token);
 
-            // Redirect to the driver search page
+            // Redirect immediately
             window.location.href = "driver-search.html";
-            return;
+        } 
+        else {
+            showMessage(data.error || "Invalid credentials", "error");
         }
 
-        // Clear the password after an unsuccessful response
-        pwd.value = "";
-        pwd.type = "password";
-        toggle.textContent = "👁️";
-
-        if (res.status === 429) {
-            showMessage(
-                "Too many login attempts. Please wait before trying again.",
-                "error"
-            );
-        } else if (res.status === 401) {
-            showMessage("Invalid email or password.", "error");
-        } else {
-            showMessage(
-                "Login could not be completed. Please try again.",
-                "error"
-            );
-        }
-
-        pwd.focus();
-
-    } catch (e) {
-        // Clear the password if the request fails
-        pwd.value = "";
-        pwd.type = "password";
-        toggle.textContent = "👁️";
-
-        showMessage(
-            "Unable to connect. Check your internet connection and try again.",
-            "error"
-        );
-
-        pwd.focus();
-
-    } finally {
-        btn.disabled = false;
-        spinner.style.display = "none";
+    } catch(e){
+        showMessage("Network error. Try again.", "error");
     }
+
+    btn.disabled = false;
+    spinner.style.display = "none";
 }
+
+document.getElementById("loginBtn").addEventListener("click", login);
 
 // ---------------------
 // RESPONSIVE MENU
