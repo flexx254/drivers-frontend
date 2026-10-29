@@ -1,3 +1,21 @@
+// Clear login details whenever the login page is opened or restored
+function clearLoginDetails() {
+    document.getElementById("email").value = "";
+    document.getElementById("password").value = "";
+
+    const pwd = document.getElementById("password");
+    pwd.type = "password";
+
+    const toggle = document.getElementById("togglePass");
+    toggle.textContent = "👁️";
+}
+
+// Clear fields when the page loads
+document.addEventListener("DOMContentLoaded", clearLoginDetails);
+
+// Clear fields when returning using the browser Back button
+window.addEventListener("pageshow", clearLoginDetails);
+
 const toggle = document.getElementById("togglePass");
 const pwd = document.getElementById("password");
 
