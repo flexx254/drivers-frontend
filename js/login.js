@@ -105,6 +105,8 @@ async function login() {
         spinner.style.display = "none";
     }
 }
+
+document.getElementById("loginBtn").addEventListener("click", login);
 // ---------------------
 // RESPONSIVE MENU
 // ---------------------
