@@ -127,3 +127,13 @@ footer {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Display messages when needed */
+.msg.show {
+    display: block;
+}
+
+/* Display spinner when login is processing */
+.spinner.visible {
+    display: inline-block;
+}
