@@ -1,3 +1,31 @@
+
+// ======================================
+// CLEAR LOGIN DETAILS
+// ======================================
+
+function clearLoginDetails() {
+    const email = document.getElementById("email");
+    const pwd = document.getElementById("password");
+    const toggle = document.getElementById("togglePass");
+    const msg = document.getElementById("msgBox");
+
+    email.value = "";
+    pwd.value = "";
+    pwd.type = "password";
+
+    toggle.textContent = "👁️";
+    toggle.setAttribute("aria-label", "Show password");
+
+    msg.textContent = "";
+    msg.className = "msg";
+}
+
+// Clear fields when the page loads
+document.addEventListener("DOMContentLoaded", clearLoginDetails);
+
+// Clear fields when returning using the browser Back button
+window.addEventListener("pageshow", clearLoginDetails);
+
 const toggle = document.getElementById("togglePass");
 const pwd = document.getElementById("password");
 
