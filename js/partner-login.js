@@ -39,11 +39,17 @@ toggle.addEventListener("click", () => {
   }
 });
 
-function showMessage(text, type){
-  const msg = document.getElementById("msgBox");
-  msg.textContent = text;
-  msg.className = `msg ${type}`;
-  msg.style.display = "block";
+// ======================================
+// DISPLAY MESSAGES
+// ======================================
+
+function showMessage(text, type) {
+
+    const msg = document.getElementById("msgBox");
+
+    msg.textContent = text;
+    msg.className = `msg show ${type}`;
+
 }
 
 async function fetchContinueToken(email) {
