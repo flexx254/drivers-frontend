@@ -137,3 +137,42 @@ footer {
 .spinner.visible {
     display: inline-block;
 }
+
+/* =====================================
+MOBILE-ONLY ACCESS
+===================================== */
+.desktop-restriction {
+display: none;
+}
+@media screen and (min-width: 769px) {
+body > *:not(.desktop-restriction) {
+    display: none !important;
+}
+
+.desktop-restriction {
+    display: flex !important;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 25px;
+    box-sizing: border-box;
+    background: #f5f5f5;
+    color: #333;
+    font-family: Arial, sans-serif;
+}
+
+.desktop-restriction .restriction-box {
+    max-width: 400px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+
+.desktop-restriction h2 {
+    color: #1b8f2a;
+}
+
+}
+
