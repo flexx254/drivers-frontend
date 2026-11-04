@@ -1,13 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Register</title>
+
+<!-- CONTENT SECURITY POLICY -->
+<meta
+  http-equiv="Content-Security-Policy"
+  content="
+    default-src 'self';
+    base-uri 'self';
+    object-src 'none';
+    frame-ancestors 'none';
+    form-action 'self';
+    script-src 'self';
+    style-src 'self' https://cdnjs.cloudflare.com;
+    font-src 'self' https://cdnjs.cloudflare.com;
+    img-src 'self' data:;
+    connect-src 'self' https://drivers-backend-4spp.onrender.com;
+    upgrade-insecure-requests;
+  "
+>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <link rel="stylesheet" href="css/drivereg.css">
-  <script src="js/drivereg.js" defer></script>
+
+<script src="js/drivereg.js" defer></script>
 
 </head>
 <body>
