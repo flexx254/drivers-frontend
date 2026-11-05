@@ -45,54 +45,105 @@
     <a href="#">About</a>
   </nav>
 </header>
-
 <div class="container">
   <h2>Create Account</h2>
 
-  <input id="name" placeholder="Enter full name" />
-  <input id="email" placeholder="Enter email" />
+  <input
+    id="name"
+    name="name"
+    type="text"
+    placeholder="Enter full name"
+    autocomplete="name"
+    required
+  />
 
-<label for="phone_number">Phone</label>
-<input id="phone_number" name="phone" type="tel" 
-       value="+254" maxlength="13" 
-       placeholder="+2547xxxxxxxx" 
-       autocomplete="tel" required
-       aria-describedby="phoneError"
-       oninput="autoInsertPrefix()" />
+  <input
+    id="email"
+    name="email"
+    type="email"
+    placeholder="Enter email"
+    autocomplete="email"
+    required
+  />
 
-<div id="phoneError" class="error" aria-live="polite" style="display:none;"></div>
-  <select id="sacco">
+  <label for="phone_number">Phone</label>
+  <input
+    id="phone_number"
+    name="phone"
+    type="tel"
+    value="+254"
+    maxlength="13"
+    placeholder="+2547xxxxxxxx"
+    autocomplete="tel"
+    inputmode="numeric"
+    required
+    aria-describedby="phoneError"
+  />
+
+  <div
+    id="phoneError"
+    class="error"
+    aria-live="polite"
+    hidden
+  ></div>
+
+  <select id="sacco" name="sacco" required>
     <option value="">Select Sacco</option>
     <option value="OOD">OOD</option>
     <option value="DOD">DOD</option>
     <option value="NONE">NONE</option>
-  
   </select>
 
   <div class="password-wrapper">
-    <input id="password" type="password" placeholder="Enter password" />
-    <span class="toggle-eye" onclick="togglePassword('password', this)">👁️</span>
+    <input
+      id="password"
+      name="password"
+      type="password"
+      placeholder="Enter password"
+      autocomplete="new-password"
+      required
+    />
+
+    <button
+      type="button"
+      class="toggle-eye"
+      data-target="password"
+      aria-label="Show password"
+    >👁️</button>
   </div>
 
   <div class="password-wrapper">
-    <input id="confirm" type="password" placeholder="Confirm password" />
-    <span class="toggle-eye" onclick="togglePassword('confirm', this)">👁️</span>
+    <input
+      id="confirm"
+      name="confirm"
+      type="password"
+      placeholder="Confirm password"
+      autocomplete="new-password"
+      required
+    />
+
+    <button
+      type="button"
+      class="toggle-eye"
+      data-target="confirm"
+      aria-label="Show confirm password"
+    >👁️</button>
   </div>
 
-  <button onclick="registerUser()">Submit</button>
-  <div id="errorBox"></div>
-  <div id="successBox"></div>
+  <button type="button" id="registerBtn">Submit</button>
 
-    <div class="extra-links">
-  <a href="/login">Already have an account? Sign In</a>
-  <a href="/forgot-password">Forgot Password?</a>
+  <div id="errorBox" role="alert" aria-live="polite"></div>
+  <div id="successBox" role="status" aria-live="polite"></div>
+
+  <div class="extra-links">
+    <a href="/login">Already have an account? Sign In</a>
+    <a href="/forgot-password">Forgot Password?</a>
   </div>
 </div>
 
-
 <footer>
   &copy; 2025 Driver App. All rights reserved.
-</footer>
+                               </footer>
 
 
 
