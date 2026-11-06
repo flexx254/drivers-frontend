@@ -28,48 +28,91 @@
 </header>
 
 <div class="container">
-  <h2>Create Account</h2>
+  <h2>Create Account</h2><input
+id="name"
+name="name"
+type="text"
+placeholder="Enter full name"
+autocomplete="name"
+maxlength="100"
+required
+/>
 
-  <input id="name" placeholder="Enter full name" />
-  <input id="email" placeholder="Enter email" />
+<input
+id="email"
+name="email"
+type="email"
+placeholder="Enter email"
+autocomplete="email"
+maxlength="254"
+required
+/>
 
 <label for="phone_number">Phone</label>
-<input id="phone_number" name="phone" type="tel" 
-       value="+254" maxlength="13" 
-       placeholder="+2547xxxxxxxx" 
-       autocomplete="tel" required
-       aria-describedby="phoneError"
-       oninput="autoInsertPrefix()" />
 
-<div id="phoneError" class="error" aria-live="polite" style="display:none;"></div>
-  <select id="sacco">
+<input
+id="phone_number"
+name="phone"
+type="tel"
+value="+254"
+maxlength="13"
+placeholder="+2547xxxxxxxx"
+autocomplete="tel"
+required
+aria-describedby="phoneError"
+/>
+
+  <div
+    id="phoneError"
+    class="error is-hidden"
+    aria-live="polite">
+  </div>  <select id="sacco" name="sacco" required>
     <option value="">Select Sacco</option>
     <option value="OOD">OOD</option>
     <option value="DOD">DOD</option>
     <option value="NONE">NONE</option>
-  
-  </select>
+  </select>  <div class="password-wrapper">
+    <input
+      id="password"
+      name="password"
+      type="password"
+      placeholder="Enter password"
+      autocomplete="new-password"
+      minlength="8"
+      required
+    /><span
+  class="toggle-eye"
+  data-password="password"
+  role="button"
+  tabindex="0"
+  aria-label="Show password"
+  aria-pressed="false">👁️</span>
 
-  <div class="password-wrapper">
-    <input id="password" type="password" placeholder="Enter password" />
-    <span class="toggle-eye" onclick="togglePassword('password', this)">👁️</span>
+  </div>  <div class="password-wrapper">
+    <input
+      id="confirm"
+      name="confirm"
+      type="password"
+      placeholder="Confirm password"
+      autocomplete="new-password"
+      minlength="8"
+      required
+    /><span
+  class="toggle-eye"
+  data-password="confirm"
+  role="button"
+  tabindex="0"
+  aria-label="Show confirm password"
+  aria-pressed="false">👁️</span>
+
+  </div><button type="button" id="registerBtn">Submit</button>
+
+  <div id="errorBox" role="alert" aria-live="polite"></div>
+  <div id="successBox" role="status" aria-live="polite"></div>  <div class="extra-links">
+    <a href="/login">Already have an account? Sign In</a>
+    <a href="/forgot-password">Forgot Password?</a>
   </div>
-
-  <div class="password-wrapper">
-    <input id="confirm" type="password" placeholder="Confirm password" />
-    <span class="toggle-eye" onclick="togglePassword('confirm', this)">👁️</span>
-  </div>
-
-  <button onclick="registerUser()">Submit</button>
-  <div id="errorBox"></div>
-  <div id="successBox"></div>
-
-    <div class="extra-links">
-  <a href="/login">Already have an account? Sign In</a>
-  <a href="/forgot-password">Forgot Password?</a>
-  </div>
-</div>
-
+      </div>
 
 <div class="desktop-overlay" aria-hidden="true">
     <div class="overlay-content">
