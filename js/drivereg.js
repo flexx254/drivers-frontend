@@ -151,7 +151,16 @@ if (!btn || !errorBox || !successBox) return;
 
 btn.classList.add("loading");
 btn.disabled = true;
+// Hide passwords immediately when Submit is pressed
+document.getElementById("password").type = "password";
+document.getElementById("confirm").type = "password";
 
+// Reset password toggle icons
+passwordToggles.forEach(toggle => {
+    toggle.textContent = "👁️";
+    toggle.setAttribute("aria-pressed", "false");
+    toggle.setAttribute("aria-label", "Show password");
+});
 errorBox.textContent = "";
 successBox.textContent = "";
 
