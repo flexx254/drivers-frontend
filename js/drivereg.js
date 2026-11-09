@@ -256,11 +256,27 @@ try {
     }
 
 
-    // SUCCESS MESSAGE
+// SUCCESS MESSAGE
 
-    successBox.textContent =
-        "Registration complete! Check your email to continue ✔";
+successBox.textContent =
+    "Registration complete! Check your email to continue ✔";
 
+// CLEAR FORM FIELDS
+
+document.getElementById("name").value = "";
+document.getElementById("email").value = "";
+document.getElementById("phone_number").value = "+254";
+document.getElementById("sacco").value = "";
+document.getElementById("password").value = "";
+document.getElementById("confirm").value = "";
+
+// RESET PASSWORD VISIBILITY
+
+passwordToggles.forEach(toggle => {
+    toggle.textContent = "👁️";
+    toggle.setAttribute("aria-pressed", "false");
+    toggle.setAttribute("aria-label", "Show password");
+});
 
 } catch (err) {
 
