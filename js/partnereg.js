@@ -1,17 +1,36 @@
 /* ===============================
    PASSWORD TOGGLE
 ================================ */
-function togglePassword(id, el) {
-  const input = document.getElementById(id);
-  if (input.type === "password") {
-    input.type = "text";
-    el.textContent = "🙈";
-  } else {
-    input.type = "password";
-    el.textContent = "👁️";
-  }
-}
+document.querySelectorAll(".toggle-eye").forEach((toggle) => {
 
+  function changeVisibility() {
+    const input = document.getElementById(toggle.dataset.password);
+
+    if (!input) return;
+
+    if (input.type === "password") {
+      input.type = "text";
+      toggle.textContent = "🙈";
+      toggle.setAttribute("aria-label", "Hide password");
+      toggle.setAttribute("aria-pressed", "true");
+    } else {
+      input.type = "password";
+      toggle.textContent = "👁️";
+      toggle.setAttribute("aria-label", "Show password");
+      toggle.setAttribute("aria-pressed", "false");
+    }
+  }
+
+  toggle.addEventListener("click", changeVisibility);
+
+  toggle.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      changeVisibility();
+    }
+  });
+
+});
 /* ===============================
    RESPONSIVE MENU
 ================================ */
