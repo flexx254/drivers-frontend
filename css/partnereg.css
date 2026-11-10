@@ -136,6 +136,17 @@ button:hover {
   text-align: center;
 }
 
+/* PHONE VALIDATION MESSAGE */
+.error {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.is-hidden {
+  display: none;
+}
+
 /* PASSWORD TOGGLE */
 .password-wrapper {
   position: relative;
