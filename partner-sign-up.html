@@ -43,29 +43,61 @@
   <h2>Create Account</h2>
 
   <input id="name" placeholder="Enter full name" />
+
   <input id="email" placeholder="Enter email" />
 
-<label for="phone_number">Phone</label>
-<input id="phone_number" name="phone" type="tel" 
-       value="+254" maxlength="13" 
-       placeholder="+2547xxxxxxxx" 
-       autocomplete="tel" required
-       aria-describedby="phoneError"
-       oninput="autoInsertPrefix()" />
+  <label for="phone_number">Phone</label>
 
-<div id="phoneError" class="error" aria-live="polite" style="display:none;"></div>
+  <input
+    id="phone_number"
+    name="phone"
+    type="tel"
+    value="+254"
+    maxlength="13"
+    placeholder="+2547xxxxxxxx"
+    autocomplete="tel"
+    required
+    aria-describedby="phoneError"
+  />
+
+  <div id="phoneError"
+       class="error is-hidden"
+       aria-live="polite"></div>
 
   <div class="password-wrapper">
-    <input id="password" type="password" placeholder="Enter password" />
-    <span class="toggle-eye" onclick="togglePassword('password', this)">👁️</span>
+    <input
+      id="password"
+      type="password"
+      placeholder="Enter password"
+    />
+
+    <span
+      class="toggle-eye"
+      data-password="password"
+      role="button"
+      tabindex="0"
+      aria-label="Show password"
+      aria-pressed="false">👁️</span>
   </div>
 
   <div class="password-wrapper">
-    <input id="confirm" type="password" placeholder="Confirm password" />
-    <span class="toggle-eye" onclick="togglePassword('confirm', this)">👁️</span>
+    <input
+      id="confirm"
+      type="password"
+      placeholder="Confirm password"
+    />
+
+    <span
+      class="toggle-eye"
+      data-password="confirm"
+      role="button"
+      tabindex="0"
+      aria-label="Show password"
+      aria-pressed="false">👁️</span>
   </div>
 
-  <button onclick="registerUser()">Submit</button>
+  <button type="button" id="registerBtn">Submit</button>
+
   <div id="errorBox"></div>
   <div id="successBox"></div>
 
