@@ -265,26 +265,33 @@ async function changePassword() {
     const data = await response.json();
 
 
-    /* =========================
-       SUCCESS
-    ========================= */
+/* =========================
+   SUCCESS
+========================= */
 
-    if (response.ok && data.success) {
+if (response.ok && data.success) {
 
-      showMessage(
-        "Password changed successfully!",
-        "success"
-      );
+  showMessage(
+    "Password changed successfully! Redirecting you to login...",
+    "success"
+  );
 
-      document.getElementById("currentPassword").value = "";
+  // Clear password fields
+  document.getElementById("currentPassword").value = "";
+  document.getElementById("newPassword").value = "";
+  document.getElementById("confirmPassword").value = "";
 
-      document.getElementById("newPassword").value = "";
+  updateRequirements();
 
-      document.getElementById("confirmPassword").value = "";
+  // Remove the current login token
+  localStorage.removeItem("token");
 
-      updateRequirements();
+  // Redirect to driver login after 2 seconds
+  setTimeout(() => {
+    window.location.replace("login.html");
+  }, 2000);
 
-    }
+}
 
 
     /* =========================
