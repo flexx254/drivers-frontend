@@ -290,8 +290,8 @@ if (response.ok && data.success) {
 
   // Redirect to driver login after 2 seconds
   setTimeout(() => {
-    window.location.replace("login.html");
-  }, 2000);
+  window.location.replace(loginPage);
+}, 2000);
 
 }
 
