@@ -4,7 +4,7 @@
 
 const token = localStorage.getItem("token");
 
-const loginPage = document.body.dataset.loginPage || "login.html";
+const loginPage = document.body.dataset.loginPage || "partner-login.html";
 
 if (!token) {
   window.location.replace(loginPage);
