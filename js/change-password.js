@@ -1,6 +1,3 @@
-
-
-
 /* =====================================================
    CHECK LOGIN TOKEN
 ===================================================== */
@@ -8,9 +5,7 @@
 const token = localStorage.getItem("token");
 
 if (!token) {
-
   window.location.href = "/login";
-
 }
 
 
@@ -18,23 +13,45 @@ if (!token) {
    PASSWORD TOGGLE
 ===================================================== */
 
-function togglePassword(id, element) {
+document.querySelectorAll(".toggle-pass").forEach(toggle => {
 
-  const input = document.getElementById(id);
+  function togglePassword() {
 
-  if (input.type === "password") {
+    const id = toggle.dataset.target;
+    const input = document.getElementById(id);
 
-    input.type = "text";
-    element.textContent = "🙈";
+    if (!input) return;
 
-  } else {
+    if (input.type === "password") {
 
-    input.type = "password";
-    element.textContent = "👁️";
+      input.type = "text";
+      toggle.textContent = "🙈";
+      toggle.setAttribute("aria-pressed", "true");
+
+    } else {
+
+      input.type = "password";
+      toggle.textContent = "👁️";
+      toggle.setAttribute("aria-pressed", "false");
+
+    }
 
   }
 
-}
+  toggle.addEventListener("click", togglePassword);
+
+  toggle.addEventListener("keydown", event => {
+
+    if (event.key === "Enter" || event.key === " ") {
+
+      event.preventDefault();
+      togglePassword();
+
+    }
+
+  });
+
+});
 
 
 /* =====================================================
@@ -46,9 +63,7 @@ function showMessage(text, type) {
   const msg = document.getElementById("msgBox");
 
   msg.textContent = text;
-
   msg.className = "msg " + type;
-
   msg.style.display = "block";
 
 }
@@ -88,35 +103,20 @@ function updateRequirements() {
 
   const result = validatePassword(password);
 
+  document.getElementById("lengthReq").className =
+    "requirement " + (result.length ? "valid" : "invalid");
 
-  document.getElementById("lengthReq")
-    .className =
-    "requirement " +
-    (result.length ? "valid" : "invalid");
+  document.getElementById("upperReq").className =
+    "requirement " + (result.upper ? "valid" : "invalid");
 
+  document.getElementById("lowerReq").className =
+    "requirement " + (result.lower ? "valid" : "invalid");
 
-  document.getElementById("upperReq")
-    .className =
-    "requirement " +
-    (result.upper ? "valid" : "invalid");
+  document.getElementById("numberReq").className =
+    "requirement " + (result.number ? "valid" : "invalid");
 
-
-  document.getElementById("lowerReq")
-    .className =
-    "requirement " +
-    (result.lower ? "valid" : "invalid");
-
-
-  document.getElementById("numberReq")
-    .className =
-    "requirement " +
-    (result.number ? "valid" : "invalid");
-
-
-  document.getElementById("specialReq")
-    .className =
-    "requirement " +
-    (result.special ? "valid" : "invalid");
+  document.getElementById("specialReq").className =
+    "requirement " + (result.special ? "valid" : "invalid");
 
 }
 
@@ -124,7 +124,6 @@ function updateRequirements() {
 document
   .getElementById("newPassword")
   .addEventListener("input", updateRequirements);
-
 
 
 /* =====================================================
@@ -142,10 +141,9 @@ async function changePassword() {
   const confirmPassword =
     document.getElementById("confirmPassword").value;
 
+  const msgBox = document.getElementById("msgBox");
 
-  /* Clear previous message */
-
-  document.getElementById("msgBox").style.display = "none";
+  msgBox.style.display = "none";
 
 
   /* =========================
@@ -176,9 +174,7 @@ async function changePassword() {
   }
 
 
-  const requirements =
-    validatePassword(newPassword);
-
+  const requirements = validatePassword(newPassword);
 
   if (
     !requirements.length ||
@@ -226,12 +222,9 @@ async function changePassword() {
      BUTTON LOADING
   ========================= */
 
-  const button =
-    document.getElementById("changeBtn");
+  const button = document.getElementById("changeBtn");
 
-  const spinner =
-    document.getElementById("btnSpinner");
-
+  const spinner = document.getElementById("btnSpinner");
 
   button.disabled = true;
 
@@ -252,8 +245,7 @@ async function changePassword() {
         headers: {
           "Content-Type": "application/json",
 
-          "Authorization":
-            "Bearer " + token
+          "Authorization": "Bearer " + token
         },
 
         body: JSON.stringify({
@@ -284,23 +276,13 @@ async function changePassword() {
         "success"
       );
 
-
-      /* Clear fields */
-
       document.getElementById("currentPassword").value = "";
 
       document.getElementById("newPassword").value = "";
 
       document.getElementById("confirmPassword").value = "";
 
-
       updateRequirements();
-
-
-      /*
-       * Keep the current JWT.
-       * The user remains logged in.
-       */
 
     }
 
@@ -321,26 +303,20 @@ async function changePassword() {
 
   } catch (error) {
 
-    console.error(error);
-
     showMessage(
       "Network error. Please try again.",
       "error"
     );
 
+  } finally {
+
+    button.disabled = false;
+
+    spinner.style.display = "none";
+
   }
 
-
-  /* =========================
-     STOP LOADING
-  ========================= */
-
-  button.disabled = false;
-
-  spinner.style.display = "none";
-
 }
-
 
 
 /* =====================================================
@@ -352,28 +328,31 @@ document
   .addEventListener("click", changePassword);
 
 
-
 /* =====================================================
    RESPONSIVE MENU
 ===================================================== */
 
-const menuToggle =
-  document.getElementById("menuToggle");
+const menuToggle = document.getElementById("menuToggle");
 
-const navMenu =
-  document.getElementById("navMenu");
+const navMenu = document.getElementById("navMenu");
+
+const menuIcon = menuToggle.querySelector("i");
 
 
 menuToggle.addEventListener("click", () => {
 
   navMenu.classList.toggle("active");
 
-  menuToggle.innerHTML =
-    navMenu.classList.contains("active")
+  if (navMenu.classList.contains("active")) {
 
-      ? '<i class="fas fa-times"></i>'
+    menuIcon.classList.remove("fa-bars");
+    menuIcon.classList.add("fa-times");
 
-      : '<i class="fas fa-bars"></i>';
+  } else {
+
+    menuIcon.classList.remove("fa-times");
+    menuIcon.classList.add("fa-bars");
+
+  }
 
 });
-
