@@ -4,8 +4,10 @@
 
 const token = localStorage.getItem("token");
 
+const loginPage = document.body.dataset.loginPage || "login.html";
+
 if (!token) {
-  window.location.href = "/login.html";
+  window.location.replace(loginPage);
 }
 
 
