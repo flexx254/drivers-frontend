@@ -204,3 +204,20 @@ display: none;
 animation: none;
 }
 }
+
+
+/* FORGOT PASSWORD LINK */
+
+.forgot-password {
+    display: block;
+    text-align: right;
+    margin: 8px 0 18px;
+    color: #005a2a;
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
