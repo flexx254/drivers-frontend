@@ -210,13 +210,14 @@ animation: none;
 
 .forgot-password {
   display: block;
-  width: fit-content;
-  margin: -12px 0 18px auto;
+  text-align: right;
+  margin-top: -15px;
+  margin-bottom: 15px;
   color: #005a2a;
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
-}
+    }
 
 .forgot-password:hover {
   text-decoration: underline;
