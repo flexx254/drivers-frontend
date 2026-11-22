@@ -187,3 +187,24 @@ footer {
         line-height: 1.6;
     }
 }
+
+/* FORGOT PASSWORD LINK */
+
+.forgot-password {
+  display: block;
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  text-align: right;
+  margin: -12px 0 18px;
+  padding: 5px 0;
+  color: #005a2a;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+    }
