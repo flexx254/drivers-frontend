@@ -80,38 +80,7 @@
 
    <script>
 
-("btnSpinner").style.display = "block";
-){
-        showMessage("Number plate is required.","error");
-        hideSpinner();
-        return;
-    }
-
-    // --- Update ID ---
-    try{
-        const formID = new FormData();
-        formID.append("id_number", id);
-
-        const resID = await fetch("https://drivers-backend-4spp.onrender.com/update-id", {
-            method:"POST",
-            headers: {
-                "Authorization": "Bearer " + getToken()
-            },
-            body:formID
-        });
-
-        if(handleUnauthorized(resID)) return;
-
-        const dataID = await resID.json();
-        if(!dataID.success){
-            showMessage(dataID.error || "Error saving ID number","error");
-            hideSpinner();
-            return;
-        }
-
-    }catch(e){
-        showMessage("Network error updating ID number.","error");
-        hideSpinner();
+);
         return;
     }
 
