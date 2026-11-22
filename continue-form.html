@@ -81,30 +81,7 @@
    <script>
 
 ("btnSpinner").style.display = "block";
-}
-
-function hideSpinner(){
-    const btn = document.getElementById("saveBtn");
-    btn.disabled = false;
-    document.getElementById("btnSpinner").style.display = "none";
-}
-
-// ============================
-// SAVE DETAILS FUNCTION
-// ============================
-async function saveDetails(){
-    showSpinner();
-
-    const id = document.getElementById("id_number").value.trim();
-    const plate = document.getElementById("number_plate").value.trim();
-
-    if(!id){
-        showMessage("ID number is required.","error");
-        hideSpinner();
-        return;
-    }
-
-    if(!plate){
+){
         showMessage("Number plate is required.","error");
         hideSpinner();
         return;
