@@ -210,15 +210,19 @@ animation: none;
 
 .forgot-password {
   display: block;
+  position: relative;
+  z-index: 10;
+  width: 100%;
   text-align: right;
-  margin-top: -15px;
-  margin-bottom: 15px;
+  margin: -12px 0 18px;
+  padding: 5px 0;
   color: #005a2a;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   text-decoration: none;
-    }
+  cursor: pointer;
+}
 
 .forgot-password:hover {
   text-decoration: underline;
-      }
+}
