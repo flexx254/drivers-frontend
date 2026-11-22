@@ -115,3 +115,18 @@ footer {
   padding: 15px;
   margin-top: auto;
 }
+
+/* HIDDEN ELEMENTS */
+.preview[hidden] {
+    display: none !important;
+}
+
+/* MESSAGE VISIBILITY */
+.msg.show {
+    display: block;
+}
+
+/* SPINNER VISIBILITY */
+.spinner.show {
+    display: block;
+}
