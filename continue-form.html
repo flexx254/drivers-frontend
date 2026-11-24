@@ -46,8 +46,25 @@
     <label for="id_number">Enter Your ID Number</label>
     <input type="text" id="id_number" placeholder="e.g. 12345678">
 
+<!-- CAR AVAILABILITY -->
+<label for="has_car">Do you currently have a car to work with?</label>
+
+<select id="has_car">
+    <option value="">Select an option</option>
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+</select>
+
+<!-- NUMBER PLATE: SHOWN ONLY WHEN YES IS SELECTED -->
+<div id="numberPlateField" hidden>
     <label for="number_plate">Enter Your Number Plate</label>
-    <input type="text" id="number_plate" placeholder="e.g. KDK 123A">
+    <input
+        type="text"
+        id="number_plate"
+        placeholder="e.g. KDK 123A"
+        autocomplete="off"
+    >
+    </div>
 
     <label>Upload Profile Picture</label>
     <img id="preview" class="preview" hidden>
