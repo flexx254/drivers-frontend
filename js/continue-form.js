@@ -46,6 +46,37 @@ setupPreview("psv_badge", "psv_preview");
 setupPreview("good_conduct", "gc_preview");
 
 // ============================
+// CAR AVAILABILITY
+// ============================
+const hasCarSelect = document.getElementById("has_car");
+const numberPlateField = document.getElementById("numberPlateField");
+const numberPlateInput = document.getElementById("number_plate");
+
+function updateCarField() {
+
+    if (hasCarSelect.value === "yes") {
+
+        numberPlateField.hidden = false;
+        numberPlateInput.value = "";
+
+    } else if (hasCarSelect.value === "no") {
+
+        numberPlateField.hidden = true;
+        numberPlateInput.value = "NONE";
+
+    } else {
+
+        numberPlateField.hidden = true;
+        numberPlateInput.value = "";
+    }
+}
+
+hasCarSelect.addEventListener("change", updateCarField);
+
+// Set initial state
+updateCarField();
+
+// ============================
 // HANDLE 401
 // ============================
 function handleUnauthorized(res) {
@@ -157,7 +188,12 @@ async function saveDetails() {
     showSpinner();
 
     const id = document.getElementById("id_number").value.trim();
-    const plate = document.getElementById("number_plate").value.trim();
+
+    const hasCar = hasCarSelect.value;
+
+    const plate = hasCar === "no"
+        ? "NONE"
+        : numberPlateInput.value.trim();
 
     if (!id) {
 
@@ -167,7 +203,17 @@ async function saveDetails() {
         return;
     }
 
-    if (!plate) {
+    // Validate car selection
+    if (!hasCar) {
+
+        showMessage("Please indicate whether you have a car.", "error");
+        hideSpinner();
+
+        return;
+    }
+
+    // Validate number plate when driver has a car
+    if (hasCar === "yes" && !plate) {
 
         showMessage("Number plate is required.", "error");
         hideSpinner();
